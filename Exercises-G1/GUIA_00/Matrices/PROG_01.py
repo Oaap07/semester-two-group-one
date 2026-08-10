@@ -1,6 +1,6 @@
 """
 PROG_01: Desarrollar un juego de mapa del tesoro. El jugador debe encontrar un
-tesoro escondido en una matriz, con pistas limitadas Requisitos del
+tesoro escosndido en una matriz, con pistas limitada Requisitos del
 juego:
 - Crear una matriz de tamaño n x n con números o símbolos (n es
 ingresado por el usuario, se debe validar sea un entero).
