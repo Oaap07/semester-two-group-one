@@ -3,7 +3,6 @@ pila_aux = []
 pila_ordenada = []
 
 while (len(pila_desordenada) + len(pila_aux)) != 0:
-
     pila_ordenada.append(pila_desordenada.pop())
 
     while len(pila_desordenada) > 0:
