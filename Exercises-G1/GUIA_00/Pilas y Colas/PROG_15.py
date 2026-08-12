@@ -5,6 +5,7 @@ A medida que llegan paquetes con pesos aleatorios, se deben apilar
 en el vagón actual. Cuando el siguiente paquete supere la capacidad
 restante del vagón, ese vagón se "sella" y se debe pasar al siguiente
 vagón (siguiente pila). Funciones a desarrollar:
+
     1. generar_paquete(peso_min, peso_max): Función que retorna
     aleatoriamente el peso de un paquete a cargar. Recomendación: 
     Los paquetes pesan entre 10 y 40.
@@ -21,32 +22,40 @@ vagón (siguiente pila). Funciones a desarrollar:
 """
 import random 
 
-def generar_paquete():
-    paquete = random.randint(10,41)
+def generar_paquete(min, max):
+    paquete = (id_producto, random.randint(min, max))
     return paquete
 
-def cargar_vagon(n):
-    tren = []
-    peso = 0
-    paquete = 0
-    for i in range(n):
-        peso = paquete
-        while peso < 150:
-            paquete = generar_paquete()
-            peso += paquete
-            if len(tren) == 0:
-                tren.append([])
-                tren[i].append(paquete)
-            elif peso > 150 and len(tren) <= (n-1):
-                tren.append([])
-                tren[i+1].append(paquete)
-            elif peso < 150:
-                tren[i].append(paquete)
-            
+def cargar_vagon(tren, n, paquete):
 
-    return tren
+    for i in matriz:
+        peso_vagon = 0
+        for j in i:
+            peso_vagon += j[1]
+        
+    if len(tren) == 0 or ((peso_vagon + paquete[1]) >= 150 and len(matriz) < vagones):
+        tren.append([])
+    elif len(matriz) == vagones and (peso_vagon + paquete[1]) >= 150:
+        return tren, -1
+    
+    tren[n].append(paquete)
 
-matriz = cargar_vagon(29)
-print(matriz)
-for i in range(len(matriz)):
-    print(f"vagon : {i+1} pesa : {sum(matriz[i])}")
+    return tren, id_producto
+
+vagones = int(input("Ingrese la cantidad de vagones: "))
+matriz = []
+id_producto = 0
+
+while id_producto != -1: #  id_producto se usa como índice de productos y como flag
+
+    id_producto += 1
+    paquete = generar_paquete(10, 41) #  Se llama a la función generar_paquete con los límites de peso de los paquetes
+    matriz, id_producto = cargar_vagon(matriz, -1, paquete) #  Mandamos una matriz vacía (tren) y un número ingresado para la cantidad de "vagones" (n).
+
+
+#  Sección únicamente de Muestro
+print()
+for i in matriz:
+    print(f"Vagón[{matriz.index(i)+1}] | Pesa: {sum([j[1] for j in i])} kg")
+print()
+[print(i) for i in matriz]

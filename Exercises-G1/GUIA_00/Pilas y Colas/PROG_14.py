@@ -14,21 +14,20 @@ Camión Sano y Pila Camión Defectuoso). Funciones a desarrollar:
         3. Retorno: Un resumen con la cantidad total de productos clasificados.
 """
 
-
-def clasificar_productos(pila_recepcion): #funcion
+def clasificar_productos(pila_recepcion):
 
     camion_envio = []
-    defectuoso = []
+    camion_defectuoso = []
 
     while len(pila_recepcion) > 0:
 
         if pila_recepcion[0][1] == "correcto":
-            camion_envio.append(pila_recepcion.pop(0))
+            camion_envio.append(pila_recepcion.pop(0)) #  Sacamos el siguiente elemento con la etiqueta "correcto"
 
         elif pila_recepcion[0][1] == "defectuoso":
-            defectuoso.append(pila_recepcion.pop(0))
+            camion_defectuoso.append(pila_recepcion.pop(0)) #  Sacamos el siguiente elemento con la etiqueta "defectuoso"
 
-    return camion_envio, defectuoso
+    return camion_envio, camion_defectuoso #  Envío las dos listas juntas.
 
 pila_recepcion = [
         (1, "correcto"),
@@ -41,6 +40,7 @@ pila_recepcion = [
         (8, "defectuoso"),
 ]
 
-resultado = clasificar_productos(pila_recepcion)
-print(resultado)
-print(pila_recepcion)
+resultado = clasificar_productos(pila_recepcion) #  Regresa una tupla con las dos listas como elementos. 
+
+print(f"\nProductos dentro del Camión Envío: {[i[0] for i in resultado[0]]}") #  Muestro los productos en buen estado.
+print(f"Productos dentro del Camión Defectuoso: {[i[0] for i in resultado[1]]}\n") #  Muestro los productos defectuosos.
