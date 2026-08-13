@@ -16,3 +16,69 @@ y se lo elimina de la lista).Importante: si no hay pacientes, no podemos
 eliminar de la lista, por lo que debemos validar que haya pacientes para
 que no interrumpa el programa.
 """
+def Cargar_Paciente(Db_Pacientes):
+    
+    #indice [0]:dni [1]: nombre [2]:apellido
+    Nuevo_Paciente = ["","",""]
+    
+    Nuevo_Paciente[1] = input("Ingrese el Nombre del paciente: ")
+    
+    Nuevo_Paciente[2] = input("Ingrese el Apellido del paciente: ")
+    
+    Ingresar_DNI = input("Ingrese el DNI del paciente EJEMPO:[xxxxxxx]: ")
+    
+    for f in range(len(Db_Pacientes)):
+        for c in range(len(Db_Pacientes)):
+            if Db_Pacientes[f][0] == Ingresar_DNI:
+                print("DNI ya reguistrado")
+                break
+            else:
+                
+                Nuevo_Paciente[0] = Ingresar_DNI
+
+    Db_Pacientes.append(Nuevo_Paciente)
+
+    return Db_Pacientes
+
+def Mostrar_Paciente_espera(Db_Pacientes):
+    
+    contador_de_turnos = 0
+    
+    print("---------------------------")
+    print("Mostrando Pacientes...")
+    print("---------------------------")
+    for Paciente in Db_Pacientes:
+        contador_de_turnos += 1
+        print(f""" Turno:{(contador_de_turnos)}
+            DNI: {Paciente[0]} | Nombre: {Paciente[1]} | Apellido: {Paciente[2]}""")
+        
+        print()
+
+def Atender_paciente(Db_Pacientes):
+    
+    print("---------------------------")
+    print("Atendiendo Paciente...")
+    print("---------------------------")
+    print(f"DNI: {Db_Pacientes[0][0]} | Nombre: {Db_Pacientes[0][1]} | Apellido: {Db_Pacientes[0][2]}")
+    Db_Pacientes.pop(0)
+    print()
+
+Db_Pacientes = []
+
+while True:
+    print()
+    print("---------------------------")
+    print("Menu De Administracion")
+    print("---------------------------")
+    print("""Opcciones:
+        [0]:Cerrar
+        [1]:Agregar un paciente
+        [2]:Mostrar lista de espera
+        [3]:Atender paciente
+        """)
+    Opccion = input("Eleccion: ")
+
+    if Opccion == "0":break
+    elif Opccion == "1": Cargar_Paciente(Db_Pacientes)
+    elif Opccion == "2": Mostrar_Paciente_espera(Db_Pacientes)
+    elif Opccion == "3": Atender_paciente(Db_Pacientes)
