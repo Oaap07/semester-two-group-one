@@ -17,25 +17,20 @@ eliminar de la lista, por lo que debemos validar que haya pacientes para
 que no interrumpa el programa.
 """
 def Cargar_Paciente(Db_Pacientes):
+    Ingresar_DNI = input("Ingrese el DNI del paciente EJEMPLO:[xxxxxxx]: ")
     
-    #indice [0]:dni [1]: nombre [2]:apellido
-    Nuevo_Paciente = ["","",""]
-    
-    Nuevo_Paciente[1] = input("Ingrese el Nombre del paciente: ")
-    
-    Nuevo_Paciente[2] = input("Ingrese el Apellido del paciente: ")
-    
-    Ingresar_DNI = input("Ingrese el DNI del paciente EJEMPO:[xxxxxxx]: ")
-    
-    for f in range(len(Db_Pacientes)):
-        for c in range(len(Db_Pacientes)):
-            if Db_Pacientes[f][0] == Ingresar_DNI:
-                print("DNI ya reguistrado")
-                break
-            else:
-                
-                Nuevo_Paciente[0] = Ingresar_DNI
+    # Comprobar si el DNI ya existe en la lista de pacientes
+    for paciente in Db_Pacientes:
+        if paciente[0] == Ingresar_DNI:
+            print("---------------------------")
+            print("DNI ya registrado")
+            print("---------------------------")
+            return Db_Pacientes  # Cancela la carga sin modificar la lista
 
+    nombre = input("Ingrese el Nombre del paciente: ")
+    apellido = input("Ingrese el Apellido del paciente: ")
+
+    Nuevo_Paciente = [Ingresar_DNI, nombre, apellido]
     Db_Pacientes.append(Nuevo_Paciente)
 
     return Db_Pacientes
