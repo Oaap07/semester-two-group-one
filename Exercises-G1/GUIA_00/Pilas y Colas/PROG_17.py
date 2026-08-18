@@ -74,8 +74,9 @@ def Atender_paciente(Db_Pacientes):
     print()
 
 Db_Pacientes = []
+aux = True
 
-while True:
+while aux:
     print()
     print("---------------------------")
     print("Menu De Administracion")
@@ -88,7 +89,7 @@ while True:
         """)
     Opccion = input("Eleccion: ")
 
-    if Opccion == "0":break
+    if Opccion == "0":aux = False
     elif Opccion == "1": Cargar_Paciente(Db_Pacientes)
     elif Opccion == "2": Mostrar_Paciente_espera(Db_Pacientes)
     elif Opccion == "3": Atender_paciente(Db_Pacientes)
