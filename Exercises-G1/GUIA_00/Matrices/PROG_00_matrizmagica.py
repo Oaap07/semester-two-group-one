@@ -18,22 +18,16 @@ def esmagica(matriz):
         for columna in range(len(matriz)):
             contador_filas += matriz[fila][columna]
             
-
-
     for fila in range(len(matriz)):
         contador_columnas = 0
         for columna in range(len(matriz)):
             contador_columnas += matriz[columna][fila]
             
-
-
     contador_diagonal = 0
     for fila in range(len(matriz)):
         for columna in range(len(matriz)):
             if columna == fila:
                 contador_diagonal += matriz[columna][fila]
-                
-
 
     contador_invertida = 0
     for fila in range(len(matriz)):
@@ -41,8 +35,6 @@ def esmagica(matriz):
             if columna+fila == 2:
                 contador_invertida += matriz[columna][fila]
                 
-
-
     if contador_filas == contador_columnas and contador_filas == contador_diagonal and contador_filas == contador_invertida:
         print("es magica")
     else:
