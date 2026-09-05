@@ -37,4 +37,4 @@ for g in ganancias:
     if ganancias[g] == mayor_precio:
         mayor_precio_nombre = g
 print(50*"=")
-print(f"el producro que genero es: {mayor_precio_nombre}: {mayor_precio}")
+print(f"el producro que mas genero es: {mayor_precio_nombre}: {mayor_precio}")
