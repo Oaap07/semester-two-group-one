@@ -17,6 +17,7 @@ ganancias = {}
 for p in precios:
     final = ventas.get(p) * precios.get(p)
     ganancias[p] = final
+
 total = 0
 for g in ganancias:
     print(f"el producto: {g} vendio: {ganancias[g]}")
@@ -24,10 +25,11 @@ for g in ganancias:
     total += ganancias[g]
 print(f"el total de las ventas es: {total}")
 
-for v in ventas:
+for v   in ventas:
     mayor_producto = max(ventas.values())
     if ventas[v] == mayor_producto:
         mayor_producto_nombre = v
+
 print(50*"=")
 print(f"el producro que mas se vendio es: {mayor_producto_nombre}: {mayor_producto}")
 for g in ganancias:
