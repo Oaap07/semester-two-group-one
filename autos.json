@@ -1,0 +1,62 @@
+{
+    "1": {
+        "marca": "peugeot",
+        "modelo": "2008",
+        "estado": "usado",
+        "año": 2001
+    },
+    "2": {
+        "marca": "fiat",
+        "modelo": "cronos",
+        "estado": "nuevo",
+        "año": 2006
+    },
+    "3": {
+        "marca": "peugeot",
+        "modelo": "408",
+        "estado": "usado",
+        "año": 2004
+    },
+    "4": {
+        "marca": "chevrloet",
+        "modelo": "tracker",
+        "estado": "nuevo",
+        "año": 2000
+    },
+    "5": {
+        "marca": "chevrloet",
+        "modelo": "montana",
+        "estado": "como nuevo",
+        "año": 2019
+    },
+    "6": {
+        "marca": "fiat",
+        "modelo": "fastback",
+        "estado": "usado",
+        "año": 2015
+    },
+    "7": {
+        "marca": "chevrloet",
+        "modelo": "tracker",
+        "estado": "como nuevo",
+        "año": 2021
+    },
+    "8": {
+        "marca": "toyota",
+        "modelo": "hilux",
+        "estado": "usado",
+        "año": 2004
+    },
+    "9": {
+        "marca": "toyota",
+        "modelo": "corolla",
+        "estado": "nuevo",
+        "año": 2009
+    },
+    "10": {
+        "marca": "peugeot",
+        "modelo": "2008",
+        "estado": "nuevo",
+        "año": 2017
+    }
+}
