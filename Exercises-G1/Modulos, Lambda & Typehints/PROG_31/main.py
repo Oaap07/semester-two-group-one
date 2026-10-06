@@ -6,3 +6,4 @@ def main():
     print(f"Generando {cantidad} registros de cosecha...")
     print(f"Peso total cosechado: {peso:.2f} kg")
 main()
+
