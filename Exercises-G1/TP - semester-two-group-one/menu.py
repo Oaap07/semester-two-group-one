@@ -1,6 +1,6 @@
-import json
+import informes
 import precarga
-import crud
+import json
 '''
 def generar_alumnos_json(
     ruta_archivo: str = "alumnos.json", cantidad_registros: int = 10
@@ -12,66 +12,53 @@ RUTA_ARCHIVO = "alumnos.json"
 # FUNCIONES STUB (VACÍAS PARA DESARROLLAR)
 # ==========================================
 
-def agregar_alumno():
-    """Opción 1: Agregar un nuevo alumno al archivo JSON"""
-    pass
+def menu_principal():
+    while True:
+        print("\n--- MENÚ PRINCIPAL ---")
+        print("1. Menu de usuario.")
+        print("2. Menu de empresa.")
+        print("0. Salir.")
+        opcion = input("Seleccione una opción: ").strip()
+        if opcion == "1":
+            submenu_usuario()
+        elif opcion == "2":
+            submenu_empresa()
+        elif opcion == "0":
+            break
+        else:
+            print("Opción no válida. Intente de nuevo.")
 
-def modificar_estado_civil():
-    crud.modificar_estado_civil()
-    return
+def rentar_auto():
+    print("-- Autos disponibles --")
 
-def modificar_estado_cursada():
-    """Subopción 2.2: Cambiar el estado de cursada de un alumno"""
-    pass
+    
 
-def modificar_notas():
-    """Subopción 2.3: Cambiar la lista de notas de un alumno"""
-    pass
+    
 
-def ver_alumno():
-    """Opción 3: Mostrar los datos de un alumno por ID"""
-    pass
-
-def eliminar_alumno():
-    """Opción 4: Eliminar un alumno por ID"""
-    pass
-
-def informe_promedio_curso():
-    """Subopción 5.1: Calcular y mostrar el promedio general del curso"""
-    pass
-
-def informe_mejor_promedio():
-    """Subopción 5.2: Encontrar y mostrar el alumno con el mejor promedio"""
-    pass
 
 
 # ==========================================
 # MENÚS Y SUBMENÚS DE NAVEGACIÓN
 # ==========================================
 
-def submenu_modificar():
+def submenu_usuario():
     while True:
         print("\n--- SUBMENÚ: MODIFICAR ALUMNO ---")
-        print("1. Cambiar estado civil")
-        print("2. Cambiar estado cursada")
-        print("3. Cambiar notas")
+        print("1. rentar auto.")
+        print("2. devolver auto.")
         print("0. Volver al menú principal")
-        
         opcion = input("Seleccione una opción: ").strip()
-        
         if opcion == "1":
-            modificar_estado_civil()
+            rentar_auto()
         elif opcion == "2":
-            modificar_estado_cursada()
-        elif opcion == "3":
-            modificar_notas()
+            devolver_auto()
         elif opcion == "0":
             break
         else:
             print("Opción no válida. Intente de nuevo.")
 
 
-def submenu_informes():
+def submenu_empresa():
     while True:
         print("\n--- SUBMENÚ: INFORMES ---")
         print("1. Promedio del curso")

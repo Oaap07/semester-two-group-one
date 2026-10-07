@@ -9,28 +9,64 @@ AUTOS = {
     "chevrloet":("cruze","onix","spin","tracker","montana")
 }
 MARCAS = tuple(AUTOS.keys())
-ESTADO = ("nuevo","como nuevo","usado")
+CALIDAD = ("nuevo","como nuevo","usado")
 ANIO = (2000,2026)
 
 def informe_autos(
-    ruta_archivo : str = "autos.json", cant_autos : int = 10    
+    ruta_archivo : str = "autos.json", cant_autos : int = 10                 
 ):
+    letras = ("a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "ñ", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z")
+    numeros = ("0", "1", "2", "3", "4", "5", "6", "7", "8", "9")
+    
     listado = {}
-    cant_autos = 10
-    for i in range(1, cant_autos + 1):
-        clave = str(i)
-        marca = random.choice(MARCAS)
-        listado[clave] = {
+    cant_autos = 25
+    marca = random.choice(MARCAS)
+    for _ in range(1, cant_autos + 1):
+        anio = random.randint(ANIO[0],ANIO[1])
+        if anio >= 2016:
+            patente = ""
+            contador = 1
+            for _ in range(7):
+                if contador < 3:
+                    patente += (random.choice(letras))
+                    contador += 1
+                elif contador >= 3 and contador <= 5:
+                    patente += (random.choice(numeros))
+                    contador += 1
+                    
+                elif contador >= 6 <= 7:
+                    patente += (random.choice(letras))
+                    contador += 1
+            patente = patente.upper()
+        else:
+            patente = ""
+            contador = 1
+            for _ in range(6):
+                if contador <= 3:
+                    patente += (random.choice(letras))
+                    contador += 1
+                elif contador > 3 :
+                    patente += (random.choice(numeros))
+                    contador += 1
+            patente = patente.upper()
+        precio = 90
+        if anio < 2026:
+            a = 2026 - anio
+            precio = precio -(a*2)
+        
+        listado[patente] = {
             "marca" : marca,
             "modelo" : random.choice(AUTOS[marca]),
-            "estado" : random.choice(ESTADO),
-            "año" : random.randint(ANIO[0],ANIO[1]) 
+            "calidad" : random.choice(CALIDAD),
+            "año" : anio,
+            "precio": precio
         }
     with open(ruta_archivo, "w", encoding="utf-8") as f:
             json.dump(listado, f, indent=4, ensure_ascii=False)
     print(
             f"[alumnos_json.py] Archivo '{ruta_archivo}' generado con éxito con {cant_autos} alumnos.\n"
         )
+    return listado
 
 if __name__ == "__main__":
     informe_autos()
