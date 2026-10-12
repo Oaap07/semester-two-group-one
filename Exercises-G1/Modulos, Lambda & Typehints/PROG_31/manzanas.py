@@ -47,6 +47,7 @@ def generar_cosecha(cantidad_registros):
         }
         cosecha.append(manzana)
     return cosecha
+
 def calcular_cosecha(cosecha):
     peso_total = 0
     cantidad_registros = 0
