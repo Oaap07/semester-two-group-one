@@ -17,27 +17,37 @@ def informe_autos(
 ):
     letras = ("a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "ñ", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z")
     numeros = ("0", "1", "2", "3", "4", "5", "6", "7", "8", "9")
+
+    preset = {
+        2016: ["AA"],
+        2017: ["AB"],
+        2018: ["AC", "AD"],
+        2019: ["AD","AE"],
+        2020: ["AE"],
+        2021: ["AE", "AF"],
+        2022: ["AF"],
+        2023: ["AG"],
+        2024: ["AG", "AH"],
+        2025: ["AH"],
+        2026: ["AI"]
+    }
     
     listado = {}
     cant_autos = 25
-    marca = random.choice(MARCAS)
     for _ in range(1, cant_autos + 1):
+        marca = random.choice(MARCAS)
         anio = random.randint(ANIO[0],ANIO[1])
+        patente = ""
+        #patentes mayores= a 2016
         if anio >= 2016:
-            patente = ""
-            contador = 1
-            for _ in range(7):
-                if contador < 3:
-                    patente += (random.choice(letras))
-                    contador += 1
-                elif contador >= 3 and contador <= 5:
-                    patente += (random.choice(numeros))
-                    contador += 1
-                    
-                elif contador >= 6 <= 7:
-                    patente += (random.choice(letras))
-                    contador += 1
+            patente += random.choice(preset[anio])
+            for i in range(5):
+                if i <= 2:
+                    patente += random.choice(numeros)
+                else:
+                    patente += random.choice(letras)
             patente = patente.upper()
+        #patentes menores a 2016
         else:
             patente = ""
             contador = 1

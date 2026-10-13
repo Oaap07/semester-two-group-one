@@ -29,7 +29,13 @@ def menu_principal():
             print("Opción no válida. Intente de nuevo.")
 
 def rentar_auto():
-    print("-- Autos disponibles --")
+    with open("autos.json", 'r', encoding="utf-8") as archivo:
+        lista = json.load(archivo)
+        for i in lista.keys():
+            dict = lista[i]
+            for k, v in dict.items():
+                print(f"[{lista[i]}]", )
+                print(f"\t CALIDAD: {elemento["calidad"]} | AÑO: {elemento["año"]} | PRECIO: {elemento["precio"]}")
 
     
 
