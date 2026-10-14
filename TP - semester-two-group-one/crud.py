@@ -78,6 +78,7 @@ lo que falta. NO se modificó ninguna línea de lógica del programa.
 """
 
 import json
+import informe as f
 
 # ==========================================
 # CONFIGURACIÓN Y CONSTANTES
@@ -85,13 +86,13 @@ import json
 
 # Ruta del archivo JSON donde se guarda el catálogo de autos.
 # (Req 2 y 3 del TP: persistencia y precarga desde archivo).
-RUTA_AUTOS = "autos.json"
+RUTA_AUTOS = f.RUTA_AUTOS_JSON
 
 # Tuplas con los valores permitidos para cada campo.
 # (Req 4 del TP: uso de tuplas como parte de la lógica / validaciones).
-CALIDADES = ("nuevo", "como nuevo", "usado")
-MARCAS = ("toyota", "renault", "fiat", "peugeot", "chevrloet")
-CATEGORIAS = ("sedan_hatchback", "suv_crossover", "pickup", "monovolumen_mpv")
+CALIDAD = f.CALIDAD
+MARCA = f.MARCAS
+CATEGORIA = f.CATEGORIAS
 
 # Mapeo entre la opción numérica del menú de modificación y el campo del JSON.
 # Formato: "clave de menú": ("nombre del campo en el JSON", "nombre para mostrar").
@@ -225,7 +226,7 @@ def _pedir_float(etiqueta):
         valor = input(f"Inválido. {etiqueta} debe ser un número positivo: ").strip().replace(",", ".")
 
 
-def _pedir_patente_existente(autos):
+def _pedir_patente_existente(autos : dict) -> str:
     """
     Pide una patente y valida que ya exista en el catálogo.
 

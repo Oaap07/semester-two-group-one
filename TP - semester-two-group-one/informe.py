@@ -1,5 +1,6 @@
 import json
 import random
+import os
 
 AUTOS = {
     "toyota":("etios","yaris","hilux","corolla","rav4"),
@@ -11,35 +12,40 @@ AUTOS = {
 MARCAS = tuple(AUTOS.keys())
 CALIDAD = ("nuevo","como nuevo","usado")
 ANIO = (2000,2026)
+CATEGORIAS = ("sedan_hatchback", "suv_crossover", "pickup", "monovolumen_mpv")
+preset = {
+    2016: ["AA"],
+    2017: ["AB"],
+    2018: ["AC", "AD"],
+    2019: ["AD","AE"],
+    2020: ["AE"],
+    2021: ["AE", "AF"],
+    2022: ["AF"],
+    2023: ["AG"],
+    2024: ["AG", "AH"],
+    2025: ["AH"],
+    2026: ["AI"]
+}
+
+categorías = {
+    "sedan_hatchback" : ["etios", "yaris", "corolla", "clio", "sandero", 
+                        "argo", "cronos", "206", "208", "408", "onix", "cruze"],
+    "suv_crossover" : ["rav4", "kardian", "duster", "pulse",
+                    "fastback", "2008", "3008", "tracker"],
+    "pickup" : ["hilux", "toro", "montana"],
+
+    "monovolumen_mpv" : ["kangoo", "spin"]
+}
+
+RUTA_AUTOS_JSON = "autos.json"
+letras = ("a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "ñ", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z")
+numeros = ("0", "1", "2", "3", "4", "5", "6", "7", "8", "9")
+
 
 def informe_autos(
     ruta_archivo : str, cant_autos : int
 ) -> dict[dict]:
-    letras = ("a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "ñ", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z")
-    numeros = ("0", "1", "2", "3", "4", "5", "6", "7", "8", "9")
-
-    preset = {
-        2016: ["AA"],
-        2017: ["AB"],
-        2018: ["AC", "AD"],
-        2019: ["AD","AE"],
-        2020: ["AE"],
-        2021: ["AE", "AF"],
-        2022: ["AF"],
-        2023: ["AG"],
-        2024: ["AG", "AH"],
-        2025: ["AH"],
-        2026: ["AI"]
-    }
-    categorías = {
-                    "sedan_hatchback" : ["etios", "yaris", "corolla", "clio", "sandero", 
-                                        "argo", "cronos", "206", "208", "408", "onix", "cruze"],
-                    "suv_crossover" : ["rav4", "kardian", "duster", "pulse",
-                                    "fastback", "2008", "3008", "tracker"],
-                    "pickup" : ["hilux", "toro", "montana"],
-            
-                    "monovolumen_mpv" : ["kangoo", "spin"]
-                }
+    
     listado = {}
     cant_autos = 25
     for _ in range(1, cant_autos + 1):
@@ -68,11 +74,13 @@ def informe_autos(
                     contador += 1
             patente = patente.upper()
         precio = 90
+
         if anio < 2026:
             a = 2026 - anio
-            precio = precio -(a*2)
+            precio = precio - (a*2.5)
         marca = random.choice(MARCAS)
-        modelo = random.choice(AUTOS[marca])        
+        modelo = random.choice(AUTOS[marca])
+
         listado[patente] = {
             "marca" : marca,
             "modelo" : modelo,
@@ -81,10 +89,35 @@ def informe_autos(
             "precio": precio,
             "categoria": [i for i in categorías if modelo in categorías[i]][0]
         }
-    with open(ruta_archivo, "w", encoding="utf-8") as f:
+    
+    try:
+        with open(ruta_archivo, "r", encoding="utf-8") as f:
+            print(f"/// Archivo ya existente ///")
+    except FileNotFoundError:
+        with open(ruta_archivo, "w", encoding="utf-8") as f:
             json.dump(listado, f, indent=4, ensure_ascii=False)
-    print(
-            f"\n/// Archivo '{ruta_archivo}' generado con éxito con {cant_autos} autos ///"
-        )
+            print(f"/// Archivo [autos.json] creado exitosamente ///")
+    
     input("[Enter] ")
     return listado
+
+def limpiar():
+    """
+    Limpia la consola según el sistema operativo.
+
+    En Windows usa 'cls'; en Linux/macOS usa 'clear'. Sirve para mantener la
+    interfaz ordenada entre pantallas del menú.
+    """
+    os.system('cls' if os.name == 'nt' else 'clear')
+
+if __name__ == "__main__":
+    limpiar()
+    try:
+        # Intento de generar un informe inicial al arrancar el programa.
+        # TODO(TP - Req 1): usar manejo de excepciones específico
+        # (FileNotFoundError, JSONDecodeError) en lugar de 'except' genérico.
+        informe_autos(RUTA_AUTOS_JSON, 25)
+    except:
+        # Si falla (archivo faltante, formato inválido, etc.) se continúa igual.
+        pass
+    limpiar()

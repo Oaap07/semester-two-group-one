@@ -67,10 +67,7 @@ NOTA: Esta versión solo AGREGA documentación y marcas TODO(TP) para indicar
 lo que falta. NO se modificó ninguna línea de lógica del programa.
 """
 
-import informe
-import json
-import os
-
+import json, os, crud
 
 def limpiar():
     """
@@ -149,10 +146,9 @@ def rentar_auto():
     # TODO(TP - Req 1): manejar excepciones (FileNotFoundError, JSONDecodeError).
     with open("autos.json", 'r', encoding="utf-8") as archivo:
         lista = json.load(archivo)
-
-    # --- NIVEL 1: selección de categoría ---
     while True:
         limpiar()
+        # --- NIVEL 1: selección de categoría ---
         res = input(" --- Escoja una categoría ---\n\n"
                         "[1] Sedán / Hatchback\n"
                         "[2] SUV / Crossover\n"
@@ -171,7 +167,7 @@ def rentar_auto():
         if res == '0':
             # Volver al submenú de usuario.
             break
-        elif res not in list(map(str, list(range(1,5)))):
+        elif res not in list(map(str, list(range(1,5)))): 
             # Validación: la opción debe estar entre 1 y 4.
             print("\nOpción no válida. Intente de nuevo.")
             input("[Enter]")
@@ -203,8 +199,8 @@ def rentar_auto():
                 print("[0] Para salir a Categorías")
                 res1 = input("\nSeleccione el modelo que desea: ")
                 if res1 == '0':
-                        # Volver al nivel de categorías.
-                        break
+                    # Volver al nivel de categorías.
+                    break
                 elif res1 not in filtrados.keys():
                     # Validación: el modelo debe estar entre los mostrados.
                     print("\nOpción no válida. Intente de nuevo.")
@@ -222,13 +218,16 @@ def rentar_auto():
 
                         # Muestra la ficha resumida de cada patente disponible.
                         for i, j in enumerate(patentes):
+                            
                             print(f"\n[{i+1}]: {j}\n"
                                 f"\tCalidad: {lista[j]['calidad']}\n"\
                                 f"\tAño: {lista[j]['año']}\n"\
                                 f"\tPrecio: u$d {lista[j]['precio']:.1f}")
                         print("-------------------------")
                         print("[0] Para salir a Modelos")
+
                         res2 = input("\nSeleccione el auto que desea: ")
+
                         if res2 == '0':
                             # Volver al nivel de modelos.
                             break
@@ -241,7 +240,7 @@ def rentar_auto():
                             limpiar()
                             patente_elegida = patentes[int(res2)-1]
                             print(f"\n¡Auto con patente: {patente_elegida} RENTADO!")
-
+                            print(len(lista))
                             # Se copia la ficha completa del auto al diccionario
                             # de rentados y se guarda (sobreescribe el archivo).
                             # TODO(TP - Req 1): validar claves (KeyError) y guardar con try/except.
@@ -253,6 +252,8 @@ def rentar_auto():
                             break
                     # Salir del bucle de modelos.
                     break
+            break
+        
 
 
 def devolver_auto():
@@ -398,14 +399,6 @@ def submenu_empresa():
 
 
 if __name__ == "__main__":
-    try:
-        # Intento de generar un informe inicial al arrancar el programa.
-        # TODO(TP - Req 1): usar manejo de excepciones específico
-        # (FileNotFoundError, JSONDecodeError) en lugar de 'except' genérico.
-        informe.informe_autos("autos.json", 25)
-    except:
-        # Si falla (archivo faltante, formato inválido, etc.) se continúa igual.
-        pass
     # Inicio de la aplicación.
     # TODO(TP - Req 3): confirmar que autos.json tenga al menos 5 registros (precarga).
     limpiar()
