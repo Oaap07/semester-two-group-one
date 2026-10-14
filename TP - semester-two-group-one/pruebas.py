@@ -1,4 +1,7 @@
+import json
 
-my_lista = ["hola", "hasta luego", "adiós"]
+with open("autos.json", "r", encoding="utf-8") as archivo:
+    dic = json.load(archivo)
 
-print(list(range(len(my_lista))))
+for i in dic:
+    print(dic[i]["marca"])

@@ -31,11 +31,19 @@ def informe_autos(
         2025: ["AH"],
         2026: ["AI"]
     }
-    
+    categorías = {
+                    "sedan_hatchback" : ["etios", "yaris", "corolla", "clio", "sandero", 
+                                        "argo", "cronos", "206", "208", "408", "onix", "cruze"],
+                    "suv_crossover" : ["rav4", "kardian", "duster", "pulse",
+                                    "fastback", "2008", "3008", "tracker"],
+                    "pickup" : ["hilux", "toro", "montana"],
+            
+                    "monovolumen_mpv" : ["kangoo", "spin"]
+                }
     listado = {}
     cant_autos = 25
     for _ in range(1, cant_autos + 1):
-        marca = random.choice(MARCAS)
+        
         anio = random.randint(ANIO[0],ANIO[1])
         patente = ""
         #  Patentes mayores o iguales a 2016
@@ -63,13 +71,15 @@ def informe_autos(
         if anio < 2026:
             a = 2026 - anio
             precio = precio -(a*2)
-        
+        marca = random.choice(MARCAS)
+        modelo = random.choice(AUTOS[marca])        
         listado[patente] = {
             "marca" : marca,
-            "modelo" : random.choice(AUTOS[marca]),
+            "modelo" : modelo,
             "calidad" : random.choice(CALIDAD),
             "año" : anio,
-            "precio": precio
+            "precio": precio,
+            "categoria": [i for i in categorías if modelo in categorías[i]][0]
         }
     with open(ruta_archivo, "w", encoding="utf-8") as f:
             json.dump(listado, f, indent=4, ensure_ascii=False)

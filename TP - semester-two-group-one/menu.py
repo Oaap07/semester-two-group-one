@@ -18,15 +18,7 @@ def limpiar(): os.system('cls' if os.name == 'nt' else 'clear') #  Limpia la ter
 
 def rentar_auto():
     limpiar()
-    categorías = {
-        '1' : {"sedan_hatchback" : ["etios", "yaris", "corolla", "clio", "sandero", 
-                             "argo", "cronos", "206", "208", "408", "onix", "cruze"]},
-        '2' : {"suv_crossover" : ["rav4", "kardian", "duster", "pulse",
-                           "fastback", "2008", "3008", "tracker"]},
-        '3' : {"pickup" : ["hilux", "toro", "montana"]},
-
-        '4' : {"monovolumen_mpv" : ["kangoo", "spin"]}
-    }
+    
 
     with open("autos.json", 'r', encoding="utf-8") as archivo:
         lista = json.load(archivo)
@@ -41,7 +33,12 @@ def rentar_auto():
                             "-------------------------\n"
                             "[0] Para ir a Sub menú\n"
                             "Seleccione una opción: ")
-
+            dicc = {
+                "1": "sedan_hatchback",
+                "2": "suv_crossover",
+                "3": "pickup",
+                "4": "monovolumen_mpv"
+            }
             if res == '0':
                 break
             elif res not in list(map(str, list(range(1,5)))):
@@ -51,24 +48,14 @@ def rentar_auto():
                 while True:
                     limpiar()
                     print(" --- Modelos disponibles ---")
-                    [print(f"{j}-", i[j].capitalize()) for i in (categorías[res].values()) for j in range(len(i))]
-                    print("-------------------------\n"
-                          "[0] Para ir a categorías")
-                    res2 = input("Seleccione una opción: ")
-
-                    if res2 == '0':
-                        break
-                    elif res2 not in list(map(str, list(range(len(list(categorías[res].values())[0]))))):
-                        print(list(range(len(list(categorías[res].values())[0]))))
-                        print("\nOpción no válida. Intente de nuevo.")
-                        input("[Enter]")
-                    else:
-                        limpiar()
-                        print(f"\n### Auto rentado!: '{(list(categorías[res].values()))[0][int(res2)].capitalize()}' ###\n")
-                        input("[Enter]") #  TODO: En este else sólo se printea el mensaje, solucionar seguimiento del auto seleccionado y 
-                                         #        printear con todos lo datos del auto seleccionado.
-                                         
-
+                    [print(i+1,j.capitalize()) for i ,j in enumerate(list({lista[i]["modelo"] for i in lista if lista[i]["categoria"] == dicc[res]}))]
+                    res1 = input("Seleccione el modelo que desea: ")
+                    if res1 == '0':
+                                    break
+                    elif res1 not in list(map(str, list(range(1, len())))):
+                                    print("\nOpción no válida. Intente de nuevo.")
+                                    input("[Enter]")
+                    
 def devolver_auto():
     limpiar()
     pass
