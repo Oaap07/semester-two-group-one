@@ -48,13 +48,23 @@ def rentar_auto():
                 while True:
                     limpiar()
                     print(" --- Modelos disponibles ---")
-                    [print(i+1,j.capitalize()) for i ,j in enumerate(list({lista[i]["modelo"] for i in lista if lista[i]["categoria"] == dicc[res]}))]
+                    filtrados = {str(i+1): j.capitalize() for i ,j in enumerate(list({lista[i]["modelo"] for i in lista if lista[i]["categoria"] == dicc[res]}))}
+                    [print(i,j) for i, j in filtrados.items()]
                     res1 = input("Seleccione el modelo que desea: ")
                     if res1 == '0':
-                                    break
-                    elif res1 not in list(map(str, list(range(1, len())))):
-                                    print("\nOpción no válida. Intente de nuevo.")
-                                    input("[Enter]")
+                            break
+                    elif res1 not in filtrados.keys():
+                        print("\nOpción no válida. Intente de nuevo.")
+                        input("[Enter]")
+                    else:
+                        while True:
+                            limpiar()
+                            print(f"PATENTES seleccionadas para Modelo: {filtrados[res1]}")
+                            [print(f"{i}, Calidad: {lista[i]['calidad']}, Año: {lista[i]['año']}, Precio: u$d {lista[i]['precio']:.1f} ") for i in lista if lista[i]["modelo"].capitalize() == filtrados[res1]]
+                            
+                            res2 = input("Seleccione el auto que desea: ")
+                            if res1 == '0':
+                                break
                     
 def devolver_auto():
     limpiar()

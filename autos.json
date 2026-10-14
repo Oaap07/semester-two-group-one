@@ -1,0 +1,202 @@
+{
+    "AD476PW": {
+        "marca": "chevrloet",
+        "modelo": "spin",
+        "calidad": "como nuevo",
+        "año": 2019,
+        "precio": 76,
+        "categoria": "monovolumen_mpv"
+    },
+    "AF993GG": {
+        "marca": "renault",
+        "modelo": "kardian",
+        "calidad": "nuevo",
+        "año": 2022,
+        "precio": 82,
+        "categoria": "suv_crossover"
+    },
+    "AA638FD": {
+        "marca": "chevrloet",
+        "modelo": "spin",
+        "calidad": "usado",
+        "año": 2016,
+        "precio": 70,
+        "categoria": "monovolumen_mpv"
+    },
+    "AG651JN": {
+        "marca": "fiat",
+        "modelo": "fastback",
+        "calidad": "nuevo",
+        "año": 2023,
+        "precio": 84,
+        "categoria": "suv_crossover"
+    },
+    "AE123SZ": {
+        "marca": "toyota",
+        "modelo": "corolla",
+        "calidad": "usado",
+        "año": 2021,
+        "precio": 80,
+        "categoria": "sedan_hatchback"
+    },
+    "AH302PB": {
+        "marca": "toyota",
+        "modelo": "rav4",
+        "calidad": "como nuevo",
+        "año": 2025,
+        "precio": 88,
+        "categoria": "suv_crossover"
+    },
+    "ZLJ328": {
+        "marca": "chevrloet",
+        "modelo": "montana",
+        "calidad": "nuevo",
+        "año": 2005,
+        "precio": 48,
+        "categoria": "pickup"
+    },
+    "PRW414": {
+        "marca": "toyota",
+        "modelo": "yaris",
+        "calidad": "nuevo",
+        "año": 2013,
+        "precio": 64,
+        "categoria": "sedan_hatchback"
+    },
+    "AE928AK": {
+        "marca": "renault",
+        "modelo": "kangoo",
+        "calidad": "nuevo",
+        "año": 2020,
+        "precio": 78,
+        "categoria": "monovolumen_mpv"
+    },
+    "TMQ363": {
+        "marca": "chevrloet",
+        "modelo": "cruze",
+        "calidad": "usado",
+        "año": 2010,
+        "precio": 58,
+        "categoria": "sedan_hatchback"
+    },
+    "AD925IE": {
+        "marca": "renault",
+        "modelo": "duster",
+        "calidad": "como nuevo",
+        "año": 2019,
+        "precio": 76,
+        "categoria": "suv_crossover"
+    },
+    "AYV441": {
+        "marca": "renault",
+        "modelo": "kardian",
+        "calidad": "nuevo",
+        "año": 2013,
+        "precio": 64,
+        "categoria": "suv_crossover"
+    },
+    "AE925FH": {
+        "marca": "renault",
+        "modelo": "duster",
+        "calidad": "como nuevo",
+        "año": 2020,
+        "precio": 78,
+        "categoria": "suv_crossover"
+    },
+    "FFK991": {
+        "marca": "fiat",
+        "modelo": "pulse",
+        "calidad": "nuevo",
+        "año": 2007,
+        "precio": 52,
+        "categoria": "suv_crossover"
+    },
+    "MYU494": {
+        "marca": "fiat",
+        "modelo": "toro",
+        "calidad": "usado",
+        "año": 2013,
+        "precio": 64,
+        "categoria": "pickup"
+    },
+    "XAA913": {
+        "marca": "peugeot",
+        "modelo": "2008",
+        "calidad": "como nuevo",
+        "año": 2014,
+        "precio": 66,
+        "categoria": "suv_crossover"
+    },
+    "JHN609": {
+        "marca": "fiat",
+        "modelo": "cronos",
+        "calidad": "usado",
+        "año": 2007,
+        "precio": 52,
+        "categoria": "sedan_hatchback"
+    },
+    "FWU741": {
+        "marca": "peugeot",
+        "modelo": "206",
+        "calidad": "como nuevo",
+        "año": 2012,
+        "precio": 62,
+        "categoria": "sedan_hatchback"
+    },
+    "KGG068": {
+        "marca": "renault",
+        "modelo": "duster",
+        "calidad": "usado",
+        "año": 2004,
+        "precio": 46,
+        "categoria": "suv_crossover"
+    },
+    "EZN942": {
+        "marca": "toyota",
+        "modelo": "yaris",
+        "calidad": "como nuevo",
+        "año": 2011,
+        "precio": 60,
+        "categoria": "sedan_hatchback"
+    },
+    "AI064JL": {
+        "marca": "fiat",
+        "modelo": "pulse",
+        "calidad": "como nuevo",
+        "año": 2026,
+        "precio": 90,
+        "categoria": "suv_crossover"
+    },
+    "AE211SA": {
+        "marca": "peugeot",
+        "modelo": "3008",
+        "calidad": "como nuevo",
+        "año": 2020,
+        "precio": 78,
+        "categoria": "suv_crossover"
+    },
+    "CTU778": {
+        "marca": "fiat",
+        "modelo": "argo",
+        "calidad": "usado",
+        "año": 2001,
+        "precio": 40,
+        "categoria": "sedan_hatchback"
+    },
+    "AE824WR": {
+        "marca": "fiat",
+        "modelo": "toro",
+        "calidad": "nuevo",
+        "año": 2019,
+        "precio": 76,
+        "categoria": "pickup"
+    },
+    "VPM151": {
+        "marca": "chevrloet",
+        "modelo": "spin",
+        "calidad": "nuevo",
+        "año": 2003,
+        "precio": 44,
+        "categoria": "monovolumen_mpv"
+    }
+}
