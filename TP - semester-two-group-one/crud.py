@@ -1,15 +1,15 @@
 """
-Requisitos del Trabajo PrÃ¡ctico (TPO - SPRINT) - ProgramaciÃ³n I
-Facultad de IngenierÃ­a InformÃ¡tica
+Requisitos del Trabajo Practico (TPO - SPRINT) - Programacion I
+Facultad de Ingenieria Informatica
 
-MÃ³dulo: crud.py - GestiÃ³n CRUD del catÃ¡logo de autos.
-Tema del trabajo: AdministraciÃ³n de una concesionaria (catÃ¡logo de autos + alquileres).
+Modulo: crud.py - Gestion CRUD del catalogo de autos.
+Tema del trabajo: Administracion de una concesionaria (catalogo de autos + alquileres).
 
 --------------------------------------------------------------------------------
 Objetivo del trabajo
 --------------------------------------------------------------------------------
 Aplicar los conocimientos vistos en clase sobre archivos/JSON y manejo de
-excepciones, ademÃ¡s de los requisitos mÃ­nimos del programa.
+excepciones, ademas de los requisitos minimos del programa.
 """
 
 import json, os
@@ -40,7 +40,7 @@ def limpiar():
     Limpia la consola segun el sistema operativo.
 
     En Windows usa 'cls'; en Linux/macOS usa 'clear'. Sirve para mantener la
-    interfaz ordenada entre pantallas del menÃº.
+    interfaz ordenada entre pantallas del menu.
     """
     os.system('cls' if os.name == 'nt' else 'clear')
 
@@ -48,7 +48,7 @@ def limpiar():
 
 def _cargar_autos() -> dict:
     """
-    Carga el catÃ¡logo de autos desde el archivo JSON.
+    Carga el catalogo de autos desde el archivo JSON.
 
     Lee el contenido de `autos.json` y lo convierte a un diccionario de Python,
     donde cada clave es la patente del auto y cada valor es otro diccionario con
@@ -70,7 +70,7 @@ def _cargar_autos() -> dict:
         return {}
     except OSError as e:
         limpiar()
-        print(f"/// OcurriÃ³ un error de sistema: {e} ///")
+        print(f"/// Ocurrió un error de sistema: {e} ///")
         input("[Enter] ")
 
 
@@ -95,10 +95,10 @@ def _guardar_autos(autos):
         with open(RUTA_AUTOS, "w", encoding="utf-8") as archivo:
             json.dump(autos, archivo, indent=4, ensure_ascii=False)
     except FileNotFoundError:
-        print(f"/// Â¡El archivo {RUTA_AUTOS} no existe! ///")
+        print(f"/// ¡El archivo {RUTA_AUTOS} no existe! ///")
     except OSError as e:
         limpiar()
-        print(f"/// OcurriÃ³ un error de sistema: {e} ///")
+        print(f"/// Ocurrió un error de sistema: {e} ///")
         input("[Enter] ")
 
 
@@ -116,19 +116,20 @@ def _pedir_de_tupla(etiqueta, opciones):
         opciones (tuple): Tupla con los valores validos aceptados.
 
     Returns:
-        str: Valor elegido por el usuario, en minusculas y validado.
+        str | bool: Valor elegido por el usuario, validado (bool si es 'estado').
     """
     print(f"{etiqueta} (opciones: {', '.join(opciones)}): ")
     
-    entrada = input().strip().lower()
-    if entrada == "true":
-        valor = True
-    elif entrada == "false":
-        valor = False
+    valor = input().strip().lower()
     # Bucle de validacion: no se sale hasta que el valor pertenezca a 'opciones'.
-    while entrada not in opciones:
-        print(f"Valor invÃ¡lido. {etiqueta} debe ser una de: {', '.join(opciones)}")
+    while valor not in opciones:
+        print(f"Valor inválido. {etiqueta} debe ser una de: {', '.join(opciones)}")
         valor = input().strip().lower()
+    # El campo 'estado' se guarda como booleano en el JSON.
+    if valor == "true":
+        return True
+    if valor == "false":
+        return False
     return valor
 
 
@@ -152,7 +153,7 @@ def _pedir_entero(etiqueta, minimo, maximo):
     valor = input(f"{etiqueta} ({minimo}-{maximo}): ").strip()
     # Se repite mientras no sea un digito o este fuera del rango permitido.
     while not valor.isdigit() or not (minimo <= int(valor) <= maximo):
-        valor = input(f"InvÃ¡lido. {etiqueta} debe ser un nÃºmero entre {minimo} y {maximo}: ").strip()
+        valor = input(f"Inválido. {etiqueta} debe ser un número entre {minimo} y {maximo}: ").strip()
     return int(valor)
 
 
@@ -179,7 +180,7 @@ def _pedir_float(etiqueta):
         except ValueError:
             # Si no se puede convertir a float, se vuelve a pedir el valor.
             pass
-        valor = input(f"InvÃ¡lido. {etiqueta} debe ser un nÃºmero positivo: ").strip().replace(",", ".")
+        valor = input(f"Inválido. {etiqueta} debe ser un número positivo: ").strip().replace(",", ".")
 
 
 def _pedir_patente_existente(autos : dict) -> str:
@@ -198,7 +199,7 @@ def _pedir_patente_existente(autos : dict) -> str:
     # TODO(TP - Req 1): validar el tipo de 'autos' (dict) para evitar errores
     # al manipular diccionarios si llega un valor inesperado.
     if not autos:
-            print("\nNo hay autos en el catÃ¡logo.")
+            print("\nNo hay autos en el catálogo.")
             try: input("[Enter] ")
             except: pass
             return
@@ -211,7 +212,7 @@ def _pedir_patente_existente(autos : dict) -> str:
 
     while patente not in autos:
         try: 
-            patente = input("Patente no encontrada. Ingrese una patente vÃ¡lida: ").strip().upper()
+            patente = input("Patente no encontrada. Ingrese una patente válida: ").strip().upper()
             if patente == '0':
                 break
         except: pass
@@ -237,9 +238,9 @@ def _mostrar_auto(patente, datos):
     print(f"\tMarca: {datos['marca'].capitalize()}")
     print(f"\tModelo: {datos['modelo'].capitalize()}")
     print(f"\tCalidad: {datos['calidad']}")
-    print(f"\tAÃ±o: {datos['aÃ±o']}")
+    print(f"\tAño: {datos['año']}")
     print(f"\tPrecio: u$d {datos['precio']:.1f}")
-    print(f"\tCategorÃ­a: {datos['categoria']}")
+    print(f"\tCategoría: {datos['categoria']}")
     print(f"\tEstado: {datos['estado']}")
 
 
@@ -255,11 +256,11 @@ def ver_stock():
     autos = _cargar_autos()
     # Si el diccionario esta vacio, no hay nada para mostrar.
     if not autos:
-        print("\nNo hay autos en el catÃ¡logo.")
+        print("\nNo hay autos en el catálogo.")
         try: input("[Enter] ")
         except: pass
         return
-    print("\n--- CATÃLOGO DE AUTOS ---")
+    print("\n--- CATÁLOGO DE AUTOS ---")
     # Recorre cada par (patente, datos) del diccionario de diccionarios.
     # TODO(TP - Req 5): aqui se podria aplicar una lista por comprension
     # o una lambda para generar un resumen del catalogo.
@@ -282,7 +283,7 @@ def ver_auto():
     """
     autos = _cargar_autos()
     if not autos:
-        print("\nNo hay autos en el catÃ¡logo.")
+        print("\nNo hay autos en el catálogo.")
         try: input(" ")
         except: pass
         return
@@ -317,16 +318,16 @@ def agregar_auto():
     marca = _pedir_de_tupla("Marca: ", MARCA)
     modelo = input("Modelo: ").strip().lower()
     calidad = _pedir_de_tupla("Calidad:", CALIDAD)
-    anio = _pedir_entero("AÃ±o: ", 2000, 2026)
+    anio = _pedir_entero("Año: ", 2000, 2026)
     precio = _pedir_float("Precio (u$d): ")
-    categoria = _pedir_de_tupla("CategorÃ­a: ", CATEGORIA)
+    categoria = _pedir_de_tupla("Categoría: ", CATEGORIA)
 
     # Se crea el registro usando la patente como clave del diccionario.
     autos[patente] = {
         "marca": marca,
         "modelo": modelo,
         "calidad": calidad,
-        "aÃ±o": anio,
+        "año": anio,
         "precio": precio,
         "categoria": categoria,
     }
@@ -355,7 +356,7 @@ def modificar_auto():
     """
     autos = _cargar_autos()
     if not autos:
-            print("\nNo hay autos en el catÃ¡logo.")
+            print("\nNo hay autos en el catálogo.")
             try: input("[Enter] ")
             except: pass
             return
@@ -371,14 +372,14 @@ def modificar_auto():
         print("--------------------")
         print("[0] Terminar")
 
-        opcion = input("\nÂ¿QuÃ© campo desea modificar?: ").strip()
+        opcion = input("\n¿Qué campo desea modificar?: ").strip()
 
         # Opcion para salir del menu de modificacion.
         if opcion == "0":
             break
         # Validacion de la opcion ingresada.
         elif int(opcion) not in list(range(1, len(autos[patente]) + 1)):
-            print("\nOpciÃ³n no vÃ¡lida. Intente de nuevo.")
+            print("\nOpción no válida. Intente de nuevo.")
             continue
 
         # Se pide el nuevo valor segun el tipo de campo elegido.
@@ -390,11 +391,11 @@ def modificar_auto():
         elif opcion == "3":
             autos[patente]["calidad"] = _pedir_de_tupla("Calidad", CALIDAD)
         elif opcion == "4":
-            autos[patente]["aÃ±o"] = _pedir_entero("AÃ±o", 2000, 2026)
+            autos[patente]["año"] = _pedir_entero("Año", 2000, 2026)
         elif opcion == "5":
             autos[patente]["precio"] = _pedir_float("Nuevo precio (u$d)")
         elif opcion == "6":
-            autos[patente]["categoria"] = _pedir_de_tupla("CategorÃ­a", CATEGORIA)
+            autos[patente]["categoria"] = _pedir_de_tupla("Categoría", CATEGORIA)
         elif opcion == "7":
             autos[patente]["estado"] = _pedir_de_tupla("estado", ESTADO)
 
@@ -416,7 +417,7 @@ def eliminar_auto():
     # TODO(TP - Req 1): manejar excepciones en la carga y en el guardado.
     autos = _cargar_autos()
     if not autos:
-            print("\nNo hay autos en el catÃ¡logo.")
+            print("\nNo hay autos en el catálogo.")
             try: input("[Enter] ")
             except: pass
             return
@@ -441,14 +442,14 @@ def menu_crud():
     while True:
         limpiar()
         print("\n--- CRUD DE AUTOS ---")
-        print("[1] Ver catÃ¡logo")
+        print("[1] Ver catálogo")
         print("[2] Ver un auto")
         print("[3] Agregar auto")
         print("[4] Modificar auto")
         print("[5] Eliminar auto")
         print("[0] Salir")
         # TODO(TP - Req 1): manejar excepciones en el ingreso de datos.
-        try: opcion = input("Seleccione una opciÃ³n: ").strip()
+        try: opcion = input("Seleccione una opción: ").strip()
         except: pass
 
         # Despacho de la opcion elegida hacia la funcion correspondiente.
@@ -466,7 +467,7 @@ def menu_crud():
             # Salir del menu CRUD.
             break
         else:
-            print("\nOpciÃ³n no vÃ¡lida. Intente de nuevo.")
+            print("\nOpción no válida. Intente de nuevo.")
 
 
 if __name__ == "__main__":

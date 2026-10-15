@@ -1,9 +1,9 @@
 """
-Requisitos del Trabajo PrÃ¡ctico (TPO - SPRINT) - ProgramaciÃ³n I
-Facultad de IngenierÃ­a InformÃ¡tica
+Requisitos del Trabajo Practico (TPO - SPRINT) - Programacion I
+Facultad de Ingenieria Informatica
 
-MÃ³dulo: menu.py - MenÃº principal, alquileres y navegaciÃ³n.
-Tema del trabajo: AdministraciÃ³n de una concesionaria (catÃ¡logo de autos + alquileres).
+Modulo: menu.py - Menu principal, alquileres y navegacion.
+Tema del trabajo: Administracion de una concesionaria (catalogo de autos + alquileres).
 """
 
 import json, os
@@ -15,7 +15,7 @@ def limpiar():
     Limpia la consola segun el sistema operativo.
 
     En Windows usa 'cls'; en Linux/macOS usa 'clear'. Sirve para mantener la
-    interfaz ordenada entre pantallas del menÃº.
+    interfaz ordenada entre pantallas del menu.
     """
     os.system('cls' if os.name == 'nt' else 'clear')
 
@@ -33,8 +33,8 @@ def rentar_auto():
     (Categorias -> Modelos -> Patentes).
 
     Notas (Req 5 del TP):
-        Se usan listas por comprensiÃ³n y conjuntos (set) para filtrar los datos.
-        Se documentan explÃ­citamente las listas por comprensiÃ³n utilizadas.
+        Se usan listas por comprension y conjuntos (set) para filtrar los datos.
+        Se documentan explicitamente las listas por comprension utilizadas.
     """
 
     # Carga el catalogo completo de autos desde el archivo.
@@ -43,7 +43,7 @@ def rentar_auto():
             lista = json.load(archivo)
     except OSError as e:
         limpiar()
-        print(f"/// OcurriÃ³ un error de sistema: {e} ///")
+        print(f"/// Ocurrió un error de sistema: {e} ///")
         try: input("[Enter] ")
         except: pass
         return
@@ -51,17 +51,17 @@ def rentar_auto():
 
     while True:
         limpiar()
-        # --- NIVEL 1: selecciÃ³n de categorÃ­a ---
-        print(" --- Escoja una categorÃ­a ---\n\n"
-            "[1] SedÃ¡n / Hatchback\n"
+        # --- NIVEL 1: seleccion de categoria ---
+        print(" --- Escoja una categoría ---\n\n"
+            "[1] Sedán / Hatchback\n"
             "[2] SUV / Crossover\n"
             "[3] Pick-up\n"
             "[4] Monovolumen / Utilitario (MPV)\n"
             "-------------------------\n"
-            "[0] Para ir a Sub menÃº\n")
+            "[0] Para ir a Sub menú\n")
 
         try:
-            opcion: str = input("\nSeleccione una opciÃ³n: ").strip()
+            opcion: str = input("\nSeleccione una opción: ").strip()
         except:
             opcion: str = ""
         # Relaciona cada opcion numerica con el valor interno de la categoria.
@@ -77,7 +77,7 @@ def rentar_auto():
             break
         elif opcion not in list(map(str, list(range(1,5)))): 
             # Validacion: la opcion debe estar entre 1 y 4.
-            print("\nOpciÃ³n no vÃ¡lida. Intente de nuevo.")
+            print("\nOpción no válida. Intente de nuevo.")
             try: input("[Enter] ")
             except: pass
         else:
@@ -95,7 +95,7 @@ def rentar_auto():
 
                 # Si no quedan modelos disponibles, se avisa y se vuelve a categorias.
                 if not filtrados:
-                    print("No hay autos disponibles en esta categorÃ­a.")
+                    print("No hay autos disponibles en esta categoría.")
                     try: input("[Enter] ")
                     except: pass
                     break
@@ -103,9 +103,9 @@ def rentar_auto():
                 # Muestra el modelo numerado y una opcion para salir.
                 [print(f"[{i}] {j}") for i, j in filtrados.items()]
                 print("-------------------------")
-                print("[0] Para salir a CategorÃ­as")
+                print("[0] Para salir a Categorías")
                 
-                try: opcion2 : str = input("\nSeleccione una opciÃ³n: ").strip()
+                try: opcion2 : str = input("\nSeleccione una opción: ").strip()
                 except: opcion2 : str = ""
 
                 if opcion2 == '0':
@@ -113,7 +113,7 @@ def rentar_auto():
                     break
                 elif opcion2 not in filtrados.keys():
                     # Validacion: el modelo debe estar entre los mostrados.
-                    print("\nOpciÃ³n no vÃ¡lida. Intente de nuevo.")
+                    print("\nOpción no válida. Intente de nuevo.")
                     try: input("[Enter] ")
                     except: pass
                 else:
@@ -132,12 +132,12 @@ def rentar_auto():
                             
                             print(f"\n[{i+1}]: {j}\n"
                                 f"\tCalidad: {lista[j]['calidad']}\n"\
-                                f"\tAÃ±o: {lista[j]['aÃ±o']}\n"\
+                                f"\tAño: {lista[j]['año']}\n"\
                                 f"\tPrecio: u$d {lista[j]['precio']:.1f}")
                         print("-------------------------")
                         print("[0] Para salir a Modelos")
 
-                        try: opcion3 : str = input("\nSeleccione una opciÃ³n: ").strip()
+                        try: opcion3 : str = input("\nSeleccione una opción: ").strip()
                         except: opcion3 : str = ""
 
                         if opcion3 == '0':
@@ -145,7 +145,7 @@ def rentar_auto():
                             break
                         elif opcion3 not in list(map(str, list(range(1, len(patentes)+1)))):
                             # Validacion: la opcion debe corresponder a una patente mostrada.
-                            print("\nOpciÃ³n no vÃ¡lida. Intente de nuevo.")
+                            print("\nOpción no válida. Intente de nuevo.")
                             try: input("[Enter] ")
                             except: pass
                         else:
@@ -153,7 +153,7 @@ def rentar_auto():
                             limpiar()
                             patente_elegida = patentes[int(opcion3)-1]
                             cd.modificar_estado_auto(patente_elegida)
-                            print(f"\nÂ¡Auto con patente: {patente_elegida} RENTADO!")
+                            print(f"\n¡Auto con patente: {patente_elegida} RENTADO!")
                             try: input("[Enter] ")
                             except: pass
                             # Salir del bucle de patentes tras alquilar.
@@ -185,7 +185,7 @@ def devolver_auto():
     input("\n[Enter]")
 
     # Interfaz base (en desarrollo).
-    print("Â¿Que auto desea devolver?")
+    print("¿Que auto desea devolver?")
     print("="*15)
     try: input("[Enter] ")
     except: pass
@@ -219,14 +219,14 @@ def menu_principal():
     
     while True:
         limpiar()
-        print("--- MENÃ PRINCIPAL ---\n")
+        print("--- MENÚ PRINCIPAL ---\n")
         print("[1] Menu de usuario.")
         print("[2] Menu de empresa.")
         print("-------------------------")
         print("[0] Salir.")
         
         
-        try: opcion = input("\nSeleccione una opciÃ³n: ").strip()
+        try: opcion = input("\nSeleccione una opción: ").strip()
         except: opcion : str = ""
 
         # Despacho de la opcion elegida hacia el submenu correspondiente.
@@ -238,7 +238,7 @@ def menu_principal():
             # Finalizar la ejecucion del programa.
             break
         else:
-            print("\nOpciÃ³n no vÃ¡lida. Intente de nuevo.")
+            print("\nOpción no válida. Intente de nuevo.")
             try: input("[Enter] ")
             except: pass
 
@@ -252,13 +252,13 @@ def submenu_usuario():
     """
     while True:
         limpiar()
-        print("--- SUBMENÃ: MANEJO DE AUTOS ---\n")
+        print("--- SUBMENÚ: MANEJO DE AUTOS ---\n")
         print("[1] Rentar auto.")
         print("[2] Devolver auto.")
         print("-------------------------")
-        print("[0] Volver al menÃº principal")
+        print("[0] Volver al menú principal")
         
-        try: opcion : str = input("\nSeleccione una opciÃ³n: ").strip()
+        try: opcion : str = input("\nSeleccione una opción: ").strip()
         except: opcion : str = ""
 
         if opcion == "1":
@@ -269,7 +269,7 @@ def submenu_usuario():
             # Volver al menu principal.
             break
         else:
-            print("\nOpciÃ³n no vÃ¡lida. Intente de nuevo.")
+            print("\nOpción no válida. Intente de nuevo.")
             try: input("[Enter] ")
             except: pass
 
@@ -289,13 +289,13 @@ def submenu_empresa():
     """
     while True:
         limpiar()
-        print("--- SUBMENÃ: INFORMES ---\n")
+        print("--- SUBMENÚ: INFORMES ---\n")
         print("[1] Disponibilidad de unidades")
         print("[2] Estadisticas del mes")
         print("[3] Estado de autos rentados")
-        print("[0] Volver al menÃº principal")
+        print("[0] Volver al menú principal")
 
-        try: opcion : str = input("\nSeleccione una opciÃ³n: ").strip()
+        try: opcion : str = input("\nSeleccione una opción: ").strip()
         except: opcion : str = ""
 
         if opcion == "1":
@@ -313,7 +313,7 @@ def submenu_empresa():
             # Volver al menu principal.
             break
         else:
-            print("\nOpciÃ³n no vÃ¡lida. Intente de nuevo.")
+            print("\nOpción no válida. Intente de nuevo.")
             try: input("[Enter] ")
             except: pass
 

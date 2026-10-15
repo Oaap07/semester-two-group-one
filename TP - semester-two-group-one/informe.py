@@ -51,10 +51,10 @@ numeros: tuple = ("0", "1", "2", "3", "4", "5", "6", "7", "8", "9")
 
 def limpiar():
     """
-    Limpia la consola según el sistema operativo.
+    Limpia la consola segun el sistema operativo.
 
     En Windows usa 'cls'; en Linux/macOS usa 'clear'. Sirve para mantener la
-    interfaz ordenada entre pantallas del menú.
+    interfaz ordenada entre pantallas del menu.
     """
     os.system('cls' if os.name == 'nt' else 'clear')
 
