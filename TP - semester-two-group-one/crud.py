@@ -15,50 +15,50 @@ excepciones, además de los requisitos mínimos del programa.
 PAUTAS / REQUISITOS DEL TP
 --------------------------------------------------------------------------------
 1) MANEJO DE EXCEPCIONES:
-   Usar manejo de excepciones en todos los métodos que requieran:
-   - Ingreso de datos.
-   - Conversión de enteros o flotantes.
-   - Manipulación de diccionarios.
-   - Apertura / cierre de archivos.
+Usar manejo de excepciones en todos los métodos que requieran:
+- Ingreso de datos.
+- Conversión de enteros o flotantes.
+- Manipulación de diccionarios.
+- Apertura / cierre de archivos.
 
 2) PERSISTENCIA DE INFORMACIÓN:
-   Guardar y procesar los datos mediante un archivo JSON (autos.json).
-   Create, Update y Delete deben SOBREESCRIBIR el archivo con la última
-   versión del diccionario; Read puede leer esa última versión.
-   (Se valora especialmente implementar las DOS opciones de persistencia).
+Guardar y procesar los datos mediante un archivo JSON (autos.json).
+Create, Update y Delete deben SOBREESCRIBIR el archivo con la última
+versión del diccionario; Read puede leer esa última versión.
+(Se valora especialmente implementar las DOS opciones de persistencia).
 
 3) PRECARGA DE INFORMACIÓN:
-   Los datos ya no se cargan desde la memoria del programa, sino desde un
-   archivo inicial (autos.json). Se requiere una precarga de al menos 5 registros.
+Los datos ya no se cargan desde la memoria del programa, sino desde un
+archivo inicial (autos.json). Se requiere una precarga de al menos 5 registros.
 
 4) TUPLA O CONJUNTO:
-   Incluir el uso de una tupla o un conjunto como parte de la lógica
-   (por ejemplo, para validaciones o estructuras de datos).
-   En este módulo: CALIDADES, MARCAS y CATEGORIAS son tuplas.
+Incluir el uso de una tupla o un conjunto como parte de la lógica
+(por ejemplo, para validaciones o estructuras de datos).
+En este módulo: CALIDADES, MARCAS y CATEGORIAS son tuplas.
 
 5) LISTA POR COMPRENSIÓN O LAMBDA:
-   Incorporar al menos una lista por comprensión o una función lambda
-   aplicada a la información.
-   -> TODO(TP - Req 5): Agregar/explicitar al menos un uso de lista por
-      comprensión o de lambda que procese los datos del catálogo.
+Incorporar al menos una lista por comprensión o una función lambda
+aplicada a la información.
+-> TODO(TP - Req 5): Agregar/explicitar al menos un uso de lista por
+    comprensión o de lambda que procese los datos del catálogo.
 
 6) ENTIDAD PRINCIPAL:
-   Representar la entidad principal con un DICCIONARIO DE DICCIONARIOS,
-   con un mínimo de 5 atributos por elemento.
-   En este módulo: autos = {patente: {marca, modelo, calidad, año, precio, categoria}}.
+Representar la entidad principal con un DICCIONARIO DE DICCIONARIOS,
+con un mínimo de 5 atributos por elemento.
+En este módulo: autos = {patente: {marca, modelo, calidad, año, precio, categoria}}.
 
 7) MENÚ CRUD COMPLETO:
-   Create (agregar_auto), Read (ver_autos / ver_auto),
-   Update (modificar_auto), Delete (eliminar_auto).
+Create (agregar_auto), Read (ver_autos / ver_auto),
+Update (modificar_auto), Delete (eliminar_auto).
 
 8) REPORTE MATRICIAL:
-   Generar al menos un reporte matricial (listas de listas) con información
-   procesada del conjunto. Recomendado: NumPy, Pandas y Matplotlib.
-   -> TODO(TP - Req 8): Este reporte se implementa en el módulo informe.py.
+Generar al menos un reporte matricial (listas de listas) con información
+procesada del conjunto. Recomendado: NumPy, Pandas y Matplotlib.
+-> TODO(TP - Req 8): Este reporte se implementa en el módulo informe.py.
 
 9) DOCUMENTACIÓN Y ENTREGA:
-   Uso de docstrings en las funciones, código claro y organizado, validación
-   de datos mediante funciones y entrega del informe en Word.
+Uso de docstrings en las funciones, código claro y organizado, validación
+de datos mediante funciones y entrega del informe en Word.
 
 --------------------------------------------------------------------------------
 CHECKLIST DE CUMPLIMIENTO (crud.py)
@@ -264,6 +264,11 @@ def _pedir_patente_existente(autos : dict) -> str:
     """
     # TODO(TP - Req 1): validar el tipo de 'autos' (dict) para evitar errores
     # al manipular diccionarios si llega un valor inesperado.
+    if not autos:
+            print("\nNo hay autos en el catálogo.")
+            try: input("[Enter] ")
+            except: pass
+            return
     patente = input("Ingrese la patente del auto: ").strip().upper()
     while patente not in autos:
         patente = input("Patente no encontrada. Ingrese una patente válida: ").strip().upper()
@@ -338,6 +343,10 @@ def ver_auto():
         return
     patente = _pedir_patente_existente(autos)
     _mostrar_auto(patente, autos[patente])
+    try: 
+        input("\n Presiona ENTER para volver")
+    except:
+        pass
 
 
 # ---------- CREATE ----------
@@ -359,12 +368,12 @@ def agregar_auto():
         patente = input("Esa patente ya existe. Ingrese otra: ").strip().upper()
 
     # Se piden y validan los demás atributos del auto.
-    marca = _pedir_de_tupla("Marca", MARCAS)
+    marca = _pedir_de_tupla("Marca: ", inf.MARCAS)
     modelo = input("Modelo: ").strip().lower()
-    calidad = _pedir_de_tupla("Calidad", CALIDADES)
-    anio = _pedir_entero("Año", 2000, 2026)
-    precio = _pedir_float("Precio (u$d)")
-    categoria = _pedir_de_tupla("Categoría", CATEGORIAS)
+    calidad = _pedir_de_tupla("Calidad:", inf.CALIDADES)
+    anio = _pedir_entero("Año: ", 2000, 2026)
+    precio = _pedir_float("Precio (u$d): ")
+    categoria = _pedir_de_tupla("Categoría: ", inf.CATEGORIAS)
 
     # Se crea el registro usando la patente como clave del diccionario.
     autos[patente] = {
@@ -395,8 +404,10 @@ def modificar_auto():
     # TODO(TP - Req 1): manejar excepciones en la carga y en el guardado.
     autos = _cargar_autos()
     if not autos:
-        print("\nNo hay autos para modificar.")
-        return
+            print("\nNo hay autos en el catálogo.")
+            try: input("[Enter] ")
+            except: pass
+            return
 
     patente = _pedir_patente_existente(autos)
 
@@ -422,17 +433,17 @@ def modificar_auto():
 
         # Se pide el nuevo valor según el tipo de campo elegido.
         if campo == "marca":
-            autos[patente]["marca"] = _pedir_de_tupla("Marca", MARCAS)
+            autos[patente]["marca"] = _pedir_de_tupla("Marca", inf.MARCAS)
         elif campo == "modelo":
             autos[patente]["modelo"] = input("Nuevo modelo: ").strip().lower()
         elif campo == "calidad":
-            autos[patente]["calidad"] = _pedir_de_tupla("Calidad", CALIDADES)
+            autos[patente]["calidad"] = _pedir_de_tupla("Calidad", inf.CALIDADES)
         elif campo == "año":
             autos[patente]["año"] = _pedir_entero("Año", 2000, 2026)
         elif campo == "precio":
             autos[patente]["precio"] = _pedir_float("Nuevo precio (u$d)")
         elif campo == "categoria":
-            autos[patente]["categoria"] = _pedir_de_tupla("Categoría", CATEGORIAS)
+            autos[patente]["categoria"] = _pedir_de_tupla("Categoría", inf.CATEGORIAS)
 
         # Se guarda el cambio y se confirma.
         _guardar_autos(autos)
@@ -452,8 +463,10 @@ def eliminar_auto():
     # TODO(TP - Req 1): manejar excepciones en la carga y en el guardado.
     autos = _cargar_autos()
     if not autos:
-        print("\nNo hay autos para eliminar.")
-        return
+            print("\nNo hay autos en el catálogo.")
+            try: input("[Enter] ")
+            except: pass
+            return
 
     patente = _pedir_patente_existente(autos)
     # Se elimina el registro del diccionario y se guarda el estado actualizado.
