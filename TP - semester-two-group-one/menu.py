@@ -184,7 +184,7 @@ def rentar_auto():
                         # Lista por comprension: patentes de ese modelo que
                         # todavia no estan rentadas.
                         # TODO(TP - Req 5): otro uso de lista por comprension.
-                        patentes = [i for i in lista if lista[i]["modelo"].capitalize() == filtrados[opcion2] and i not in rentados]
+                        patentes = [i for i in lista if lista[i]["modelo"].capitalize() == filtrados[opcion2]]
 
                         # Muestra la ficha resumida de cada patente disponible.
                         for i, j in enumerate(patentes):
@@ -237,10 +237,8 @@ def devolver_auto():
     """
     limpiar()
     # TODO(TP - Req 1): manejar excepciones al cargar.
-    rentados = cargar_rentados()
 
     # Si no hay autos rentados, se avisa y se sale de la funcion.
-    if rentados == None:
         print("No hay autos rentados actualmente.")
         input("\n[Enter]")
 
@@ -261,7 +259,6 @@ def estado_rentas():
     """
     limpiar()
     # TODO(TP - Req 1): manejar excepciones al cargar.
-    rentados = cargar_rentados()
     print("--- ESTADO DE AUTOS RENTADOS ---\n")
     # TODO(TP): recorrer 'rentados' y mostrar la informacion de cada auto.
     # TODO(TP - Req 5): aplicar lista por comprension o lambda para un resumen.
