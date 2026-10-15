@@ -1,70 +1,70 @@
 """
-REQUISITOS DEL TRABAJO PRÁCTICO (TPO – SPRINT) — Programación I
-Facultad de Ingeniería Informática
+REQUISITOS DEL TRABAJO PRACTICO (TPO – SPRINT) — Programacion I
+Facultad de Ingenieria Informatica
 
-Módulo: menu.py — Menú principal, alquileres y navegación.
-Tema del trabajo: Administración de una concesionaria (catálogo de autos + alquileres).
+Modulo: menu.py — Menu principal, alquileres y navegacion.
+Tema del trabajo: Administracion de una concesionaria (catalogo de autos + alquileres).
 
 --------------------------------------------------------------------------------
 OBJETIVO DEL TRABAJO
 --------------------------------------------------------------------------------
 Aplicar los conocimientos vistos en clase sobre archivos/JSON y manejo de
-excepciones, además de los requisitos mínimos del programa.
+excepciones, ademas de los requisitos minimos del programa.
 
 --------------------------------------------------------------------------------
-PAUTAS / REQUISITOS DEL TP Y CÓMO SE RELACIONAN CON ESTE MÓDULO
+PAUTAS / REQUISITOS DEL TP Y COMO SE RELACIONAN CON ESTE MODULO
 --------------------------------------------------------------------------------
 1) MANEJO DE EXCEPCIONES:
    Usar manejo de excepciones en apertura/lectura/escritura de archivos,
-   ingreso de datos, conversiones y manipulación de diccionarios.
+   ingreso de datos, conversiones y manipulacion de diccionarios.
    -> TODO(TP - Req 1): completar los try/except marcados en este archivo.
 
-2) PERSISTENCIA DE INFORMACIÓN:
+2) PERSISTENCIA DE INFORMACION:
    rentados.json guarda los autos alquilados (diccionario). Las acciones que
-   modifican datos deben sobreescribir el archivo con la última versión.
+   modifican datos deben sobreescribir el archivo con la ultima version.
    (Se valora implementar las DOS opciones de persistencia).
 
-3) PRECARGA DE INFORMACIÓN:
-   El catálogo se alimenta desde autos.json (precarga de al menos 5 registros).
+3) PRECARGA DE INFORMACION:
+   El catalogo se alimenta desde autos.json (precarga de al menos 5 registros).
 
 4) TUPLA O CONJUNTO:
-   Usar una tupla o conjunto dentro de la lógica. Aquí se usan conjuntos
-   (set comprehension) al filtrar modelos y claves de categorías.
+   Usar una tupla o conjunto dentro de la logica. Aqui se usan conjuntos
+   (set comprehension) al filtrar modelos y claves de categorias.
 
-5) LISTA POR COMPRENSIÓN O LAMBDA:
-   Incorporar al menos una lista por comprensión o una función lambda.
+5) LISTA POR COMPRENSION O LAMBDA:
+   Incorporar al menos una lista por comprension o una funcion lambda.
    -> TODO(TP - Req 5): en rentar_auto() ya hay comprensiones; se pide
-      documentarlas explícitamente y/o agregar una lambda aplicada a los datos.
+      documentarlas explicitamente y/o agregar una lambda aplicada a los datos.
 
 6) ENTIDAD PRINCIPAL:
-   Diccionario de diccionarios con un mínimo de 5 atributos por elemento
+   Diccionario de diccionarios con un minimo de 5 atributos por elemento
    (tanto 'lista' de autos como 'rentados').
 
-7) MENÚ CRUD COMPLETO:
-   Menú principal + submenús de usuario y empresa.
+7) MENU CRUD COMPLETO:
+   Menu principal + submenus de usuario y empresa.
 
 8) REPORTE MATRICIAL:
    Los informes deben incluir al menos un reporte matricial (listas de listas).
    Recomendado: NumPy, Pandas y Matplotlib.
-   -> TODO(TP - Req 8): implementar en el módulo informe.py.
+   -> TODO(TP - Req 8): implementar en el modulo informe.py.
 
-9) DOCUMENTACIÓN Y ENTREGA:
-   Docstrings, código claro y organizado, informe en Word.
+9) DOCUMENTACION Y ENTREGA:
+   Docstrings, codigo claro y organizado, informe en Word.
 
 --------------------------------------------------------------------------------
 CHECKLIST DE CUMPLIMIENTO (menu.py)
 --------------------------------------------------------------------------------
-[x] Integración con JSON (autos.json y rentados.json).
-[x] Menús y navegación (principal, usuario, empresa).
+[x] Integracion con JSON (autos.json y rentados.json).
+[x] Menus y navegacion (principal, usuario, empresa).
 [x] Uso de comprensiones al filtrar modelos/patentes.
 [x] Docstrings en las funciones.
 [ ] Req 1: try/except completo en la entrada/salida de archivos.
-[ ] Req 5: documentar explícitamente una lista por comprensión o lambda.
+[ ] Req 5: documentar explicitamente una lista por comprension o lambda.
 [ ] Req 8: asegurar el reporte matricial (delegado a informe.py).
-[ ] Completar la lógica de devolver_auto() y estado_rentas().
+[ ] Completar la logica de devolver_auto() y estado_rentas().
 
-NOTA: Esta versión solo AGREGA documentación y marcas TODO(TP) para indicar
-lo que falta. NO se modificó ninguna línea de lógica del programa.
+NOTA: Esta version solo AGREGA documentacion y marcas TODO(TP) para indicar
+lo que falta. NO se modifico ninguna linea de logica del programa.
 """
 
 import json, os
@@ -72,10 +72,10 @@ import informe as inf
 
 def limpiar():
     """
-    Limpia la consola según el sistema operativo.
+    Limpia la consola segun el sistema operativo.
 
     En Windows usa 'cls'; en Linux/macOS usa 'clear'. Sirve para mantener la
-    interfaz ordenada entre pantallas del menú.
+    interfaz ordenada entre pantallas del menu.
     """
     os.system('cls' if os.name == 'nt' else 'clear')
 
@@ -85,21 +85,21 @@ def cargar_rentados():
     Carga el diccionario de autos actualmente rentados desde `rentados.json`.
 
     Si el archivo no existe (primer uso o sin rentas), devuelve un diccionario
-    vacío para evitar errores de lectura.
+    vacio para evitar errores de lectura.
 
     Returns:
         dict: Estructura {patente: datos_del_auto, ...} con los mismos campos
         que cada auto de autos.json.
 
     Raises:
-        json.JSONDecodeError: Si rentados.json tiene un formato inválido.
+        json.JSONDecodeError: Si rentados.json tiene un formato invalido.
     """
     # TODO(TP - Req 1): ampliar el manejo de excepciones (JSONDecodeError, OSError).
     try:
         with open("rentados.json", 'r', encoding="utf-8") as archivo:
             return json.load(archivo)
     except FileNotFoundError as e:
-        #  Empieza con un diccionario vacío si no se encuentra el archivo 
+        #  Empieza con un diccionario vacio si no se encuentra el archivo 
         return {}
     except OSError as e:
         limpiar()
@@ -114,14 +114,14 @@ def guardar_rentados(rentados):
 
     Sobreescribe el archivo con el estado actual. Se usa al alquilar un auto
     para actualizar el registro.
-    (Req 2 del TP: la acción debe sobreescribir el archivo con la última versión).
+    (Req 2 del TP: la accion debe sobreescribir el archivo con la ultima version).
 
     Args:
         rentados (dict): Diccionario con los autos actualmente en alquiler.
 
     Raises:
         OSError: Si ocurre un error al abrir o escribir el archivo.
-        TypeError: Si algún valor no es serializable a JSON.
+        TypeError: Si algun valor no es serializable a JSON.
     """
     # TODO(TP - Req 1): agregar try/except para el guardado (OSError).
     try:
@@ -139,21 +139,21 @@ def rentar_auto():
     Flujo completo para alquilar un auto disponible.
 
     Pasos:
-    1. Muestra las categorías de autos.
-    2. Filtra los modelos disponibles de esa categoría, excluyendo los ya rentados.
-    3. Muestra las patentes de ese modelo, también excluyendo los ya rentados.
+    1. Muestra las categorias de autos.
+    2. Filtra los modelos disponibles de esa categoria, excluyendo los ya rentados.
+    3. Muestra las patentes de ese modelo, tambien excluyendo los ya rentados.
     4. Confirma el alquiler guardando la ficha completa en `rentados.json`.
 
-    El flujo está anidado con bucles while para poder volver entre niveles
-    (Categorías -> Modelos -> Patentes).
+    El flujo esta anidado con bucles while para poder volver entre niveles
+    (Categorias -> Modelos -> Patentes).
 
     Notas (Req 5 del TP):
-        Se usan listas por comprensión y conjuntos (set) para filtrar los datos.
-        TODO(TP - Req 5): documentar explícitamente al menos una de estas
-        comprensiones o agregar una función lambda aplicada a la información.
+        Se usan listas por comprension y conjuntos (set) para filtrar los datos.
+        TODO(TP - Req 5): documentar explicitamente al menos una de estas
+        comprensiones o agregar una funcion lambda aplicada a la informacion.
     """
 
-    # Carga el catálogo completo de autos desde el archivo.
+    # Carga el catalogo completo de autos desde el archivo.
     # TODO(TP - Req 1): manejar excepciones (FileNotFoundError, JSONDecodeError).
     try:
         with open("autos.json", 'r', encoding="utf-8") as archivo:
@@ -167,7 +167,7 @@ def rentar_auto():
 
     while True:
         limpiar()
-        # --- NIVEL 1: selección de categoría ---
+        # --- NIVEL 1: seleccion de categoria ---
         print(" --- Escoja una categoría ---\n\n"
               "[1] Sedán / Hatchback\n"
               "[2] SUV / Crossover\n"
@@ -178,7 +178,7 @@ def rentar_auto():
         
         try: opcion : str = input("\nSeleccione una opción: ").strip()
         except: opcion : str = ""
-        # Relaciona cada opción numérica con el valor interno de la categoría.
+        # Relaciona cada opcion numerica con el valor interno de la categoria.
         categ_preset = {
             "1": "sedan_hatchback",
             "2": "suv_crossover",
@@ -187,15 +187,15 @@ def rentar_auto():
         }
 
         if opcion == '0':
-            # Volver al submenú de usuario.
+            # Volver al submenu de usuario.
             break
         elif opcion not in list(map(str, list(range(1,5)))): 
-            # Validación: la opción debe estar entre 1 y 4.
+            # Validacion: la opcion debe estar entre 1 y 4.
             print("\nOpción no válida. Intente de nuevo.")
             try: input("[Enter] ")
             except: pass
         else:
-            # --- NIVEL 2: selección de modelo dentro de la categoría ---
+            # --- NIVEL 2: seleccion de modelo dentro de la categoria ---
             while True:
                 limpiar()
                 print("--- Modelos disponibles ---\n")
@@ -203,21 +203,21 @@ def rentar_auto():
                 # Estado actual de los autos rentados (se recarga cada vez).
                 rentados = cargar_rentados()
 
-                # Filtra modelos únicos disponibles de la categoría elegida.
-                # Se considera "disponible" si pertenece a la categoría y su
-                # patente NO está en 'rentados'. Es una lista por comprensión
+                # Filtra modelos unicos disponibles de la categoria elegida.
+                # Se considera "disponible" si pertenece a la categoria y su
+                # patente NO esta en 'rentados'. Es una lista por comprension
                 # que alimenta un conjunto (set) para eliminar duplicados.
-                # TODO(TP - Req 5): esta comprensión es un uso válido del requisito.
+                # TODO(TP - Req 5): esta comprension es un uso valido del requisito.
                 filtrados = {str(i+1): j.capitalize() for i ,j in enumerate(list({lista[i]["modelo"] for i in lista if lista[i]["categoria"] == categ_preset[opcion] and i not in rentados}))}
 
-                # Si no quedan modelos disponibles, se avisa y se vuelve a categorías.
+                # Si no quedan modelos disponibles, se avisa y se vuelve a categorias.
                 if not filtrados:
                     print("No hay autos disponibles en esta categoría.")
                     try: input("[Enter] ")
                     except: pass
                     break
 
-                # Muestra el modelo numerado y una opción para salir.
+                # Muestra el modelo numerado y una opcion para salir.
                 [print(f"[{i}] {j}") for i, j in filtrados.items()]
                 print("-------------------------")
                 print("[0] Para salir a Categorías")
@@ -226,22 +226,22 @@ def rentar_auto():
                 except: opcion2 : str = ""
 
                 if opcion2 == '0':
-                    # Volver al nivel de categorías.
+                    # Volver al nivel de categorias.
                     break
                 elif opcion2 not in filtrados.keys():
-                    # Validación: el modelo debe estar entre los mostrados.
+                    # Validacion: el modelo debe estar entre los mostrados.
                     print("\nOpción no válida. Intente de nuevo.")
                     try: input("[Enter] ")
                     except: pass
                 else:
-                    # --- NIVEL 3: selección de patente del modelo elegido ---
+                    # --- NIVEL 3: seleccion de patente del modelo elegido ---
                     while True:
                         limpiar()
                         print(f"--- PATENTES con Modelo: {filtrados[opcion2]}---")
 
-                        # Lista por comprensión: patentes de ese modelo que
-                        # todavía no están rentadas.
-                        # TODO(TP - Req 5): otro uso de lista por comprensión.
+                        # Lista por comprension: patentes de ese modelo que
+                        # todavia no estan rentadas.
+                        # TODO(TP - Req 5): otro uso de lista por comprension.
                         patentes = [i for i in lista if lista[i]["modelo"].capitalize() == filtrados[opcion2] and i not in rentados]
 
                         # Muestra la ficha resumida de cada patente disponible.
@@ -261,12 +261,12 @@ def rentar_auto():
                             # Volver al nivel de modelos.
                             break
                         elif opcion3 not in list(map(str, list(range(1, len(patentes)+1)))):
-                            # Validación: la opción debe corresponder a una patente mostrada.
+                            # Validacion: la opcion debe corresponder a una patente mostrada.
                             print("\nOpción no válida. Intente de nuevo.")
                             try: input("[Enter] ")
                             except: pass
                         else:
-                            # --- Confirmación y registro del alquiler ---
+                            # --- Confirmacion y registro del alquiler ---
                             limpiar()
                             patente_elegida = patentes[int(opcion3)-1]
                             print(f"\n¡Auto con patente: {patente_elegida} RENTADO!")
@@ -289,21 +289,21 @@ def rentar_auto():
 
 def devolver_auto():
     """
-    Interfaz para registrar la devolución de un auto rentado.
+    Interfaz para registrar la devolucion de un auto rentado.
 
-    Actualmente solo muestra un mensaje informativo y espera confirmación.
+    Actualmente solo muestra un mensaje informativo y espera confirmacion.
     TODO(TP): completar la funcionalidad:
         - Listar los autos rentados (patente + datos).
         - Pedir la patente a devolver, validando que exista.
         - Eliminarla de `rentados.json` (sobreescribir el archivo con la
-          última versión del diccionario).
-        - Informar que la devolución se realizó correctamente.
+          ultima version del diccionario).
+        - Informar que la devolucion se realizo correctamente.
     """
     limpiar()
     # TODO(TP - Req 1): manejar excepciones al cargar.
     rentados = cargar_rentados()
 
-    # Si no hay autos rentados, se avisa y se sale de la función.
+    # Si no hay autos rentados, se avisa y se sale de la funcion.
     if rentados == None:
         print("No hay autos rentados actualmente.")
         input("\n[Enter]")
@@ -320,25 +320,25 @@ def estado_rentas():
     Muestra el estado actual de los autos rentados.
 
     Lee `rentados.json` y muestra un listado de los autos (patentes y datos).
-    TODO(TP): completar la visualización con el formato de ficha y considerar
-    el uso de una lista por comprensión o lambda para resumir la información.
+    TODO(TP): completar la visualizacion con el formato de ficha y considerar
+    el uso de una lista por comprension o lambda para resumir la informacion.
     """
     limpiar()
     # TODO(TP - Req 1): manejar excepciones al cargar.
     rentados = cargar_rentados()
     print("--- ESTADO DE AUTOS RENTADOS ---\n")
-    # TODO(TP): recorrer 'rentados' y mostrar la información de cada auto.
-    # TODO(TP - Req 5): aplicar lista por comprensión o lambda para un resumen.
+    # TODO(TP): recorrer 'rentados' y mostrar la informacion de cada auto.
+    # TODO(TP - Req 5): aplicar lista por comprension o lambda para un resumen.
     try: input("[Enter] ")
     except: pass
 
-# ---------- Menús ----------
+# ---------- Menus ----------
 
 def menu_principal():
     """
-    Menú principal del sistema.
+    Menu principal del sistema.
 
-    Permite acceder al submenú de usuario o al submenú de empresa.
+    Permite acceder al submenu de usuario o al submenu de empresa.
     El bucle termina cuando se selecciona [0] Salir.
     """
     while True:
@@ -353,13 +353,13 @@ def menu_principal():
         try: opcion = input("\nSeleccione una opción: ").strip()
         except: opcion : str = ""
 
-        # Despacho de la opción elegida hacia el submenú correspondiente.
+        # Despacho de la opcion elegida hacia el submenu correspondiente.
         if opcion == "1":
             submenu_usuario()
         elif opcion == "2":
             submenu_empresa()
         elif opcion == "0":
-            # Finalizar la ejecución del programa.
+            # Finalizar la ejecucion del programa.
             break
         else:
             print("\nOpción no válida. Intente de nuevo.")
@@ -369,10 +369,10 @@ def menu_principal():
 
 def submenu_usuario():
     """
-    Submenú destinado al usuario final.
+    Submenu destinado al usuario final.
 
     Ofrece acciones de alquiler: rentar auto o devolver auto.
-    Permite volver al menú principal con [0].
+    Permite volver al menu principal con [0].
     """
     while True:
         limpiar()
@@ -390,7 +390,7 @@ def submenu_usuario():
         elif opcion == "2":
             devolver_auto()
         elif opcion == "0":
-            # Volver al menú principal.
+            # Volver al menu principal.
             break
         else:
             print("\nOpción no válida. Intente de nuevo.")
@@ -400,13 +400,13 @@ def submenu_usuario():
 
 def submenu_empresa():
     """
-    Submenú destinado a la empresa (gestión e informes).
+    Submenu destinado a la empresa (gestion e informes).
 
-    Accede a las funciones de informe del módulo `informe`:
+    Accede a las funciones de informe del modulo `informe`:
     - Disponibilidad de unidades.
-    - Estadísticas del mes.
-    - Estado de autos rentados (función local estado_rentas).
-    Permite volver al menú principal con [0].
+    - Estadisticas del mes.
+    - Estado de autos rentados (funcion local estado_rentas).
+    Permite volver al menu principal con [0].
 
     Importante (Req 8 del TP): las funciones de informe deben generar al menos
     UN REPORTE MATRICIAL (listas de listas). Recomendado NumPy/Pandas/Matplotlib.
@@ -423,18 +423,18 @@ def submenu_empresa():
         except: opcion : str = ""
 
         if opcion == "1":
-            # Informe de disponibilidad (módulo informe).
+            # Informe de disponibilidad (modulo informe).
             # TODO(TP - Req 8): verificar que incluya un reporte matricial.
             informe.informe_disponibilidad()
         elif opcion == "2":
-            # Informe de estadísticas (módulo informe).
+            # Informe de estadisticas (modulo informe).
             # TODO(TP - Req 8): verificar que incluya un reporte matricial.
             informe.informe_estadisticas()
         elif opcion == "3":
             # Estado local de los autos rentados.
             estado_rentas()
         elif opcion == "0":
-            # Volver al menú principal.
+            # Volver al menu principal.
             break
         else:
             print("\nOpción no válida. Intente de nuevo.")
@@ -442,7 +442,7 @@ def submenu_empresa():
             except: pass
 
 if __name__ == "__main__":
-    # Inicio de la aplicación.
+    # Inicio de la aplicacion.
     # TODO(TP - Req 3): confirmar que autos.json tenga al menos 5 registros (precarga).
     limpiar()
     menu_principal()
