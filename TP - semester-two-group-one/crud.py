@@ -77,8 +77,9 @@ NOTA: Esta versión solo AGREGA documentación y marcas TODO(TP) para indicar
 lo que falta. NO se modificó ninguna línea de lógica del programa.
 """
 
-import json
-import informe as f
+import json, os
+import informe as inf
+
 
 # ==========================================
 # CONFIGURACIÓN Y CONSTANTES
@@ -86,13 +87,13 @@ import informe as f
 
 # Ruta del archivo JSON donde se guarda el catálogo de autos.
 # (Req 2 y 3 del TP: persistencia y precarga desde archivo).
-RUTA_AUTOS = f.RUTA_AUTOS_JSON
+RUTA_AUTOS = inf.RUTA_AUTOS_JSON
 
 # Tuplas con los valores permitidos para cada campo.
 # (Req 4 del TP: uso de tuplas como parte de la lógica / validaciones).
-CALIDAD = f.CALIDAD
-MARCA = f.MARCAS
-CATEGORIA = f.CATEGORIAS
+CALIDAD = inf.CALIDADES
+MARCA = inf.MARCAS
+CATEGORIA = inf.CATEGORIAS
 
 # Mapeo entre la opción numérica del menú de modificación y el campo del JSON.
 # Formato: "clave de menú": ("nombre del campo en el JSON", "nombre para mostrar").
@@ -106,10 +107,18 @@ CAMPOS = {
     "6": ("categoria", "Categoría"),
 }
 
+def limpiar():
+    """
+    Limpia la consola según el sistema operativo.
+
+    En Windows usa 'cls'; en Linux/macOS usa 'clear'. Sirve para mantener la
+    interfaz ordenada entre pantallas del menú.
+    """
+    os.system('cls' if os.name == 'nt' else 'clear')
 
 # ---------- Persistencia ----------
 
-def _cargar_autos():
+def _cargar_autos() -> dict[dict]:
     """
     Carga el catálogo de autos desde el archivo JSON.
 
@@ -122,12 +131,19 @@ def _cargar_autos():
 
     Raises:
         FileNotFoundError: Si el archivo autos.json no existe.
-        json.JSONDecodeError: Si el archivo no tiene un formato JSON válido.
+        OSError: Si ocurre un problema a nivel operativo
     """
     # TODO(TP - Req 1): envolver en try/except para manejar apertura/lectura
     # del archivo (FileNotFoundError, json.JSONDecodeError, OSError).
-    with open(RUTA_AUTOS, "r", encoding="utf-8") as archivo:
-        return json.load(archivo)
+    try: 
+        with open(RUTA_AUTOS, "r", encoding="utf-8") as archivo:
+            return json.load(archivo)
+    except FileNotFoundError:
+        return {}
+    except OSError as e:
+        limpiar()
+        print(f"/// Ocurrió un error de sistema: {e} ///")
+        input("[Enter] ")
 
 
 def _guardar_autos(autos):
@@ -147,8 +163,15 @@ def _guardar_autos(autos):
     """
     # TODO(TP - Req 1): envolver en try/except para el guardado (OSError)
     # y validar que 'autos' sea un diccionario antes de escribir.
-    with open(RUTA_AUTOS, "w", encoding="utf-8") as archivo:
-        json.dump(autos, archivo, indent=4, ensure_ascii=False)
+    try:
+        with open(RUTA_AUTOS, "w", encoding="utf-8") as archivo:
+            json.dump(autos, archivo, indent=4, ensure_ascii=False)
+    except FileNotFoundError:
+        print(f"/// ¡El archivo {RUTA_AUTOS} no existe! ///")
+    except OSError as e:
+        limpiar()
+        print(f"/// Ocurrió un error de sistema: {e} ///")
+        input("[Enter] ")
 
 
 # ---------- Validaciones de entrada ----------
@@ -273,18 +296,19 @@ def _mostrar_auto(patente, datos):
 
 # ---------- READ ----------
 
-def ver_autos():
+def ver_stock():
     """
     Muestra todo el catálogo de autos (lectura general / Read).
 
     Carga el archivo JSON y, si hay autos, los lista uno por uno usando
     `_mostrar_auto()`. Si el catálogo está vacío, lo informa.
     """
-    # TODO(TP - Req 1): manejar excepciones al cargar el archivo.
     autos = _cargar_autos()
     # Si el diccionario está vacío, no hay nada para mostrar.
     if not autos:
         print("\nNo hay autos en el catálogo.")
+        try: input("[Enter] ")
+        except: pass
         return
     print("\n--- CATÁLOGO DE AUTOS ---")
     # Recorre cada par (patente, datos) del diccionario de diccionarios.
@@ -292,6 +316,11 @@ def ver_autos():
     # o una lambda para generar un resumen del catálogo.
     for patente, datos in autos.items():
         _mostrar_auto(patente, datos)
+        try: 
+            res = input(" ")
+            if res == "q":
+                return
+        except: pass
 
 
 def ver_auto():
@@ -301,10 +330,11 @@ def ver_auto():
     Pide una patente existente y muestra únicamente la ficha de ese auto.
     Si el catálogo está vacío, lo informa.
     """
-    # TODO(TP - Req 1): manejar excepciones al cargar el archivo.
     autos = _cargar_autos()
     if not autos:
         print("\nNo hay autos en el catálogo.")
+        try: input(" ")
+        except: pass
         return
     patente = _pedir_patente_existente(autos)
     _mostrar_auto(patente, autos[patente])
@@ -443,6 +473,7 @@ def menu_crud():
     activo hasta que se selecciona [0] Salir.
     """
     while True:
+        limpiar()
         print("\n--- CRUD DE AUTOS ---")
         print("[1] Ver catálogo")
         print("[2] Ver un auto")
@@ -455,7 +486,7 @@ def menu_crud():
 
         # Despacho de la opción elegida hacia la función correspondiente.
         if opcion == "1":
-            ver_autos()
+            ver_stock()
         elif opcion == "2":
             ver_auto()
         elif opcion == "3":

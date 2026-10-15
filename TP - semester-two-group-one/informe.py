@@ -9,11 +9,12 @@ AUTOS = {
     "peugeot":("208","3008","2008","408","206"),
     "chevrloet":("cruze","onix","spin","tracker","montana")
 }
-MARCAS = tuple(AUTOS.keys())
-CALIDAD = ("nuevo","como nuevo","usado")
-ANIO = (2000,2026)
-CATEGORIAS = ("sedan_hatchback", "suv_crossover", "pickup", "monovolumen_mpv")
-preset = {
+MARCAS : tuple = tuple(AUTOS.keys())
+CALIDADES : tuple = ("nuevo","como nuevo","usado")
+DISPONIBLE : bool = True
+ANIOS : tuple = (2000,2026)
+CATEGORIAS : tuple = ("sedan_hatchback", "suv_crossover", "pickup", "monovolumen_mpv")
+preset : dict = {
     2016: ["AA"],
     2017: ["AB"],
     2018: ["AC", "AD"],
@@ -27,7 +28,7 @@ preset = {
     2026: ["AI"]
 }
 
-categorías = {
+categorías : dict = {
     "sedan_hatchback" : ["etios", "yaris", "corolla", "clio", "sandero", 
                         "argo", "cronos", "206", "208", "408", "onix", "cruze"],
     "suv_crossover" : ["rav4", "kardian", "duster", "pulse",
@@ -37,9 +38,19 @@ categorías = {
     "monovolumen_mpv" : ["kangoo", "spin"]
 }
 
-RUTA_AUTOS_JSON = "autos.json"
-letras = ("a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "ñ", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z")
-numeros = ("0", "1", "2", "3", "4", "5", "6", "7", "8", "9")
+RUTA_AUTOS_JSON : str = "autos.json"
+letras : tuple = ("a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "ñ", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z")
+numeros : tuple = ("0", "1", "2", "3", "4", "5", "6", "7", "8", "9")
+
+
+def limpiar():
+    """
+    Limpia la consola según el sistema operativo.
+
+    En Windows usa 'cls'; en Linux/macOS usa 'clear'. Sirve para mantener la
+    interfaz ordenada entre pantallas del menú.
+    """
+    os.system('cls' if os.name == 'nt' else 'clear')
 
 
 def informe_autos(
@@ -50,7 +61,7 @@ def informe_autos(
     cant_autos = 25
     for _ in range(1, cant_autos + 1):
         
-        anio = random.randint(ANIO[0],ANIO[1])
+        anio = random.randint(ANIOS[0],ANIOS[1])
         patente = ""
         #  Patentes mayores o iguales a 2016
         if anio >= 2016:
@@ -84,10 +95,11 @@ def informe_autos(
         listado[patente] = {
             "marca" : marca,
             "modelo" : modelo,
-            "calidad" : random.choice(CALIDAD),
+            "calidad" : random.choice(CALIDADES),
             "año" : anio,
             "precio": precio,
-            "categoria": [i for i in categorías if modelo in categorías[i]][0]
+            "categoria": [i for i in categorías if modelo in categorías[i]][0],
+            "estado" : DISPONIBLE
         }
     
     try:
@@ -98,17 +110,11 @@ def informe_autos(
             json.dump(listado, f, indent=4, ensure_ascii=False)
             print(f"/// Archivo [autos.json] creado exitosamente ///")
     
-    input("[Enter] ")
-    return listado
+    try: input("[Enter] ")
+    except: pass
 
-def limpiar():
-    """
-    Limpia la consola según el sistema operativo.
+    return
 
-    En Windows usa 'cls'; en Linux/macOS usa 'clear'. Sirve para mantener la
-    interfaz ordenada entre pantallas del menú.
-    """
-    os.system('cls' if os.name == 'nt' else 'clear')
 
 if __name__ == "__main__":
     limpiar()

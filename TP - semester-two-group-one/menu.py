@@ -67,7 +67,8 @@ NOTA: Esta versión solo AGREGA documentación y marcas TODO(TP) para indicar
 lo que falta. NO se modificó ninguna línea de lógica del programa.
 """
 
-import json, os, crud
+import json, os
+import informe as inf
 
 def limpiar():
     """
@@ -97,9 +98,14 @@ def cargar_rentados():
     try:
         with open("rentados.json", 'r', encoding="utf-8") as archivo:
             return json.load(archivo)
-    except FileNotFoundError:
-        # Aún no hay autos rentados: se empieza con un diccionario vacío.
+    except FileNotFoundError as e:
+        #  Empieza con un diccionario vacío si no se encuentra el archivo 
         return {}
+    except OSError as e:
+        limpiar()
+        print(f"/// Ocurrió un error de sistema: {e} ///")
+        input("[Enter] ")
+    
 
 
 def guardar_rentados(rentados):
@@ -118,8 +124,14 @@ def guardar_rentados(rentados):
         TypeError: Si algún valor no es serializable a JSON.
     """
     # TODO(TP - Req 1): agregar try/except para el guardado (OSError).
-    with open("rentados.json", 'w', encoding="utf-8") as archivo:
-        json.dump(rentados, archivo, indent=4)
+    try:
+        with open("rentados.json", 'w', encoding="utf-8") as archivo:
+            json.dump(rentados, archivo, indent=4)
+    except OSError as e:
+        limpiar()
+        print(f"/// Ocurrió un error de sistema: {e} ///")
+        input("[Enter] ")
+        return
 
 
 def rentar_auto():
@@ -140,23 +152,32 @@ def rentar_auto():
         TODO(TP - Req 5): documentar explícitamente al menos una de estas
         comprensiones o agregar una función lambda aplicada a la información.
     """
-    limpiar()
 
     # Carga el catálogo completo de autos desde el archivo.
     # TODO(TP - Req 1): manejar excepciones (FileNotFoundError, JSONDecodeError).
-    with open("autos.json", 'r', encoding="utf-8") as archivo:
-        lista = json.load(archivo)
+    try:
+        with open("autos.json", 'r', encoding="utf-8") as archivo:
+            lista = json.load(archivo)
+    except OSError as e:
+        limpiar()
+        print(f"/// Ocurrió un error de sistema: {e} ///")
+        try: input("[Enter] ")
+        except: pass
+        return
+
     while True:
         limpiar()
         # --- NIVEL 1: selección de categoría ---
-        res = input(" --- Escoja una categoría ---\n\n"
-                        "[1] Sedán / Hatchback\n"
-                        "[2] SUV / Crossover\n"
-                        "[3] Pick-up\n"
-                        "[4] Monovolumen / Utilitario (MPV)\n"
-                        "-------------------------\n"
-                        "[0] Para ir a Sub menú\n"
-                        "\nSeleccione una opción: ")
+        print(" --- Escoja una categoría ---\n\n"
+              "[1] Sedán / Hatchback\n"
+              "[2] SUV / Crossover\n"
+              "[3] Pick-up\n"
+              "[4] Monovolumen / Utilitario (MPV)\n"
+              "-------------------------\n"
+              "[0] Para ir a Sub menú\n")
+        
+        try: opcion : str = input("\nSeleccione una opción: ").strip()
+        except: opcion : str = ""
         # Relaciona cada opción numérica con el valor interno de la categoría.
         categ_preset = {
             "1": "sedan_hatchback",
@@ -164,13 +185,15 @@ def rentar_auto():
             "3": "pickup",
             "4": "monovolumen_mpv"
         }
-        if res == '0':
+
+        if opcion == '0':
             # Volver al submenú de usuario.
             break
-        elif res not in list(map(str, list(range(1,5)))): 
+        elif opcion not in list(map(str, list(range(1,5)))): 
             # Validación: la opción debe estar entre 1 y 4.
             print("\nOpción no válida. Intente de nuevo.")
-            input("[Enter]")
+            try: input("[Enter] ")
+            except: pass
         else:
             # --- NIVEL 2: selección de modelo dentro de la categoría ---
             while True:
@@ -185,36 +208,41 @@ def rentar_auto():
                 # patente NO está en 'rentados'. Es una lista por comprensión
                 # que alimenta un conjunto (set) para eliminar duplicados.
                 # TODO(TP - Req 5): esta comprensión es un uso válido del requisito.
-                filtrados = {str(i+1): j.capitalize() for i ,j in enumerate(list({lista[i]["modelo"] for i in lista if lista[i]["categoria"] == categ_preset[res] and i not in rentados}))}
+                filtrados = {str(i+1): j.capitalize() for i ,j in enumerate(list({lista[i]["modelo"] for i in lista if lista[i]["categoria"] == categ_preset[opcion] and i not in rentados}))}
 
                 # Si no quedan modelos disponibles, se avisa y se vuelve a categorías.
                 if not filtrados:
                     print("No hay autos disponibles en esta categoría.")
-                    input("\n[Enter]")
+                    try: input("[Enter] ")
+                    except: pass
                     break
 
                 # Muestra el modelo numerado y una opción para salir.
                 [print(f"[{i}] {j}") for i, j in filtrados.items()]
                 print("-------------------------")
                 print("[0] Para salir a Categorías")
-                res1 = input("\nSeleccione el modelo que desea: ")
-                if res1 == '0':
+                
+                try: opcion2 : str = input("\nSeleccione una opción: ").strip()
+                except: opcion2 : str = ""
+
+                if opcion2 == '0':
                     # Volver al nivel de categorías.
                     break
-                elif res1 not in filtrados.keys():
+                elif opcion2 not in filtrados.keys():
                     # Validación: el modelo debe estar entre los mostrados.
                     print("\nOpción no válida. Intente de nuevo.")
-                    input("[Enter]")
+                    try: input("[Enter] ")
+                    except: pass
                 else:
                     # --- NIVEL 3: selección de patente del modelo elegido ---
                     while True:
                         limpiar()
-                        print(f"--- PATENTES con Modelo: {filtrados[res1]}---")
+                        print(f"--- PATENTES con Modelo: {filtrados[opcion2]}---")
 
                         # Lista por comprensión: patentes de ese modelo que
                         # todavía no están rentadas.
                         # TODO(TP - Req 5): otro uso de lista por comprensión.
-                        patentes = [i for i in lista if lista[i]["modelo"].capitalize() == filtrados[res1] and i not in rentados]
+                        patentes = [i for i in lista if lista[i]["modelo"].capitalize() == filtrados[opcion2] and i not in rentados]
 
                         # Muestra la ficha resumida de cada patente disponible.
                         for i, j in enumerate(patentes):
@@ -226,28 +254,31 @@ def rentar_auto():
                         print("-------------------------")
                         print("[0] Para salir a Modelos")
 
-                        res2 = input("\nSeleccione el auto que desea: ")
+                        try: opcion3 : str = input("\nSeleccione una opción: ").strip()
+                        except: opcion3 : str = ""
 
-                        if res2 == '0':
+                        if opcion3 == '0':
                             # Volver al nivel de modelos.
                             break
-                        elif res2 not in list(map(str, list(range(1, len(patentes)+1)))):
+                        elif opcion3 not in list(map(str, list(range(1, len(patentes)+1)))):
                             # Validación: la opción debe corresponder a una patente mostrada.
                             print("\nOpción no válida. Intente de nuevo.")
-                            input("\n[Enter]")
+                            try: input("[Enter] ")
+                            except: pass
                         else:
                             # --- Confirmación y registro del alquiler ---
                             limpiar()
-                            patente_elegida = patentes[int(res2)-1]
+                            patente_elegida = patentes[int(opcion3)-1]
                             print(f"\n¡Auto con patente: {patente_elegida} RENTADO!")
-                            print(len(lista))
+        
                             # Se copia la ficha completa del auto al diccionario
                             # de rentados y se guarda (sobreescribe el archivo).
                             # TODO(TP - Req 1): validar claves (KeyError) y guardar con try/except.
                             rentados[patente_elegida] = lista[patente_elegida]
                             guardar_rentados(rentados)
 
-                            input("\n[Enter]")
+                            try: input("[Enter] ")
+                            except: pass
                             # Salir del bucle de patentes tras alquilar.
                             break
                     # Salir del bucle de modelos.
@@ -273,14 +304,15 @@ def devolver_auto():
     rentados = cargar_rentados()
 
     # Si no hay autos rentados, se avisa y se sale de la función.
-    if not rentados:
+    if rentados == None:
         print("No hay autos rentados actualmente.")
         input("\n[Enter]")
 
     # Interfaz base (en desarrollo).
     print("¿Que auto desea devolver?")
     print("="*15)
-    input("\n[Enter]")
+    try: input("[Enter] ")
+    except: pass
 
 
 def estado_rentas():
@@ -297,8 +329,10 @@ def estado_rentas():
     print("--- ESTADO DE AUTOS RENTADOS ---\n")
     # TODO(TP): recorrer 'rentados' y mostrar la información de cada auto.
     # TODO(TP - Req 5): aplicar lista por comprensión o lambda para un resumen.
-    input("\n[Enter]")
+    try: input("[Enter] ")
+    except: pass
 
+# ---------- Menús ----------
 
 def menu_principal():
     """
@@ -314,7 +348,10 @@ def menu_principal():
         print("[2] Menu de empresa.")
         print("-------------------------")
         print("[0] Salir.")
-        opcion = input("\nSeleccione una opción: ").strip()
+        
+        
+        try: opcion = input("\nSeleccione una opción: ").strip()
+        except: opcion : str = ""
 
         # Despacho de la opción elegida hacia el submenú correspondiente.
         if opcion == "1":
@@ -326,7 +363,8 @@ def menu_principal():
             break
         else:
             print("\nOpción no válida. Intente de nuevo.")
-            input("[Enter] ")
+            try: input("[Enter] ")
+            except: pass
 
 
 def submenu_usuario():
@@ -343,7 +381,9 @@ def submenu_usuario():
         print("[2] Devolver auto.")
         print("-------------------------")
         print("[0] Volver al menú principal")
-        opcion = input("\nSeleccione una opción: ").strip()
+        
+        try: opcion : str = input("\nSeleccione una opción: ").strip()
+        except: opcion : str = ""
 
         if opcion == "1":
             rentar_auto()
@@ -354,7 +394,8 @@ def submenu_usuario():
             break
         else:
             print("\nOpción no válida. Intente de nuevo.")
-            input("[Enter] ")
+            try: input("[Enter] ")
+            except: pass
 
 
 def submenu_empresa():
@@ -378,7 +419,8 @@ def submenu_empresa():
         print("[3] Estado de autos rentados")
         print("[0] Volver al menú principal")
 
-        opcion = input("\nSeleccione una opción: ").strip()
+        try: opcion : str = input("\nSeleccione una opción: ").strip()
+        except: opcion : str = ""
 
         if opcion == "1":
             # Informe de disponibilidad (módulo informe).
@@ -396,7 +438,8 @@ def submenu_empresa():
             break
         else:
             print("\nOpción no válida. Intente de nuevo.")
-
+            try: input("[Enter] ")
+            except: pass
 
 if __name__ == "__main__":
     # Inicio de la aplicación.
