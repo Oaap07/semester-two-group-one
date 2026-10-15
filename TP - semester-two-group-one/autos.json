@@ -6,7 +6,7 @@
         "año": 2009,
         "precio": 47.5,
         "categoria": "suv_crossover",
-        "estado": true
+        "estado": false
     },
     "STL837": {
         "marca": "peugeot",

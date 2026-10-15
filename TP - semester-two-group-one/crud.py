@@ -1,80 +1,15 @@
 """
-REQUISITOS DEL TRABAJO PRACTICO (TPO – SPRINT) — Programacion I
-Facultad de Ingenieria Informatica
+Requisitos del Trabajo PrÃ¡ctico (TPO - SPRINT) - ProgramaciÃ³n I
+Facultad de IngenierÃ­a InformÃ¡tica
 
-Modulo: crud.py — Gestion CRUD del catalogo de autos.
-Tema del trabajo: Administracion de una concesionaria (catalogo de autos + alquileres).
+MÃ³dulo: crud.py - GestiÃ³n CRUD del catÃ¡logo de autos.
+Tema del trabajo: AdministraciÃ³n de una concesionaria (catÃ¡logo de autos + alquileres).
 
 --------------------------------------------------------------------------------
-OBJETIVO DEL TRABAJO
+Objetivo del trabajo
 --------------------------------------------------------------------------------
 Aplicar los conocimientos vistos en clase sobre archivos/JSON y manejo de
-excepciones, ademas de los requisitos minimos del programa.
-
---------------------------------------------------------------------------------
-PAUTAS / REQUISITOS DEL TP
---------------------------------------------------------------------------------
-1) MANEJO DE EXCEPCIONES:
-Usar manejo de excepciones en todos los metodos que requieran:
-- Ingreso de datos.
-- Conversion de enteros o flotantes.
-- Manipulacion de diccionarios.
-- Apertura / cierre de archivos.
-
-2) PERSISTENCIA DE INFORMACION:
-Guardar y procesar los datos mediante un archivo JSON (autos.json).
-Create, Update y Delete deben SOBREESCRIBIR el archivo con la ultima
-version del diccionario; Read puede leer esa ultima version.
-(Se valora especialmente implementar las DOS opciones de persistencia).
-
-3) PRECARGA DE INFORMACION:
-Los datos ya no se cargan desde la memoria del programa, sino desde un
-archivo inicial (autos.json). Se requiere una precarga de al menos 5 registros.
-
-4) TUPLA O CONJUNTO:
-Incluir el uso de una tupla o un conjunto como parte de la logica
-(por ejemplo, para validaciones o estructuras de datos).
-En este modulo: CALIDADES, MARCAS y CATEGORIAS son tuplas.
-
-5) LISTA POR COMPRENSION O LAMBDA:
-Incorporar al menos una lista por comprension o una funcion lambda
-aplicada a la informacion.
--> TODO(TP - Req 5): Agregar/explicitar al menos un uso de lista por
-    comprension o de lambda que procese los datos del catalogo.
-
-6) ENTIDAD PRINCIPAL:
-Representar la entidad principal con un DICCIONARIO DE DICCIONARIOS,
-con un minimo de 5 atributos por elemento.
-En este modulo: autos = {patente: {marca, modelo, calidad, ano, precio, categoria}}.
-
-7) MENU CRUD COMPLETO:
-Create (agregar_auto), Read (ver_autos / ver_auto),
-Update (modificar_auto), Delete (eliminar_auto).
-
-8) REPORTE MATRICIAL:
-Generar al menos un reporte matricial (listas de listas) con informacion
-procesada del conjunto. Recomendado: NumPy, Pandas y Matplotlib.
--> TODO(TP - Req 8): Este reporte se implementa en el modulo informe.py.
-
-9) DOCUMENTACION Y ENTREGA:
-Uso de docstrings en las funciones, codigo claro y organizado, validacion
-de datos mediante funciones y entrega del informe en Word.
-
---------------------------------------------------------------------------------
-CHECKLIST DE CUMPLIMIENTO (crud.py)
---------------------------------------------------------------------------------
-[x] Entidad con diccionario de diccionarios y >= 5 atributos.
-[x] Tuplas para validaciones (CALIDADES, MARCAS, CATEGORIAS).
-[x] CRUD completo y menu en consola.
-[x] Docstrings en las funciones.
-[x] Persistencia en JSON (leer / escribir).
-[ ] Req 1: Manejo de excepciones en carga/guardado y validaciones.
-[ ] Req 5: Lista por comprension o lambda aplicada a la informacion.
-[ ] Req 3: Garantizar/documentar que autos.json tenga >= 5 registros.
-[ ] Req 8: Reporte matricial (ver modulo informe.py).
-
-NOTA: Esta version solo AGREGA documentacion y marcas TODO(TP) para indicar
-lo que falta. NO se modifico ninguna linea de logica del programa.
+excepciones, ademÃ¡s de los requisitos mÃ­nimos del programa.
 """
 
 import json, os
@@ -94,7 +29,7 @@ RUTA_AUTOS = inf.RUTA_AUTOS_JSON
 CALIDAD = inf.CALIDADES
 MARCA = inf.MARCAS
 CATEGORIA = inf.CATEGORIAS
-ESTADO = inf.DISPONIBLE
+ESTADO = ("true", "false")
 
 # Mapeo entre la opcion numerica del menu de modificacion y el campo del JSON.
 # Formato: "clave de menu": ("nombre del campo en el JSON", "nombre para mostrar").
@@ -105,15 +40,15 @@ def limpiar():
     Limpia la consola segun el sistema operativo.
 
     En Windows usa 'cls'; en Linux/macOS usa 'clear'. Sirve para mantener la
-    interfaz ordenada entre pantallas del menu.
+    interfaz ordenada entre pantallas del menÃº.
     """
     os.system('cls' if os.name == 'nt' else 'clear')
 
 # ---------- Persistencia ----------
 
-def _cargar_autos() -> dict[dict]:
+def _cargar_autos() -> dict:
     """
-    Carga el catalogo de autos desde el archivo JSON.
+    Carga el catÃ¡logo de autos desde el archivo JSON.
 
     Lee el contenido de `autos.json` y lo convierte a un diccionario de Python,
     donde cada clave es la patente del auto y cada valor es otro diccionario con
@@ -135,7 +70,7 @@ def _cargar_autos() -> dict[dict]:
         return {}
     except OSError as e:
         limpiar()
-        print(f"/// Ocurrió un error de sistema: {e} ///")
+        print(f"/// OcurriÃ³ un error de sistema: {e} ///")
         input("[Enter] ")
 
 
@@ -160,10 +95,10 @@ def _guardar_autos(autos):
         with open(RUTA_AUTOS, "w", encoding="utf-8") as archivo:
             json.dump(autos, archivo, indent=4, ensure_ascii=False)
     except FileNotFoundError:
-        print(f"/// ¡El archivo {RUTA_AUTOS} no existe! ///")
+        print(f"/// Â¡El archivo {RUTA_AUTOS} no existe! ///")
     except OSError as e:
         limpiar()
-        print(f"/// Ocurrió un error de sistema: {e} ///")
+        print(f"/// OcurriÃ³ un error de sistema: {e} ///")
         input("[Enter] ")
 
 
@@ -184,10 +119,15 @@ def _pedir_de_tupla(etiqueta, opciones):
         str: Valor elegido por el usuario, en minusculas y validado.
     """
     print(f"{etiqueta} (opciones: {', '.join(opciones)}): ")
-    valor = input().strip().lower()
+    
+    entrada = input().strip().lower()
+    if entrada == "true":
+        valor = True
+    elif entrada == "false":
+        valor = False
     # Bucle de validacion: no se sale hasta que el valor pertenezca a 'opciones'.
-    while valor not in opciones:
-        print(f"Valor inválido. {etiqueta} debe ser una de: {', '.join(opciones)}")
+    while entrada not in opciones:
+        print(f"Valor invÃ¡lido. {etiqueta} debe ser una de: {', '.join(opciones)}")
         valor = input().strip().lower()
     return valor
 
@@ -212,7 +152,7 @@ def _pedir_entero(etiqueta, minimo, maximo):
     valor = input(f"{etiqueta} ({minimo}-{maximo}): ").strip()
     # Se repite mientras no sea un digito o este fuera del rango permitido.
     while not valor.isdigit() or not (minimo <= int(valor) <= maximo):
-        valor = input(f"Inválido. {etiqueta} debe ser un número entre {minimo} y {maximo}: ").strip()
+        valor = input(f"InvÃ¡lido. {etiqueta} debe ser un nÃºmero entre {minimo} y {maximo}: ").strip()
     return int(valor)
 
 
@@ -239,7 +179,7 @@ def _pedir_float(etiqueta):
         except ValueError:
             # Si no se puede convertir a float, se vuelve a pedir el valor.
             pass
-        valor = input(f"Inválido. {etiqueta} debe ser un número positivo: ").strip().replace(",", ".")
+        valor = input(f"InvÃ¡lido. {etiqueta} debe ser un nÃºmero positivo: ").strip().replace(",", ".")
 
 
 def _pedir_patente_existente(autos : dict) -> str:
@@ -258,7 +198,7 @@ def _pedir_patente_existente(autos : dict) -> str:
     # TODO(TP - Req 1): validar el tipo de 'autos' (dict) para evitar errores
     # al manipular diccionarios si llega un valor inesperado.
     if not autos:
-            print("\nNo hay autos en el catálogo.")
+            print("\nNo hay autos en el catÃ¡logo.")
             try: input("[Enter] ")
             except: pass
             return
@@ -271,7 +211,7 @@ def _pedir_patente_existente(autos : dict) -> str:
 
     while patente not in autos:
         try: 
-            patente = input("Patente no encontrada. Ingrese una patente válida: ").strip().upper()
+            patente = input("Patente no encontrada. Ingrese una patente vÃ¡lida: ").strip().upper()
             if patente == '0':
                 break
         except: pass
@@ -297,9 +237,9 @@ def _mostrar_auto(patente, datos):
     print(f"\tMarca: {datos['marca'].capitalize()}")
     print(f"\tModelo: {datos['modelo'].capitalize()}")
     print(f"\tCalidad: {datos['calidad']}")
-    print(f"\tAño: {datos['año']}")
+    print(f"\tAÃ±o: {datos['aÃ±o']}")
     print(f"\tPrecio: u$d {datos['precio']:.1f}")
-    print(f"\tCategoría: {datos['categoria']}")
+    print(f"\tCategorÃ­a: {datos['categoria']}")
     print(f"\tEstado: {datos['estado']}")
 
 
@@ -315,11 +255,11 @@ def ver_stock():
     autos = _cargar_autos()
     # Si el diccionario esta vacio, no hay nada para mostrar.
     if not autos:
-        print("\nNo hay autos en el catálogo.")
+        print("\nNo hay autos en el catÃ¡logo.")
         try: input("[Enter] ")
         except: pass
         return
-    print("\n--- CATÁLOGO DE AUTOS ---")
+    print("\n--- CATÃLOGO DE AUTOS ---")
     # Recorre cada par (patente, datos) del diccionario de diccionarios.
     # TODO(TP - Req 5): aqui se podria aplicar una lista por comprension
     # o una lambda para generar un resumen del catalogo.
@@ -342,7 +282,7 @@ def ver_auto():
     """
     autos = _cargar_autos()
     if not autos:
-        print("\nNo hay autos en el catálogo.")
+        print("\nNo hay autos en el catÃ¡logo.")
         try: input(" ")
         except: pass
         return
@@ -374,19 +314,19 @@ def agregar_auto():
             except: pass
 
     # Se piden y validan los demas atributos del auto.
-    marca = _pedir_de_tupla("Marca: ", inf.MARCAS)
+    marca = _pedir_de_tupla("Marca: ", MARCA)
     modelo = input("Modelo: ").strip().lower()
-    calidad = _pedir_de_tupla("Calidad:", inf.CALIDADES)
-    anio = _pedir_entero("Año: ", 2000, 2026)
+    calidad = _pedir_de_tupla("Calidad:", CALIDAD)
+    anio = _pedir_entero("AÃ±o: ", 2000, 2026)
     precio = _pedir_float("Precio (u$d): ")
-    categoria = _pedir_de_tupla("Categoría: ", inf.CATEGORIAS)
+    categoria = _pedir_de_tupla("CategorÃ­a: ", CATEGORIA)
 
     # Se crea el registro usando la patente como clave del diccionario.
     autos[patente] = {
         "marca": marca,
         "modelo": modelo,
         "calidad": calidad,
-        "año": anio,
+        "aÃ±o": anio,
         "precio": precio,
         "categoria": categoria,
     }
@@ -415,7 +355,7 @@ def modificar_auto():
     """
     autos = _cargar_autos()
     if not autos:
-            print("\nNo hay autos en el catálogo.")
+            print("\nNo hay autos en el catÃ¡logo.")
             try: input("[Enter] ")
             except: pass
             return
@@ -427,42 +367,40 @@ def modificar_auto():
         print(f"\n--- Modificar auto [{patente}] ---")
         
         for i, j in enumerate(autos[patente]):
-            print(f"[{i}] {j.capitalize()}: {autos[patente][j]}")
-        
+            print(f"[{i+1}] {j.capitalize()}: {autos[patente][j]}")
+        print("--------------------")
         print("[0] Terminar")
 
-        opcion = input("\n¿Qué campo desea modificar?: ").strip()
+        opcion = input("\nÂ¿QuÃ© campo desea modificar?: ").strip()
 
         # Opcion para salir del menu de modificacion.
         if opcion == "0":
             break
         # Validacion de la opcion ingresada.
-        elif (int(opcion)-1) not in (len(autos[patente])):
-            print("\nOpción no válida. Intente de nuevo.")
+        elif int(opcion) not in list(range(1, len(autos[patente]) + 1)):
+            print("\nOpciÃ³n no vÃ¡lida. Intente de nuevo.")
             continue
 
-        # Se traduce la opcion a (campo del JSON, nombre visible).
-        autos[patente], autos[patente] = autos[opcion]
-
         # Se pide el nuevo valor segun el tipo de campo elegido.
-        if campo == "marca":
-            autos[patente]["marca"] = _pedir_de_tupla("Marca", inf.MARCAS)
-        elif campo == "modelo":
+        
+        if opcion == "1":
+            autos[patente]["marca"] = _pedir_de_tupla("Marca", MARCA)
+        elif opcion == "2":
             autos[patente]["modelo"] = input("Nuevo modelo: ").strip().lower()
-        elif campo == "calidad":
-            autos[patente]["calidad"] = _pedir_de_tupla("Calidad", inf.CALIDADES)
-        elif campo == "año":
-            autos[patente]["año"] = _pedir_entero("Año", 2000, 2026)
-        elif campo == "precio":
+        elif opcion == "3":
+            autos[patente]["calidad"] = _pedir_de_tupla("Calidad", CALIDAD)
+        elif opcion == "4":
+            autos[patente]["aÃ±o"] = _pedir_entero("AÃ±o", 2000, 2026)
+        elif opcion == "5":
             autos[patente]["precio"] = _pedir_float("Nuevo precio (u$d)")
-        elif campo == "categoria":
-            autos[patente]["categoria"] = _pedir_de_tupla("Categoría", inf.CATEGORIAS)
-        elif campo == "estado":
-            autos[patente]["estado"] = _pedir_de_tupla("estado", inf.ESTADO)
+        elif opcion == "6":
+            autos[patente]["categoria"] = _pedir_de_tupla("CategorÃ­a", CATEGORIA)
+        elif opcion == "7":
+            autos[patente]["estado"] = _pedir_de_tupla("estado", ESTADO)
 
         # Se guarda el cambio y se confirma.
         _guardar_autos(autos)
-        print(f"\n{nombre} actualizado correctamente.")
+        print(f"\n{patente} actualizado correctamente.")
 
 
 # ---------- DELETE ----------
@@ -478,7 +416,7 @@ def eliminar_auto():
     # TODO(TP - Req 1): manejar excepciones en la carga y en el guardado.
     autos = _cargar_autos()
     if not autos:
-            print("\nNo hay autos en el catálogo.")
+            print("\nNo hay autos en el catÃ¡logo.")
             try: input("[Enter] ")
             except: pass
             return
@@ -503,14 +441,14 @@ def menu_crud():
     while True:
         limpiar()
         print("\n--- CRUD DE AUTOS ---")
-        print("[1] Ver catálogo")
+        print("[1] Ver catÃ¡logo")
         print("[2] Ver un auto")
         print("[3] Agregar auto")
         print("[4] Modificar auto")
         print("[5] Eliminar auto")
         print("[0] Salir")
         # TODO(TP - Req 1): manejar excepciones en el ingreso de datos.
-        try: opcion = input("Seleccione una opción: ").strip()
+        try: opcion = input("Seleccione una opciÃ³n: ").strip()
         except: pass
 
         # Despacho de la opcion elegida hacia la funcion correspondiente.
@@ -528,7 +466,7 @@ def menu_crud():
             # Salir del menu CRUD.
             break
         else:
-            print("\nOpción no válida. Intente de nuevo.")
+            print("\nOpciÃ³n no vÃ¡lida. Intente de nuevo.")
 
 
 if __name__ == "__main__":

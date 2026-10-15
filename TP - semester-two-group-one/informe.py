@@ -3,22 +3,22 @@ import random
 import os
 
 AUTOS = {
-    "toyota":("etios","yaris","hilux","corolla","rav4"),
-    "renault":("kardian","clio","kangoo","sandero","duster"),
-    "fiat":("cronos","fastback","argo","pulse","toro"),
-    "peugeot":("208","3008","2008","408","206"),
-    "chevrloet":("cruze","onix","spin","tracker","montana")
+    "toyota": ("etios", "yaris", "hilux", "corolla", "rav4"),
+    "renault": ("kardian", "clio", "kangoo", "sandero", "duster"),
+    "fiat": ("cronos", "fastback", "argo", "pulse", "toro"),
+    "peugeot": ("208", "3008", "2008", "408", "206"),
+    "chevrolet": ("cruze", "onix", "spin", "tracker", "montana")
 }
-MARCAS : tuple = tuple(AUTOS.keys())
-CALIDADES : tuple = ("nuevo","como nuevo","usado")
-DISPONIBLE : bool = True
-ANIOS : tuple = (2000,2026)
-CATEGORIAS : tuple = ("sedan_hatchback", "suv_crossover", "pickup", "monovolumen_mpv")
-preset : dict = {
+MARCAS: tuple = tuple(AUTOS.keys())
+CALIDADES: tuple = ("nuevo", "como nuevo", "usado")
+DISPONIBLE: tuple = (True, False)
+ANIOS: tuple = (2000, 2026)
+CATEGORIAS: tuple = ("sedan_hatchback", "suv_crossover", "pickup", "monovolumen_mpv")
+preset: dict = {
     2016: ["AA"],
     2017: ["AB"],
     2018: ["AC", "AD"],
-    2019: ["AD","AE"],
+    2019: ["AD", "AE"],
     2020: ["AE"],
     2021: ["AE", "AF"],
     2022: ["AF"],
@@ -28,42 +28,56 @@ preset : dict = {
     2026: ["AI"]
 }
 
-categorías : dict = {
-    "sedan_hatchback" : ["etios", "yaris", "corolla", "clio", "sandero", 
-                        "argo", "cronos", "206", "208", "408", "onix", "cruze"],
-    "suv_crossover" : ["rav4", "kardian", "duster", "pulse",
-                    "fastback", "2008", "3008", "tracker"],
-    "pickup" : ["hilux", "toro", "montana"],
-
-    "monovolumen_mpv" : ["kangoo", "spin"]
+categorias: dict = {
+    "sedan_hatchback": [
+        "etios", "yaris", "corolla", "clio", "sandero",
+        "argo", "cronos", "206", "208", "408", "onix", "cruze"
+    ],
+    "suv_crossover": [
+        "rav4", "kardian", "duster", "pulse",
+        "fastback", "2008", "3008", "tracker"
+    ],
+    "pickup": ["hilux", "toro", "montana"],
+    "monovolumen_mpv": ["kangoo", "spin"]
 }
 
-RUTA_AUTOS_JSON : str = "autos.json"
-letras : tuple = ("a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "ñ", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z")
-numeros : tuple = ("0", "1", "2", "3", "4", "5", "6", "7", "8", "9")
+RUTA_AUTOS_JSON: str = "autos.json"
+letras: tuple = (
+    "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "ñ", "o",
+    "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"
+)
+numeros: tuple = ("0", "1", "2", "3", "4", "5", "6", "7", "8", "9")
 
 
 def limpiar():
     """
-    Limpia la consola segun el sistema operativo.
+    Limpia la consola según el sistema operativo.
 
     En Windows usa 'cls'; en Linux/macOS usa 'clear'. Sirve para mantener la
-    interfaz ordenada entre pantallas del menu.
+    interfaz ordenada entre pantallas del menú.
     """
     os.system('cls' if os.name == 'nt' else 'clear')
 
 
 def informe_autos(
-    ruta_archivo : str, cant_autos : int
-) -> dict[dict]:
-    
+    ruta_archivo: str, cant_autos: int
+) -> dict:
+    """
+    Genera un conjunto aleatorio de autos y lo guarda en un archivo JSON.
+
+    Args:
+        ruta_archivo (str): Ruta del archivo JSON a generar.
+        cant_autos (int): Cantidad de autos a generar.
+
+    Returns:
+        dict: Diccionario con el listado de autos generado.
+    """
     listado = {}
     cant_autos = 25
     for _ in range(1, cant_autos + 1):
-        
-        anio = random.randint(ANIOS[0],ANIOS[1])
+        anio = random.randint(ANIOS[0], ANIOS[1])
         patente = ""
-        #  Patentes mayores o iguales a 2016
+        # Patentes mayores o iguales a 2016
         if anio >= 2016:
             patente += random.choice(preset[anio])
             for i in range(5):
@@ -72,7 +86,7 @@ def informe_autos(
                 else:
                     patente += random.choice(letras)
             patente = patente.upper()
-        #  Patentes menores a 2016
+        # Patentes menores a 2016
         else:
             patente = ""
             contador = 1
@@ -80,7 +94,7 @@ def informe_autos(
                 if contador <= 3:
                     patente += (random.choice(letras))
                     contador += 1
-                elif contador > 3 :
+                elif contador > 3:
                     patente += (random.choice(numeros))
                     contador += 1
             patente = patente.upper()
@@ -93,13 +107,13 @@ def informe_autos(
         modelo = random.choice(AUTOS[marca])
 
         listado[patente] = {
-            "marca" : marca,
-            "modelo" : modelo,
-            "calidad" : random.choice(CALIDADES),
-            "año" : anio,
+            "marca": marca,
+            "modelo": modelo,
+            "calidad": random.choice(CALIDADES),
+            "año": anio,
             "precio": precio,
-            "categoria": [i for i in categorías if modelo in categorías[i]][0],
-            "estado" : DISPONIBLE
+            "categoria": [i for i in categorias if modelo in categorias[i]][0],
+            "estado": random.choice(DISPONIBLE)
         }
     
     try:
@@ -109,9 +123,11 @@ def informe_autos(
         with open(ruta_archivo, "w", encoding="utf-8") as f:
             json.dump(listado, f, indent=4, ensure_ascii=False)
             print(f"/// Archivo [autos.json] creado exitosamente ///")
-    
-    try: input("[Enter] ")
-    except: pass
+
+    try:
+        input("[Enter] ")
+    except:
+        pass
 
     return
 
