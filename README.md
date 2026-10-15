@@ -1,4 +1,228 @@
-# Guía de Trabajos Prácticos - Programación I
+# Programación I — Repositorio de Trabajos Prácticos
+
+**Facultad de Ingeniería Informática**
+
+Repositorio con los ejercicios prácticos de la materia **Programación I** y el
+**Trabajo Práctico (TPO – SPRINT)** del grupo. Reúne los programas de las distintas
+unidades (pilas y colas, listas por comprensión y slicing, matrices, módulos/lambda/
+typehints, JSON y bibliotecas especiales) y la aplicación de gestión de una
+concesionaria.
+
+> Este documento cumple dos funciones: (1) describir el repositorio y servir de
+> índice de los ejercicios, y (2) conservar las **consignas originales** de cada
+> trabajo al final del archivo.
+
+---
+
+## Contenido
+
+- [Descripcion general](#descripcion-general)
+- [Estructura del repositorio](#estructura-del-repositorio)
+- [Indice de ejercicios](#indice-de-ejercicios)
+- [Requisitos tecnicos](#requisitos-tecnicos)
+- [Como ejecutar](#como-ejecutar)
+- [Trabajo Practico: Concesionaria](#trabajo-practico-concesionaria)
+- [Consignas (Guia de Trabajos Practicos)](#consignas-guia-de-trabajos-practicos)
+- [Observaciones](#observaciones)
+- [Licencia](#licencia)
+
+---
+
+## Descripcion general
+
+El repositorio contiene dos bloques principales:
+
+1. **`Exercises-G1/`** — Los ejercicios prácticos de clase, organizados por unidad
+   temática. Cada archivo `PROG_NN.py` corresponde a un enunciado de la guía.
+2. **`TP - semester-two-group-one/`** — El **Trabajo Práctico** integrador: una
+   aplicación de consola para administrar una **concesionaria de autos** (catálogo
+   + alquileres), con persistencia en archivos JSON.
+
+El lenguaje utilizado es **Python 3**. La mayoría de los ejercicios usan únicamente
+la biblioteca estándar (`random`, `json`, `os`, etc.). Los ejercicios de la Unidad 5
+(NumPy, Pandas, Matplotlib) están pensados para ejecutarse en un **notebook de
+Google Colab**.
+
+---
+
+## Estructura del repositorio
+
+```
+semester-two-group-one/
+├── README.md                  # Este archivo
+├── LICENSE                    # Licencia MIT
+├── autos.json                 # Archivo de datos generado/suelto (ver Observaciones)
+├── Exercises-G1/              # Ejercicios de clase organizados por unidad
+│   ├── Pilas y Colas/                     # PROG_10 ... PROG_19
+│   ├── Listas por comprensión y Slicing/  # PROG_20 ... PROG_30
+│   ├── Matrices/                          # PROG_00 ... PROG_03
+│   ├── Modulos, Lambda & Typehints/       # PROG_31 y PROG_33.py (módulos)
+│   ├── json/                              # PROG_41.py (CRUD sobre JSON)
+│   ├── Ejercicios - Octavio Da Silva/     # Nivel_1.py (ejercicios varios)
+│   └── TP - semester-two-group-one/       # Versión anterior del TP (legado)
+└── TP - semester-two-group-one/           # Trabajo Práctico integrador
+    ├── crud.py                # CRUD del catálogo de autos
+    ├── menu.py                # Menú principal (usuario / empresa)
+    ├── informe.py             # Generación de datos y base de informes
+    ├── pruebas.py             # Script auxiliar de verificación
+    ├── autos.json             # Datos del catálogo (persistencia)
+    └── documentacion/         # Documentación técnica y manual de usuario
+        ├── README.md
+        ├── DOCUMENTACION_TECNICA.md
+        ├── MANUAL_DE_USUARIO.md
+        └── presentacion_rentar.html
+```
+
+> `rentados.json` (autos alquilados) lo genera el programa en tiempo de ejecución y
+> no se versiona.
+
+---
+
+## Indice de ejercicios
+
+Cada enlace lleva al archivo con la resolución del ejercicio.
+
+### Pilas y Colas
+
+| Ejercicio | Descripcion | Archivo |
+|-----------|-------------|---------|
+| PROG_10 | Verificar si una palabra es palíndromo usando una pila. | [PROG_10.PY](<Exercises-G1/Pilas y Colas/PROG_10.PY>) |
+| PROG_11 | Separar una pila de enteros en dos pilas: pares e impares. | [PROG_11.PY](<Exercises-G1/Pilas y Colas/PROG_11.PY>) |
+| PROG_12 | Ordenar una pila desordenada usando pilas auxiliares. | [PROG_12.py](<Exercises-G1/Pilas y Colas/PROG_12.py>) |
+| PROG_13 | Bodega de avión: valijas apiladas en dos pilas (A y B). | [PROG_13.py](<Exercises-G1/Pilas y Colas/PROG_13.py>) |
+| PROG_14 | Centro de logística: separar productos óptimos y defectuosos. | [PROG_14.py](<Exercises-G1/Pilas y Colas/PROG_14.py>) |
+| PROG_15 | Tren de mercancías: vagones como pilas con capacidad máxima. | [PROG_15.py](<Exercises-G1/Pilas y Colas/PROG_15.py>) |
+| PROG_16 | Centro de salud: gestión de turnos de pacientes (cola). | [PROG_16.py](<Exercises-G1/Pilas y Colas/PROG_16.py>) |
+| PROG_17 | Atención rápida para pacientes prioritarios (cola con prioridad). | [PROG_17.py](<Exercises-G1/Pilas y Colas/PROG_17.py>) |
+| PROG_18 | Estación de peaje con 3 cabinas (colas). | [PROG_18.py](<Exercises-G1/Pilas y Colas/PROG_18.py>) |
+| PROG_19 | Minimarket: administración de la heladera de lácteos. | [PROG_19.py](<Exercises-G1/Pilas y Colas/PROG_19.py>) |
+
+### Listas por comprension y Slicing
+
+| Ejercicio | Descripcion | Archivo |
+|-----------|-------------|---------|
+| PROG_20 | Generación de un mapa/matriz aleatoria con listas por comprensión. | [PROG_20.py](<Exercises-G1/Listas por comprensión y Slicing/PROG_20.py>) |
+| PROG_21 | Submuestreo y binarización de una imagen (slicing `::2`). | [PROG_21.py](<Exercises-G1/Listas por comprensión y Slicing/PROG_21.py>) |
+| PROG_22 | Encriptado/desencriptado de un mensaje con slicing y comprensión. | [PROG_22.py](<Exercises-G1/Listas por comprensión y Slicing/PROG_22.py>) |
+| PROG_23 | Conjuntos de números pares e impares. | [PROG_23.py](<Exercises-G1/Listas por comprensión y Slicing/PROG_23.py>) |
+| PROG_24 | Variante del ejercicio anterior usando conjuntos. | [PROG_24.py](<Exercises-G1/Listas por comprensión y Slicing/PROG_24.py>) |
+| PROG_25 | Ubicar oficinas mediante un conjunto de tuplas. | [PROG_25.py](<Exercises-G1/Listas por comprensión y Slicing/PROG_25.py>) |
+| PROG_26 | Generar todas las fichas de un dominó (listas, tuplas y conjuntos). | [PROG_26.py](<Exercises-G1/Listas por comprensión y Slicing/PROG_26.py>) |
+| PROG_27 | Sistema de gestión de perfumería con diccionarios paralelos. | [PROG_27.py](<Exercises-G1/Listas por comprensión y Slicing/PROG_27.py>) |
+| PROG_28 | Simulación de lotería con diccionarios, conjuntos y `random`. | [PROG_28.py](<Exercises-G1/Listas por comprensión y Slicing/PROG_28.py>) |
+| PROG_29 | Cálculo de ganancias a partir de precios y ventas (diccionarios). | [PROG_29.py](<Exercises-G1/Listas por comprensión y Slicing/PROG_29.py>) |
+| PROG_30 | AGIP: conteo de parcelas y recaudación ABL sobre una matriz 5x5. | [PROG_30.py](<Exercises-G1/Listas por comprensión y Slicing/PROG_30.py>) |
+
+### Matrices
+
+| Ejercicio | Descripcion | Archivo |
+|-----------|-------------|---------|
+| PROG_00 (JRG) | Cuadrado mágico: verificación de sumas de filas, columnas y diagonales. | [PROG_00_JRG.py](<Exercises-G1/Matrices/PROG_00_JRG.py>) |
+| PROG_00 (Juan/Benja) | Creación de una matriz a partir de un tamaño ingresado. | [PROG_00_JUAN_BENJA.py](<Exercises-G1/Matrices/PROG_00_JUAN_BENJA.py>) |
+| PROG_00 (crear matriz) | Crear una matriz del tamaño indicado por el usuario. | [PROG_00_crarmatriz.py](<Exercises-G1/Matrices/PROG_00_crarmatriz.py>) |
+| PROG_00 (matriz mágica) | Construcción/validación de una matriz mágica. | [PROG_00_matrizmagica.py](<Exercises-G1/Matrices/PROG_00_matrizmagica.py>) |
+| PROG_01 | Juego "mapa del tesoro" sobre una matriz, con pistas limitadas. | [PROG_01.py](<Exercises-G1/Matrices/PROG_01.py>) |
+| PROG_02 | Menú de funciones de matrices (marco, equis, etc.). | [PROG_02.py](<Exercises-G1/Matrices/PROG_02.py>) |
+| PROG_02.1 | Matriz con marco. | [PROG_02_01.PY](<Exercises-G1/Matrices/PROG_02_01.PY>) |
+| PROG_02.2 | Matriz en forma de equis. | [PROG_02_02.PY](<Exercises-G1/Matrices/PROG_02_02.PY>) |
+| PROG_02.3 | Triángulo superior izquierdo. | [PROG_02_03.PY](<Exercises-G1/Matrices/PROG_02_03.PY>) |
+| PROG_02.4 | Matriz "serpiente". | [PROG_02_4.py](<Exercises-G1/Matrices/PROG_02_4.py>) |
+| PROG_02.5 | Matriz "tablero". | [PROG_02_5.py](<Exercises-G1/Matrices/PROG_02_5.py>) |
+| PROG_02.6 | Matriz de diagonales. | [PROG_02_6.py](<Exercises-G1/Matrices/PROG_02_6.py>) |
+| PROG_03 | Ejercicio con código prearmado (no modificar). | [PROG_03.py](<Exercises-G1/Matrices/PROG_03.py>) |
+
+### Modulos, Lambda y Typehints
+
+| Ejercicio | Descripcion | Archivos |
+|-----------|-------------|----------|
+| PROG_31 | Simulador de cosecha de manzanas: módulo + programa principal con typehints. | [manzanas.py](<Exercises-G1/Modulos, Lambda & Typehints/PROG_31/manzanas.py>), [main.py](<Exercises-G1/Modulos, Lambda & Typehints/PROG_31/main.py>) |
+| PROG_33 | Gestión de vivero: catálogo de plantas y filtros con `filter`/`map`/`sorted`. | [Vivero.py](<Exercises-G1/Modulos, Lambda & Typehints/PROG_33.py/Vivero.py>), [Funciones.py](<Exercises-G1/Modulos, Lambda & Typehints/PROG_33.py/Funciones.py>) |
+
+### Archivos JSON
+
+| Ejercicio | Descripcion | Archivo |
+|-----------|-------------|---------|
+| PROG_41 | CRUD sobre `cosecha.json` (crear, leer, editar y eliminar registros). | [PROG_41.py](<Exercises-G1/json/PROG_41.py>) |
+
+### Otros ejercicios
+
+| Ejercicio | Descripcion | Archivo |
+|-----------|-------------|---------|
+| Nivel_1 | Ejercicios varios (por ejemplo, factorial de n). | [Nivel_1.py](<Exercises-G1/Ejercicios - Octavio Da Silva/Nivel_1.py>) |
+
+---
+
+## Requisitos tecnicos
+
+- **Lenguaje:** Python 3 (se recomienda **3.10+**; algunos archivos usan anotaciones
+  de tipo como `list[dict]` / `dict[dict]`, que requieren 3.9+).
+- **Biblioteca estándar:** `random`, `json`, `os`, entre otros. La mayoría de los
+  ejercicios no requiere instalar nada.
+- **Dependencias opcionales (Unidad 5 — para Colab):**
+  - `numpy` (álgebra matricial),
+  - `pandas` (DataFrames),
+  - `matplotlib` (gráficos).
+- **Editor sugerido:** VS Code o cualquier editor de texto.
+
+---
+
+## Como ejecutar
+
+Cada ejercicio es un script independiente. Abrí una terminal en la raíz del
+repositorio y ejecutá el archivo con Python.
+
+```bash
+# Ejemplo: un ejercicio de pilas y colas
+python "Exercises-G1/Pilas y Colas/PROG_10.PY"
+
+# Ejemplo: un ejercicio de listas por comprensión
+python "Exercises-G1/Listas por comprensión y Slicing/PROG_20.py"
+```
+
+Para los ejercicios con **módulos** (varios archivos), ejecutá el `main.py` desde su
+propia carpeta:
+
+```bash
+cd "Exercises-G1/Modulos, Lambda & Typehints/PROG_31"
+python main.py
+```
+
+> Los ejercicios de la **Unidad 5** (NumPy / Pandas / Matplotlib) se resuelven en un
+> notebook de Google Colab, no como script local.
+
+---
+
+## Trabajo Practico: Concesionaria
+
+El TP integrador está en la carpeta **`TP - semester-two-group-one/`** y consiste en
+una aplicación de consola para administrar una **concesionaria**: catálogo de autos
+con CRUD y registro de alquileres, con persistencia en archivos JSON.
+
+| Módulo | Rol |
+|--------|-----|
+| `crud.py` | Alta, baja, modificación y consulta del catálogo de autos. |
+| `menu.py` | Menú principal: submenú de usuario (alquileres) y de empresa (informes). |
+| `informe.py` | Generación de la precarga de autos y base de los informes. |
+| `autos.json` | Persistencia del catálogo (diccionario de diccionarios). |
+| `rentados.json` | Persistencia de autos alquilados (se genera al ejecutar). |
+
+**Ejecución:**
+
+```bash
+cd "TP - semester-two-group-one"
+python menu.py      # Aplicación principal (usuario / empresa)
+python crud.py      # Administración del catálogo (CRUD)
+```
+
+La documentación completa del TP está en la carpeta
+[`documentacion/`](<TP - semester-two-group-one/documentacion/README.md>):
+
+- [Documentación técnica](<TP - semester-two-group-one/documentacion/DOCUMENTACION_TECNICA.md>)
+- [Manual de usuario](<TP - semester-two-group-one/documentacion/MANUAL_DE_USUARIO.md>)
+
+---
+
+## Consignas (Guia de Trabajos Practicos)
 
 **Facultad de Ingeniería Informática**
 
@@ -701,3 +925,27 @@ plt.show()
 | **Barras** | `plt.bar(x, y)` | Para comparar cantidades absolutas entre categorías. |
 | **Torta** | `plt.pie(valores, labels=...)` | Para ver la participación porcentual sobre un total ($100\%$). |
 | **Scatter (X-Y)** | `plt.scatter(x, y)` | Para ver si dos variables numéricas están correlacionadas. |
+
+---
+
+## Observaciones
+
+- **Carpeta de TP duplicada:** `Exercises-G1/TP - semester-two-group-one/` es una
+  **versión anterior** del Trabajo Práctico (legado). La versión vigente es la de
+  la raíz, `TP - semester-two-group-one/`.
+- **`autos.json` en la raíz:** es un archivo de datos generado por el programa. La
+  copia válida del catálogo se encuentra dentro de la carpeta del TP.
+- **Archivos `__pycache__`:** son archivos compilados que genera Python
+  automáticamente; no forman parte del código fuente.
+- **Estado de los ejercicios:** algunos archivos pueden estar **incompletos o en
+  revisión** (por ejemplo, `PROG_21.py`). Se recomienda revisarlos y actualizarlos.
+- **Convención de nombres:** los enunciados se identifican como `PROG_NN`; algunos
+  ejercicios avanzados tienen variantes `_v2` (por ejemplo, `PROG_31_v2`) que piden
+  resolver la consigna con `filter()`, `map()`, `sorted()` y `lambda`.
+
+---
+
+## Licencia
+
+Este proyecto está bajo la **Licencia MIT**. Consultá el archivo
+[LICENSE](LICENSE) para más detalles.
