@@ -1,0 +1,227 @@
+{
+    "EEF824": {
+        "marca": "fiat",
+        "modelo": "argo",
+        "calidad": "nuevo",
+        "año": 2003,
+        "precio": 32.5,
+        "categoria": "sedan_hatchback",
+        "estado": true
+    },
+    "AD986DQ": {
+        "marca": "chevrloet",
+        "modelo": "onix",
+        "calidad": "usado",
+        "año": 2018,
+        "precio": 70.0,
+        "categoria": "sedan_hatchback",
+        "estado": true
+    },
+    "AE582YI": {
+        "marca": "toyota",
+        "modelo": "yaris",
+        "calidad": "nuevo",
+        "año": 2019,
+        "precio": 72.5,
+        "categoria": "sedan_hatchback",
+        "estado": true
+    },
+    "OFÑ487": {
+        "marca": "fiat",
+        "modelo": "pulse",
+        "calidad": "nuevo",
+        "año": 2010,
+        "precio": 50.0,
+        "categoria": "suv_crossover",
+        "estado": true
+    },
+    "ÑMJ175": {
+        "marca": "fiat",
+        "modelo": "cronos",
+        "calidad": "usado",
+        "año": 2004,
+        "precio": 35.0,
+        "categoria": "sedan_hatchback",
+        "estado": true
+    },
+    "AMX237": {
+        "marca": "chevrloet",
+        "modelo": "tracker",
+        "calidad": "como nuevo",
+        "año": 2012,
+        "precio": 55.0,
+        "categoria": "suv_crossover",
+        "estado": true
+    },
+    "AAX009": {
+        "marca": "fiat",
+        "modelo": "fastback",
+        "calidad": "nuevo",
+        "año": 2011,
+        "precio": 52.5,
+        "categoria": "suv_crossover",
+        "estado": true
+    },
+    "AG329FÑ": {
+        "marca": "peugeot",
+        "modelo": "408",
+        "calidad": "como nuevo",
+        "año": 2023,
+        "precio": 82.5,
+        "categoria": "sedan_hatchback",
+        "estado": true
+    },
+    "AI653TP": {
+        "marca": "toyota",
+        "modelo": "rav4",
+        "calidad": "como nuevo",
+        "año": 2026,
+        "precio": 90,
+        "categoria": "suv_crossover",
+        "estado": true
+    },
+    "CKG894": {
+        "marca": "fiat",
+        "modelo": "cronos",
+        "calidad": "nuevo",
+        "año": 2012,
+        "precio": 55.0,
+        "categoria": "sedan_hatchback",
+        "estado": true
+    },
+    "WMO834": {
+        "marca": "toyota",
+        "modelo": "rav4",
+        "calidad": "nuevo",
+        "año": 2006,
+        "precio": 40.0,
+        "categoria": "suv_crossover",
+        "estado": true
+    },
+    "AC928RJ": {
+        "marca": "toyota",
+        "modelo": "hilux",
+        "calidad": "usado",
+        "año": 2018,
+        "precio": 70.0,
+        "categoria": "pickup",
+        "estado": true
+    },
+    "VBH656": {
+        "marca": "toyota",
+        "modelo": "yaris",
+        "calidad": "nuevo",
+        "año": 2001,
+        "precio": 27.5,
+        "categoria": "sedan_hatchback",
+        "estado": true
+    },
+    "MQW529": {
+        "marca": "chevrloet",
+        "modelo": "spin",
+        "calidad": "nuevo",
+        "año": 2011,
+        "precio": 52.5,
+        "categoria": "monovolumen_mpv",
+        "estado": true
+    },
+    "AB513PY": {
+        "marca": "toyota",
+        "modelo": "corolla",
+        "calidad": "como nuevo",
+        "año": 2017,
+        "precio": 67.5,
+        "categoria": "sedan_hatchback",
+        "estado": true
+    },
+    "MGO790": {
+        "marca": "fiat",
+        "modelo": "cronos",
+        "calidad": "usado",
+        "año": 2003,
+        "precio": 32.5,
+        "categoria": "sedan_hatchback",
+        "estado": true
+    },
+    "AH081CH": {
+        "marca": "toyota",
+        "modelo": "corolla",
+        "calidad": "usado",
+        "año": 2024,
+        "precio": 85.0,
+        "categoria": "sedan_hatchback",
+        "estado": true
+    },
+    "AH983DY": {
+        "marca": "peugeot",
+        "modelo": "206",
+        "calidad": "nuevo",
+        "año": 2025,
+        "precio": 87.5,
+        "categoria": "sedan_hatchback",
+        "estado": true
+    },
+    "XZG666": {
+        "marca": "toyota",
+        "modelo": "rav4",
+        "calidad": "como nuevo",
+        "año": 2005,
+        "precio": 37.5,
+        "categoria": "suv_crossover",
+        "estado": true
+    },
+    "AD334BO": {
+        "marca": "chevrloet",
+        "modelo": "tracker",
+        "calidad": "nuevo",
+        "año": 2018,
+        "precio": 70.0,
+        "categoria": "suv_crossover",
+        "estado": true
+    },
+    "UQM507": {
+        "marca": "renault",
+        "modelo": "duster",
+        "calidad": "como nuevo",
+        "año": 2006,
+        "precio": 40.0,
+        "categoria": "suv_crossover",
+        "estado": true
+    },
+    "PGÑ041": {
+        "marca": "chevrloet",
+        "modelo": "onix",
+        "calidad": "nuevo",
+        "año": 2007,
+        "precio": 42.5,
+        "categoria": "sedan_hatchback",
+        "estado": true
+    },
+    "JGÑ215": {
+        "marca": "toyota",
+        "modelo": "corolla",
+        "calidad": "nuevo",
+        "año": 2001,
+        "precio": 27.5,
+        "categoria": "sedan_hatchback",
+        "estado": true
+    },
+    "AA565CA": {
+        "marca": "renault",
+        "modelo": "kardian",
+        "calidad": "nuevo",
+        "año": 2016,
+        "precio": 65.0,
+        "categoria": "suv_crossover",
+        "estado": true
+    },
+    "CJI574": {
+        "marca": "toyota",
+        "modelo": "hilux",
+        "calidad": "usado",
+        "año": 2001,
+        "precio": 27.5,
+        "categoria": "pickup",
+        "estado": true
+    }
+}

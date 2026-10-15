@@ -79,61 +79,6 @@ def limpiar():
     """
     os.system('cls' if os.name == 'nt' else 'clear')
 
-
-def cargar_rentados():
-    """
-    Carga el diccionario de autos actualmente rentados desde `rentados.json`.
-
-    Si el archivo no existe (primer uso o sin rentas), devuelve un diccionario
-    vacio para evitar errores de lectura.
-
-    Returns:
-        dict: Estructura {patente: datos_del_auto, ...} con los mismos campos
-        que cada auto de autos.json.
-
-    Raises:
-        json.JSONDecodeError: Si rentados.json tiene un formato invalido.
-    """
-    # TODO(TP - Req 1): ampliar el manejo de excepciones (JSONDecodeError, OSError).
-    try:
-        with open("rentados.json", 'r', encoding="utf-8") as archivo:
-            return json.load(archivo)
-    except FileNotFoundError as e:
-        #  Empieza con un diccionario vacio si no se encuentra el archivo 
-        return {}
-    except OSError as e:
-        limpiar()
-        print(f"/// Ocurrió un error de sistema: {e} ///")
-        input("[Enter] ")
-    
-
-
-def guardar_rentados(rentados):
-    """
-    Guarda el diccionario de autos rentados en `rentados.json`.
-
-    Sobreescribe el archivo con el estado actual. Se usa al alquilar un auto
-    para actualizar el registro.
-    (Req 2 del TP: la accion debe sobreescribir el archivo con la ultima version).
-
-    Args:
-        rentados (dict): Diccionario con los autos actualmente en alquiler.
-
-    Raises:
-        OSError: Si ocurre un error al abrir o escribir el archivo.
-        TypeError: Si algun valor no es serializable a JSON.
-    """
-    # TODO(TP - Req 1): agregar try/except para el guardado (OSError).
-    try:
-        with open("rentados.json", 'w', encoding="utf-8") as archivo:
-            json.dump(rentados, archivo, indent=4)
-    except OSError as e:
-        limpiar()
-        print(f"/// Ocurrió un error de sistema: {e} ///")
-        input("[Enter] ")
-        return
-
-
 def rentar_auto():
     """
     Flujo completo para alquilar un auto disponible.
@@ -169,12 +114,12 @@ def rentar_auto():
         limpiar()
         # --- NIVEL 1: seleccion de categoria ---
         print(" --- Escoja una categoría ---\n\n"
-              "[1] Sedán / Hatchback\n"
-              "[2] SUV / Crossover\n"
-              "[3] Pick-up\n"
-              "[4] Monovolumen / Utilitario (MPV)\n"
-              "-------------------------\n"
-              "[0] Para ir a Sub menú\n")
+            "[1] Sedán / Hatchback\n"
+            "[2] SUV / Crossover\n"
+            "[3] Pick-up\n"
+            "[4] Monovolumen / Utilitario (MPV)\n"
+            "-------------------------\n"
+            "[0] Para ir a Sub menú\n")
         
         try: opcion : str = input("\nSeleccione una opción: ").strip()
         except: opcion : str = ""
@@ -200,15 +145,12 @@ def rentar_auto():
                 limpiar()
                 print("--- Modelos disponibles ---\n")
 
-                # Estado actual de los autos rentados (se recarga cada vez).
-                rentados = cargar_rentados()
-
                 # Filtra modelos unicos disponibles de la categoria elegida.
                 # Se considera "disponible" si pertenece a la categoria y su
                 # patente NO esta en 'rentados'. Es una lista por comprension
                 # que alimenta un conjunto (set) para eliminar duplicados.
                 # TODO(TP - Req 5): esta comprension es un uso valido del requisito.
-                filtrados = {str(i+1): j.capitalize() for i ,j in enumerate(list({lista[i]["modelo"] for i in lista if lista[i]["categoria"] == categ_preset[opcion] and i not in rentados}))}
+                filtrados = {str(i+1): j.capitalize() for i ,j in enumerate(list({lista[i]["modelo"] for i in lista if lista[i]["categoria"] == categ_preset[opcion]}))}
 
                 # Si no quedan modelos disponibles, se avisa y se vuelve a categorias.
                 if not filtrados:
@@ -270,12 +212,6 @@ def rentar_auto():
                             limpiar()
                             patente_elegida = patentes[int(opcion3)-1]
                             print(f"\n¡Auto con patente: {patente_elegida} RENTADO!")
-        
-                            # Se copia la ficha completa del auto al diccionario
-                            # de rentados y se guarda (sobreescribe el archivo).
-                            # TODO(TP - Req 1): validar claves (KeyError) y guardar con try/except.
-                            rentados[patente_elegida] = lista[patente_elegida]
-                            guardar_rentados(rentados)
 
                             try: input("[Enter] ")
                             except: pass
@@ -296,7 +232,7 @@ def devolver_auto():
         - Listar los autos rentados (patente + datos).
         - Pedir la patente a devolver, validando que exista.
         - Eliminarla de `rentados.json` (sobreescribir el archivo con la
-          ultima version del diccionario).
+        - ultima version del diccionario).
         - Informar que la devolucion se realizo correctamente.
     """
     limpiar()
