@@ -94,18 +94,11 @@ RUTA_AUTOS = inf.RUTA_AUTOS_JSON
 CALIDAD = inf.CALIDADES
 MARCA = inf.MARCAS
 CATEGORIA = inf.CATEGORIAS
+ESTADO = inf.DISPONIBLE
 
 # Mapeo entre la opcion numerica del menu de modificacion y el campo del JSON.
 # Formato: "clave de menu": ("nombre del campo en el JSON", "nombre para mostrar").
 # Se usa para no repetir la lista de campos editables en varios lugares.
-CAMPOS = {
-    "1": ("marca", "Marca"),
-    "2": ("modelo", "Modelo"),
-    "3": ("calidad", "Calidad"),
-    "4": ("año", "Año"),
-    "5": ("precio", "Precio"),
-    "6": ("categoria", "Categoría"),
-}
 
 def limpiar():
     """
@@ -269,9 +262,19 @@ def _pedir_patente_existente(autos : dict) -> str:
             try: input("[Enter] ")
             except: pass
             return
-    patente = input("Ingrese la patente del auto: ").strip().upper()
+
+    try: 
+        patente = input("Ingrese la patente del auto: ").strip().upper()
+        if patente == '0':
+            return patente
+    except: pass
+
     while patente not in autos:
-        patente = input("Patente no encontrada. Ingrese una patente válida: ").strip().upper()
+        try: 
+            patente = input("Patente no encontrada. Ingrese una patente válida: ").strip().upper()
+            if patente == '0':
+                break
+        except: pass
     return patente
 
 
@@ -297,9 +300,10 @@ def _mostrar_auto(patente, datos):
     print(f"\tAño: {datos['año']}")
     print(f"\tPrecio: u$d {datos['precio']:.1f}")
     print(f"\tCategoría: {datos['categoria']}")
+    print(f"\tEstado: {datos['estado']}")
 
 
-# ---------- READ ----------
+# ---------- READ EBZ899-HHE013 ----------
 
 def ver_stock():
     """
@@ -319,6 +323,7 @@ def ver_stock():
     # Recorre cada par (patente, datos) del diccionario de diccionarios.
     # TODO(TP - Req 5): aqui se podria aplicar una lista por comprension
     # o una lambda para generar un resumen del catalogo.
+    
     for patente, datos in autos.items():
         _mostrar_auto(patente, datos)
         try: 
@@ -359,13 +364,14 @@ def agregar_auto():
     Al finalizar, guarda la ultima version del diccionario en el archivo JSON.
     (Req 2 del TP: Create sobreescribe el archivo).
     """
-    # TODO(TP - Req 1): manejar excepciones en la carga y en el guardado.
     autos = _cargar_autos()
 
     # Se pide la patente y se valida que no exista (una patente es unica).
-    patente = input("Patente del nuevo auto: ").strip().upper()
+    try: patente = input("Patente del nuevo auto: ").strip().upper()
+    except: pass
     while patente in autos:
-        patente = input("Esa patente ya existe. Ingrese otra: ").strip().upper()
+            try: patente = input("Esa patente ya existe. Ingrese otra: ").strip().upper()
+            except: pass
 
     # Se piden y validan los demas atributos del auto.
     marca = _pedir_de_tupla("Marca: ", inf.MARCAS)
@@ -390,6 +396,12 @@ def agregar_auto():
 
 
 # ---------- UPDATE ----------
+def modificar_estado_auto(patente):
+
+    autos = _cargar_autos()
+    autos[patente]["estado"] = False
+    with open("autos.json", 'w', encoding="utf-8") as archivo:
+        json.dump(autos, archivo, indent=4, ensure_ascii=False)
 
 def modificar_auto():
     """
@@ -401,7 +413,6 @@ def modificar_auto():
 
     El bucle se repite hasta que el usuario elige la opcion [0] salir.
     """
-    # TODO(TP - Req 1): manejar excepciones en la carga y en el guardado.
     autos = _cargar_autos()
     if not autos:
             print("\nNo hay autos en el catálogo.")
@@ -414,8 +425,10 @@ def modificar_auto():
     while True:
         # Muestra el menu de campos con su valor actual.
         print(f"\n--- Modificar auto [{patente}] ---")
-        for clave, (campo, nombre) in CAMPOS.items():
-            print(f"[{clave}] {nombre}: {autos[patente][campo]}")
+        
+        for i, j in enumerate(autos[patente]):
+            print(f"[{i}] {j.capitalize()}: {autos[patente][j]}")
+        
         print("[0] Terminar")
 
         opcion = input("\n¿Qué campo desea modificar?: ").strip()
@@ -424,12 +437,12 @@ def modificar_auto():
         if opcion == "0":
             break
         # Validacion de la opcion ingresada.
-        elif opcion not in CAMPOS:
+        elif (int(opcion)-1) not in (len(autos[patente])):
             print("\nOpción no válida. Intente de nuevo.")
             continue
 
         # Se traduce la opcion a (campo del JSON, nombre visible).
-        campo, nombre = CAMPOS[opcion]
+        autos[patente], autos[patente] = autos[opcion]
 
         # Se pide el nuevo valor segun el tipo de campo elegido.
         if campo == "marca":
@@ -444,6 +457,8 @@ def modificar_auto():
             autos[patente]["precio"] = _pedir_float("Nuevo precio (u$d)")
         elif campo == "categoria":
             autos[patente]["categoria"] = _pedir_de_tupla("Categoría", inf.CATEGORIAS)
+        elif campo == "estado":
+            autos[patente]["estado"] = _pedir_de_tupla("estado", inf.ESTADO)
 
         # Se guarda el cambio y se confirma.
         _guardar_autos(autos)
@@ -495,7 +510,8 @@ def menu_crud():
         print("[5] Eliminar auto")
         print("[0] Salir")
         # TODO(TP - Req 1): manejar excepciones en el ingreso de datos.
-        opcion = input("Seleccione una opción: ").strip()
+        try: opcion = input("Seleccione una opción: ").strip()
+        except: pass
 
         # Despacho de la opcion elegida hacia la funcion correspondiente.
         if opcion == "1":

@@ -69,6 +69,7 @@ lo que falta. NO se modifico ninguna linea de logica del programa.
 
 import json, os
 import informe as inf
+import crud as cd
 
 def limpiar():
     """
@@ -99,7 +100,6 @@ def rentar_auto():
     """
 
     # Carga el catalogo completo de autos desde el archivo.
-    # TODO(TP - Req 1): manejar excepciones (FileNotFoundError, JSONDecodeError).
     try:
         with open("autos.json", 'r', encoding="utf-8") as archivo:
             lista = json.load(archivo)
@@ -109,6 +109,7 @@ def rentar_auto():
         try: input("[Enter] ")
         except: pass
         return
+    
 
     while True:
         limpiar()
@@ -150,7 +151,7 @@ def rentar_auto():
                 # patente NO esta en 'rentados'. Es una lista por comprension
                 # que alimenta un conjunto (set) para eliminar duplicados.
                 # TODO(TP - Req 5): esta comprension es un uso valido del requisito.
-                filtrados = {str(i+1): j.capitalize() for i ,j in enumerate(list({lista[i]["modelo"] for i in lista if lista[i]["categoria"] == categ_preset[opcion]}))}
+                filtrados = {str(i+1): j.capitalize() for i ,j in enumerate(list({lista[i]["modelo"] for i in lista if lista[i]["categoria"] == categ_preset[opcion] and lista[i]["estado"] == True }))}
 
                 # Si no quedan modelos disponibles, se avisa y se vuelve a categorias.
                 if not filtrados:
@@ -184,7 +185,7 @@ def rentar_auto():
                         # Lista por comprension: patentes de ese modelo que
                         # todavia no estan rentadas.
                         # TODO(TP - Req 5): otro uso de lista por comprension.
-                        patentes = [i for i in lista if lista[i]["modelo"].capitalize() == filtrados[opcion2]]
+                        patentes = [i for i in lista if lista[i]["modelo"].capitalize() == filtrados[opcion2] and lista[i]["estado"] == True]
 
                         # Muestra la ficha resumida de cada patente disponible.
                         for i, j in enumerate(patentes):
@@ -211,8 +212,8 @@ def rentar_auto():
                             # --- Confirmacion y registro del alquiler ---
                             limpiar()
                             patente_elegida = patentes[int(opcion3)-1]
+                            cd.modificar_estado_auto(patente_elegida)
                             print(f"\n¡Auto con patente: {patente_elegida} RENTADO!")
-
                             try: input("[Enter] ")
                             except: pass
                             # Salir del bucle de patentes tras alquilar.
@@ -239,8 +240,8 @@ def devolver_auto():
     # TODO(TP - Req 1): manejar excepciones al cargar.
 
     # Si no hay autos rentados, se avisa y se sale de la funcion.
-        print("No hay autos rentados actualmente.")
-        input("\n[Enter]")
+    print("No hay autos rentados actualmente.")
+    input("\n[Enter]")
 
     # Interfaz base (en desarrollo).
     print("¿Que auto desea devolver?")
@@ -274,6 +275,7 @@ def menu_principal():
     Permite acceder al submenu de usuario o al submenu de empresa.
     El bucle termina cuando se selecciona [0] Salir.
     """
+    
     while True:
         limpiar()
         print("--- MENÚ PRINCIPAL ---\n")
