@@ -19,7 +19,130 @@ def limpiar():
     """
     os.system('cls' if os.name == 'nt' else 'clear')
 
-def rentar_auto():
+def ingresa_usuario(lista):
+    """
+    Interfaz para el ingreso de un usuario ya registrado.
+
+    Args:
+        lista (list): Diccionario con la información de todos los usuarios.
+    
+    Returns:
+        tupla: Con el Nombre y Autos rentados del usuario
+    """
+    while True:
+        limpiar()
+        #  Manejo de excepciones en inputs.
+        #  Se pide el DNI y la contraseña al usuario.
+        print("--- REGISTRO: USUARIOS ---")
+        print("[0] en cualquier campo para salir.\n")
+        try: 
+
+            dni_usu = int(input("Ingrese DNI de usuario: "))
+            dni_usu = str(dni_usu)
+
+            if len(dni_usu) != 8 and dni_usu != "0":
+                print("\nDNI inválido, intente de nuevo")
+                try: input("[Enter] ")
+                except: pass
+                return ()
+            elif dni_usu not in lista and dni_usu != "0":
+                print("\nUsuario inexistente, regístrese.")
+                try: input("[Enter] ")
+                except: pass  
+                return ()
+            
+            clave_usu : str = input("Ingrese contraseña: ").lower()
+
+            while True:
+                if dni_usu in lista and clave_usu != lista[dni_usu]["clave"]:
+                    clave_usu = input("Contraseña incorrecta, intente de nuevo: ").lower()
+                elif clave_usu == "0": break
+                elif clave_usu.strip() == "" : int(clave_usu)
+                else: break
+            break
+        except:
+            print()
+            print("[ERROR] Intente de nuevo.")
+            try: input("[Enter] ")
+            except: pass
+        
+    #  Se retorna el Nombre y una lista con los autos que rentó
+    if dni_usu in lista and clave_usu == lista[dni_usu]["clave"]:
+        limpiar()
+        print("=" * 20)
+        print(f"Bienvenido/a {lista[dni_usu]["nombre"]}!")
+        print("=" * 20)
+        try: input("[Enter] ")
+        except: pass
+        return (lista[dni_usu]["nombre"], lista[dni_usu]["autos_rentados"])
+    elif dni_usu == "0" or clave_usu == "0":
+        return 
+
+def registro_usuario(lista):
+    """
+    Interfaz para el registro de usuarios nuevos.
+
+    Args:
+        lista (list): Diccionario con la información de todos los usuarios.
+    
+    Returns:
+        
+    """
+    while True:
+        limpiar()
+        #  Manejo de excepciones en inputs.
+        #  Se pide el DNI y la contraseña al usuario.
+        try: 
+            print("--- REGISTRO: USUARIOS ---")
+            print("[0] en cualquier campo para salir.\n")
+            
+            dni_usu = int(input("Ingrese su DNI: "))
+
+            if len(dni_usu) != 9:
+                print("\nDNI inválido, intente de nuevo.")
+                try: input("[Enter] ")
+                except: pass
+                return ()
+            elif dni_usu in lista:
+                print("\nDNI ya existente, vaya a 'INGRESAR'")
+                try: input("[Enter] ")
+                except: pass   
+                return ()
+
+            nombre_usu : str = input("Ingrese su nombre: ")
+            clave_usu : str = input("Ingrese una nueva contraseña: ").lower()
+            
+            if clave_usu == "0" or dni_usu == "0" or nombre_usu == "0": return ()
+            while True:
+                
+                clave_usu2 : str = input("Comprueba contraseña: ").lower()
+                
+                if clave_usu == clave_usu2: break
+                elif clave_usu2 == "0": return ()
+                else: limpiar(), print("| Clave incorrecta, intente de nuevo |")
+            break
+
+        except:
+            print()
+            print("[ERROR] Intente de nuevo.")
+            try: input("[Enter] ")
+            except: pass    
+
+    lista[str(dni_usu)] = {
+        "nombre": nombre_usu,
+        "clave": clave_usu,
+        "autos_rentados": [],
+    }
+    
+    with open(inf.RUTA_USUARIOS_JSON, "w", encoding="utf-8") as f:
+        json.dump(lista, f, indent=4, ensure_ascii=False)
+    print(f"||| ¡Usuario [{nombre_usu.capitalize()}] registrado exitosamente! |||")
+    try: input("[Enter] ")
+    except: pass  
+
+    #  Se retorna el Nombre y una lista con los autos que rentó
+
+def rentar_auto(usu_info):
     """
     Flujo completo para alquilar un auto disponible.
 
@@ -52,7 +175,7 @@ def rentar_auto():
     while True:
         limpiar()
         # --- NIVEL 1: seleccion de categoria ---
-        print(" --- Escoja una categoría ---\n\n"
+        print(f" --- Escoja una categoría --- [{usu_info[0]}]\n\n"
             "[1] Sedán / Hatchback\n"
             "[2] SUV / Crossover\n"
             "[3] Pick-up\n"
@@ -84,7 +207,7 @@ def rentar_auto():
             # --- NIVEL 2: seleccion de modelo dentro de la categoria ---
             while True:
                 limpiar()
-                print("--- Modelos disponibles ---\n")
+                print(f"--- Modelos disponibles --- [{usu_info[0]}]\n")
 
                 # Filtra modelos unicos disponibles de la categoria elegida.
                 # Se considera "disponible" si pertenece a la categoria y su
@@ -120,7 +243,7 @@ def rentar_auto():
                     # --- NIVEL 3: seleccion de patente del modelo elegido ---
                     while True:
                         limpiar()
-                        print(f"--- PATENTES con Modelo: {filtrados[opcion2]}---")
+                        print(f"--- PATENTES con Modelo: {filtrados[opcion2]}---  [{usu_info[0]}]")
 
                         # Lista por comprension: patentes de ese modelo que
                         # todavia no estan rentadas.
@@ -157,12 +280,7 @@ def rentar_auto():
                             try: input("[Enter] ")
                             except: pass
                             # Salir del bucle de patentes tras alquilar.
-                            break
-                    # Salir del bucle de modelos.
-                    break
-            break
-        
-
+                            return 
 
 def devolver_auto():
     """
@@ -190,23 +308,6 @@ def devolver_auto():
     try: input("[Enter] ")
     except: pass
 
-
-def estado_rentas():
-    """
-    Muestra el estado actual de los autos rentados.
-
-    Lee `rentados.json` y muestra un listado de los autos (patentes y datos).
-    TODO(TP): completar la visualizacion con el formato de ficha y considerar
-    el uso de una lista por comprension o lambda para resumir la informacion.
-    """
-    limpiar()
-    # TODO(TP - Req 1): manejar excepciones al cargar.
-    print("--- ESTADO DE AUTOS RENTADOS ---\n")
-    # TODO(TP): recorrer 'rentados' y mostrar la informacion de cada auto.
-    # TODO(TP - Req 5): aplicar lista por comprension o lambda para un resumen.
-    try: input("[Enter] ")
-    except: pass
-
 # ---------- Menus ----------
 
 def menu_principal():
@@ -226,52 +327,84 @@ def menu_principal():
         print("[0] Salir.")
         
         
-        try: opcion = input("\nSeleccione una opción: ").strip()
-        except: opcion : str = ""
+        try: 
+            opcion = input("\nSeleccione una opción: ").strip()
 
         # Despacho de la opcion elegida hacia el submenu correspondiente.
-        if opcion == "1":
-            submenu_usuario()
-        elif opcion == "2":
-            submenu_empresa()
-        elif opcion == "0":
-            # Finalizar la ejecucion del programa.
-            break
-        else:
-            print("\nOpción no válida. Intente de nuevo.")
-            try: input("[Enter] ")
-            except: pass
+            if opcion == "1":
+                submenu_usuario()
+            elif opcion == "2":
+                submenu_empresa()
+            elif opcion == "0":
+                # Finalizar la ejecucion del programa.
+                break
+            else:
+                print("\nOpción no válida. Intente de nuevo.")
+                try: input("[Enter] ")
+                except: pass
+
+        except: opcion : str = ""
 
 
 def submenu_usuario():
     """
     Submenu destinado al usuario final.
 
-    Ofrece acciones de alquiler: rentar auto o devolver auto.
+    Ofrece acciones de alquiler: ingresar, registrarse, rentar auto o devolver auto.
     Permite volver al menu principal con [0].
     """
+    with open("usuarios.json", 'r', encoding="utf-8") as archivo:
+        lista = json.load(archivo)
+
     while True:
         limpiar()
-        print("--- SUBMENÚ: MANEJO DE AUTOS ---\n")
+        print("--- INGRESO: USUARIOS ---\n")
+        print("[1] Ingresar")
+        print("[2] Registrarse")
+        print("-------------------------")
+        print("[0] Volver al menú principal")
+        try:
+            opcion : str = input("\nSeleccione una opción: ").strip()
+            
+            if opcion == "1":
+                usu_info : tuple = ingresa_usuario(lista)
+                if not usu_info: usu_info
+                else: break
+            elif opcion == "2":
+                registro_usuario(lista)
+            elif opcion == "0":
+                return
+            else:
+                print("\nOpción no válida. Intente de nuevo.")
+                try: input("[Enter] ")
+                except: pass
+
+        except: opcion = ""
+
+
+    while True:
+        limpiar()
+        print("--- SUBMENÚ: MANEJO DE AUTOS ---", end="")
+        print(f"  [{usu_info[0]}]\n")
         print("[1] Rentar auto.")
         print("[2] Devolver auto.")
         print("-------------------------")
         print("[0] Volver al menú principal")
         
-        try: opcion : str = input("\nSeleccione una opción: ").strip()
+        try: 
+            opcion : str = input("\nSeleccione una opción: ").strip()
+            if opcion == "1":
+                rentar_auto(usu_info)
+            elif opcion == "2":
+                devolver_auto(usu_info)
+            elif opcion == "0":
+                # Volver al menu principal.
+                break
+            else:
+                print("\nOpción no válida. Intente de nuevo.")
+                try: input("[Enter] ")
+                except: pass
         except: opcion : str = ""
-
-        if opcion == "1":
-            rentar_auto()
-        elif opcion == "2":
-            devolver_auto()
-        elif opcion == "0":
-            # Volver al menu principal.
-            break
-        else:
-            print("\nOpción no válida. Intente de nuevo.")
-            try: input("[Enter] ")
-            except: pass
 
 
 def submenu_empresa():

@@ -2,7 +2,7 @@ import json
 import random
 import os
 
-AUTOS = {
+AUTOS : dict[tuple] = {
     "toyota": ("etios", "yaris", "hilux", "corolla", "rav4"),
     "renault": ("kardian", "clio", "kangoo", "sandero", "duster"),
     "fiat": ("cronos", "fastback", "argo", "pulse", "toro"),
@@ -28,7 +28,7 @@ preset: dict = {
     2026: ["AI"]
 }
 
-categorias: dict = {
+categorias_modelos: dict = {
     "sedan_hatchback": [
         "etios", "yaris", "corolla", "clio", "sandero",
         "argo", "cronos", "206", "208", "408", "onix", "cruze"
@@ -42,6 +42,8 @@ categorias: dict = {
 }
 
 RUTA_AUTOS_JSON: str = "autos.json"
+RUTA_USUARIOS_JSON : str = "usuarios.json"
+
 letras: tuple = (
     "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "ñ", "o",
     "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"
@@ -112,23 +114,55 @@ def informe_autos(
             "calidad": random.choice(CALIDADES),
             "año": anio,
             "precio": precio,
-            "categoria": [i for i in categorias if modelo in categorias[i]][0],
-            "estado": random.choice(DISPONIBLE)
+            "categoria": [i for i in categorias_modelos if modelo in categorias_modelos[i]][0],
+            "estado": DISPONIBLE[0]
         }
     
     try:
         with open(ruta_archivo, "r", encoding="utf-8") as f:
-            print(f"/// Archivo ya existente ///")
+            print(f"___ Archivo [{ruta_archivo}] ya existente ___")
     except FileNotFoundError:
         with open(ruta_archivo, "w", encoding="utf-8") as f:
             json.dump(listado, f, indent=4, ensure_ascii=False)
-            print(f"/// Archivo [autos.json] creado exitosamente ///")
+            print(f"||| Archivo [{ruta_archivo}] creado exitosamente |||")
+
+    try: input("[Enter] ")
+    except: pass
+
+    return
+
+
+def informe_usuarios(
+    ruta_archivo: str) -> dict:
+    """
+    Hace un conjunto vacío y lo guarda en un JSON
+
+    Args:
+        ruta_archivo: Dirección donde se guardará el diccionario
+
+    Returns:
+        dict: Diccionario sin usuarios
+    """
+
+    listado = {}
+    
+    try:
+        with open(ruta_archivo, "r", encoding="utf-8") as f:
+            print(f"___ Archivo [{ruta_archivo}] ya existente ___")
+    except FileNotFoundError:
+        listado["10101010"] = {
+            "nombre" : "Jorge",
+            "clave" : "1010",
+            "autos_rentados" : []
+        }
+        with open(ruta_archivo, "w", encoding="utf-8") as f:
+            json.dump(listado, f, indent=4, ensure_ascii=False)
+            print(f"||| Archivo [{ruta_archivo}] creado exitosamente |||")
 
     try:
         input("[Enter] ")
     except:
         pass
-
     return
 
 
@@ -139,6 +173,8 @@ if __name__ == "__main__":
         # TODO(TP - Req 1): usar manejo de excepciones especifico
         # (FileNotFoundError, JSONDecodeError) en lugar de 'except' generico.
         informe_autos(RUTA_AUTOS_JSON, 25)
+        print()
+        informe_usuarios(RUTA_USUARIOS_JSON)
     except:
         # Si falla (archivo faltante, formato invalido, etc.) se continua igual.
         pass
