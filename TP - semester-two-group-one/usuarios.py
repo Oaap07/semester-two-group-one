@@ -53,9 +53,9 @@ def ingresa_usuario(lista):
             clave_usu : str = input("Ingrese contraseña: ").lower()
 
             while True:
-                if dni_usu in lista and clave_usu != lista[dni_usu]["clave"]:
+                if clave_usu == "0": break
+                elif dni_usu in lista and clave_usu != lista[dni_usu]["clave"]:
                     clave_usu = input("Contraseña incorrecta, intente de nuevo: ").lower()
-                elif clave_usu == "0": break
                 elif clave_usu.strip() == "" : int(clave_usu)
                 else: break
             break
@@ -73,7 +73,7 @@ def ingresa_usuario(lista):
         print("=" * 20)
         try: input("[Enter] ")
         except: pass
-        return (lista[dni_usu]["nombre"], lista[dni_usu]["autos_rentados"])
+        return list((lista[dni_usu], lista[dni_usu]["nombre"], lista[dni_usu]["autos_rentados"]))
     elif dni_usu == "0" or clave_usu == "0":
         return 
 

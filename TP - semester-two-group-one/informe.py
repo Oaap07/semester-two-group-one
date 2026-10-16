@@ -11,7 +11,7 @@ AUTOS : dict[tuple] = {
 }
 MARCAS: tuple = tuple(AUTOS.keys())
 CALIDADES: tuple = ("nuevo", "como nuevo", "usado")
-DISPONIBLE: tuple = (True, False)
+DISPONIBLE:tuple = ("true", "false")
 ANIOS: tuple = (2000, 2026)
 CATEGORIAS: tuple = ("sedan_hatchback", "suv_crossover", "pickup", "monovolumen_mpv")
 preset: dict = {
@@ -115,7 +115,7 @@ def informe_autos(
             "año": anio,
             "precio": precio,
             "categoria": [i for i in categorias_modelos if modelo in categorias_modelos[i]][0],
-            "estado": DISPONIBLE[0]
+            "estado": True
         }
     
     try:

@@ -29,7 +29,7 @@ RUTA_AUTOS = inf.RUTA_AUTOS_JSON
 CALIDAD = inf.CALIDADES
 MARCA = inf.MARCAS
 CATEGORIA = inf.CATEGORIAS
-ESTADO = ("true", "false")
+ESTADO = inf.DISPONIBLE
 categ_preset = {
     "1": "sedan_hatchback",
     "2": "suv_crossover",

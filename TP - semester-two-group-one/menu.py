@@ -55,12 +55,21 @@ def rentar_auto(usu_info):
         try: input("[Enter] ")
         except: pass
         return
-    
+
+    try:
+        with open("usuarios.json", 'r', encoding="utf-8") as archivo:
+            lista_usu = json.load(archivo)
+    except OSError as e:
+        limpiar()
+        print(f"/// Ocurrió un error de sistema: {e} ///")
+        try: input("[Enter] ")
+        except: pass
+        return
 
     while True:
         limpiar()
         # --- NIVEL 1: seleccion de categoria ---
-        print(f" --- Escoja una categoría --- [{usu_info[0]}]\n\n"
+        print(f" --- Escoja una categoría --- [{usu_info[1]}]\n\n"
             "[1] Sedán / Hatchback\n"
             "[2] SUV / Crossover\n"
             "[3] Pick-up\n"
@@ -86,7 +95,7 @@ def rentar_auto(usu_info):
             # --- NIVEL 2: seleccion de modelo dentro de la categoria ---
             while True:
                 limpiar()
-                print(f"--- Modelos disponibles --- [{usu_info[0]}]\n")
+                print(f"--- Modelos disponibles --- [{usu_info[1]}]\n")
 
                 # Filtra modelos unicos disponibles de la categoria elegida.
                 # Se considera "disponible" si pertenece a la categoria y su
@@ -122,7 +131,7 @@ def rentar_auto(usu_info):
                     # --- NIVEL 3: seleccion de patente del modelo elegido ---
                     while True:
                         limpiar()
-                        print(f"--- PATENTES con Modelo: {filtrados[opcion2]}---  [{usu_info[0]}]")
+                        print(f"--- PATENTES con Modelo: {filtrados[opcion2]}---  [{usu_info[1]}]")
 
                         # Lista por comprension: patentes de ese modelo que
                         # todavia no estan rentadas.
@@ -155,7 +164,11 @@ def rentar_auto(usu_info):
                             limpiar()
                             patente_elegida = patentes[int(opcion3)-1]
                             cd.modificar_estado_auto(patente_elegida, True)
+                            usu_info[1].append(patente_elegida)
+                            with open("usuarios.json", 'w', encoding="utf-8") as archivo:
+                                json.dump(lista_usu, archivo, indent=4, ensure_ascii=False)
                             print(f"\n¡Auto con patente: {patente_elegida} RENTADO!")
+
                             try: input("[Enter] ")
                             except: pass
                             # Salir del bucle de patentes tras alquilar.
@@ -282,7 +295,7 @@ def menu_principal():
 
         except: opcion : str = ""
 
-
+    
 def submenu_usuario():
     """
     Submenu destinado al usuario final.
@@ -290,8 +303,13 @@ def submenu_usuario():
     Ofrece acciones de alquiler: ingresar, registrarse, rentar auto o devolver auto.
     Permite volver al menu principal con [0].
     """
-    with open("usuarios.json", 'r', encoding="utf-8") as archivo:
-        lista = json.load(archivo)
+    try: 
+        with open("usuarios.json", 'r', encoding="utf-8") as archivo:
+            lista = json.load(archivo)
+    except FileNotFoundError: 
+        print("\nError: no se encontró el archivo")
+        try: input("[Enter] ")
+        except: pass
 
     while True:
         limpiar()
@@ -304,7 +322,7 @@ def submenu_usuario():
             opcion : str = input("\nSeleccione una opción: ").strip()
             
             if opcion == "1":
-                usu_info : tuple = us.ingresa_usuario(lista)
+                usu_info = us.ingresa_usuario(lista)
                 if not usu_info: usu_info
                 else: break
             elif opcion == "2":
@@ -322,7 +340,7 @@ def submenu_usuario():
     while True:
         limpiar()
         print("--- SUBMENÚ: MANEJO DE AUTOS ---", end="")
-        print(f"  [{usu_info[0]}]\n")
+        print(f"  [{usu_info[1]}]\n")
         print("[1] Rentar auto.")
         print("[2] Devolver auto.")
         print("-------------------------")
