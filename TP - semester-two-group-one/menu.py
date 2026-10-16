@@ -47,8 +47,8 @@ def rentar_auto(usu_info):
 
     # Carga el catalogo completo de autos desde el archivo.
     try:
-        with open("autos.json", 'r', encoding="utf-8") as archivo:
-            lista = json.load(archivo)
+        with open(inf.RUTA_AUTOS_JSON, 'r', encoding="utf-8") as archivo:
+            lista_aut = json.load(archivo)
     except OSError as e:
         limpiar()
         print(f"/// Ocurrió un error de sistema: {e} ///")
@@ -57,8 +57,8 @@ def rentar_auto(usu_info):
         return
 
     try:
-        with open("usuarios.json", 'r', encoding="utf-8") as archivo:
-            lista_usu = json.load(archivo)
+        with open(inf.RUTA_USUARIOS_JSON, 'r', encoding="utf-8") as archivo2:
+            lista_usu = json.load(archivo2)
     except OSError as e:
         limpiar()
         print(f"/// Ocurrió un error de sistema: {e} ///")
@@ -136,15 +136,15 @@ def rentar_auto(usu_info):
                         # Lista por comprension: patentes de ese modelo que
                         # todavia no estan rentadas.
                         # TODO(TP - Req 5): otro uso de lista por comprension.
-                        patentes = [i for i in lista if lista[i]["modelo"].capitalize() == filtrados[opcion2] and lista[i]["estado"] == True]
+                        patentes = [i for i in lista_aut if lista_aut[i]["modelo"].capitalize() == filtrados[opcion2] and lista_aut[i]["estado"] == True]
 
                         # Muestra la ficha resumida de cada patente disponible.
                         for i, j in enumerate(patentes):
                             
                             print(f"\n[{i+1}]: {j}\n"
-                                f"\tCalidad: {lista[j]['calidad']}\n"\
-                                f"\tAño: {lista[j]['año']}\n"\
-                                f"\tPrecio: u$d {lista[j]['precio']:.1f}")
+                                f"\tCalidad: {lista_aut[j]['calidad']}\n"\
+                                f"\tAño: {lista_aut[j]['año']}\n"\
+                                f"\tPrecio: u$d {lista_aut[j]['precio']:.1f}")
                         print("-------------------------")
                         print("[0] Para salir a Modelos")
 
@@ -164,9 +164,11 @@ def rentar_auto(usu_info):
                             limpiar()
                             patente_elegida = patentes[int(opcion3)-1]
                             cd.modificar_estado_auto(patente_elegida, True)
-                            usu_info[1].append(patente_elegida)
+                            lista_usu[usu_info[0]]["autos_rentados"].append(patente_elegida)
+
                             with open("usuarios.json", 'w', encoding="utf-8") as archivo:
                                 json.dump(lista_usu, archivo, indent=4, ensure_ascii=False)
+                            
                             print(f"\n¡Auto con patente: {patente_elegida} RENTADO!")
 
                             try: input("[Enter] ")
