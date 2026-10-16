@@ -1,185 +1,86 @@
 {
-    "MIK459": {
-        "marca": "renault",
-        "modelo": "kangoo",
-        "calidad": "como nuevo",
-        "año": 2003,
-        "precio": 32.5,
-        "categoria": "monovolumen_mpv",
-        "estado": false
-    },
-    "EUB069": {
-        "marca": "renault",
-        "modelo": "kangoo",
-        "calidad": "usado",
-        "año": 2003,
-        "precio": 32.5,
-        "categoria": "monovolumen_mpv",
-        "estado": false
-    },
-    "DCW450": {
+    "IFN860": {
         "marca": "peugeot",
-        "modelo": "2008",
-        "calidad": "nuevo",
-        "año": 2007,
-        "precio": 42.5,
-        "categoria": "suv_crossover",
-        "estado": true
-    },
-    "XHW273": {
-        "marca": "fiat",
-        "modelo": "argo",
-        "calidad": "como nuevo",
-        "año": 2005,
-        "precio": 37.5,
-        "categoria": "sedan_hatchback",
-        "estado": false
-    },
-    "HWX900": {
-        "marca": "toyota",
-        "modelo": "corolla",
-        "calidad": "nuevo",
-        "año": 2008,
-        "precio": 45.0,
-        "categoria": "sedan_hatchback",
-        "estado": true
-    },
-    "KFB676": {
-        "marca": "toyota",
-        "modelo": "corolla",
+        "modelo": "408",
         "calidad": "nuevo",
         "año": 2012,
         "precio": 55.0,
         "categoria": "sedan_hatchback",
         "estado": true
     },
-    "AE413WM": {
-        "marca": "peugeot",
-        "modelo": "208",
-        "calidad": "usado",
-        "año": 2020,
-        "precio": 75.0,
-        "categoria": "sedan_hatchback",
-        "estado": true
-    },
-    "BGA316": {
-        "marca": "chevrolet",
-        "modelo": "tracker",
-        "calidad": "usado",
-        "año": 2015,
-        "precio": 62.5,
-        "categoria": "suv_crossover",
-        "estado": false
-    },
-    "AE226MX": {
-        "marca": "fiat",
-        "modelo": "pulse",
-        "calidad": "como nuevo",
-        "año": 2020,
-        "precio": 75.0,
-        "categoria": "suv_crossover",
-        "estado": true
-    },
-    "AI281UE": {
+    "AB494WB": {
         "marca": "chevrolet",
         "modelo": "tracker",
         "calidad": "como nuevo",
-        "año": 2026,
-        "precio": 90,
+        "año": 2017,
+        "precio": 67.5,
         "categoria": "suv_crossover",
         "estado": true
     },
-    "AG760OI": {
+    "AH158LY": {
         "marca": "renault",
-        "modelo": "clio",
-        "calidad": "como nuevo",
-        "año": 2023,
-        "precio": 82.5,
-        "categoria": "sedan_hatchback",
-        "estado": false
-    },
-    "EBA183": {
-        "marca": "chevrolet",
-        "modelo": "spin",
-        "calidad": "como nuevo",
-        "año": 2015,
-        "precio": 62.5,
-        "categoria": "monovolumen_mpv",
-        "estado": false
-    },
-    "SHL986": {
-        "marca": "peugeot",
-        "modelo": "408",
+        "modelo": "duster",
         "calidad": "usado",
-        "año": 2013,
-        "precio": 57.5,
-        "categoria": "sedan_hatchback",
+        "año": 2025,
+        "precio": 87.5,
+        "categoria": "suv_crossover",
         "estado": true
     },
-    "DFV529": {
-        "marca": "fiat",
-        "modelo": "argo",
-        "calidad": "como nuevo",
-        "año": 2000,
-        "precio": 25.0,
-        "categoria": "sedan_hatchback",
-        "estado": false
-    },
-    "PCX898": {
+    "XRL590": {
         "marca": "toyota",
-        "modelo": "hilux",
+        "modelo": "rav4",
         "calidad": "como nuevo",
-        "año": 2009,
-        "precio": 47.5,
+        "año": 2010,
+        "precio": 50.0,
+        "categoria": "suv_crossover",
+        "estado": true
+    },
+    "AD104IY": {
+        "marca": "fiat",
+        "modelo": "toro",
+        "calidad": "usado",
+        "año": 2019,
+        "precio": 72.5,
         "categoria": "pickup",
         "estado": true
     },
-    "WND526": {
+    "AE431AT": {
         "marca": "toyota",
         "modelo": "corolla",
         "calidad": "como nuevo",
-        "año": 2013,
-        "precio": 57.5,
+        "año": 2021,
+        "precio": 77.5,
         "categoria": "sedan_hatchback",
         "estado": true
     },
-    "VÑC787": {
+    "VKU926": {
         "marca": "toyota",
-        "modelo": "yaris",
-        "calidad": "usado",
-        "año": 2001,
-        "precio": 27.5,
-        "categoria": "sedan_hatchback",
+        "modelo": "rav4",
+        "calidad": "nuevo",
+        "año": 2008,
+        "precio": 45.0,
+        "categoria": "suv_crossover",
         "estado": true
     },
-    "OYZ061": {
+    "AD301SW": {
+        "marca": "renault",
+        "modelo": "duster",
+        "calidad": "usado",
+        "año": 2018,
+        "precio": 70.0,
+        "categoria": "suv_crossover",
+        "estado": true
+    },
+    "AB123IZ": {
         "marca": "peugeot",
-        "modelo": "408",
-        "calidad": "usado",
-        "año": 2004,
-        "precio": 35.0,
-        "categoria": "sedan_hatchback",
-        "estado": true
-    },
-    "CVO326": {
-        "marca": "chevrolet",
-        "modelo": "montana",
-        "calidad": "usado",
-        "año": 2013,
-        "precio": 57.5,
-        "categoria": "pickup",
-        "estado": true
-    },
-    "AG782SY": {
-        "marca": "fiat",
-        "modelo": "argo",
+        "modelo": "2008",
         "calidad": "como nuevo",
-        "año": 2023,
-        "precio": 82.5,
-        "categoria": "sedan_hatchback",
+        "año": 2017,
+        "precio": 67.5,
+        "categoria": "suv_crossover",
         "estado": true
     },
-    "OYZ699": {
+    "GRI041": {
         "marca": "renault",
         "modelo": "kangoo",
         "calidad": "nuevo",
@@ -188,39 +89,138 @@
         "categoria": "monovolumen_mpv",
         "estado": true
     },
-    "FIU337": {
-        "marca": "fiat",
-        "modelo": "fastback",
-        "calidad": "como nuevo",
-        "año": 2006,
-        "precio": 40.0,
+    "AA190NJ": {
+        "marca": "renault",
+        "modelo": "kardian",
+        "calidad": "nuevo",
+        "año": 2016,
+        "precio": 65.0,
         "categoria": "suv_crossover",
         "estado": true
     },
-    "AF829SU": {
-        "marca": "renault",
-        "modelo": "kangoo",
-        "calidad": "como nuevo",
-        "año": 2021,
-        "precio": 77.5,
-        "categoria": "monovolumen_mpv",
-        "estado": true
-    },
-    "AB129ZN": {
-        "marca": "toyota",
-        "modelo": "hilux",
+    "AB070YC": {
+        "marca": "fiat",
+        "modelo": "pulse",
         "calidad": "usado",
         "año": 2017,
         "precio": 67.5,
+        "categoria": "suv_crossover",
+        "estado": true
+    },
+    "AG997GA": {
+        "marca": "peugeot",
+        "modelo": "208",
+        "calidad": "nuevo",
+        "año": 2023,
+        "precio": 82.5,
+        "categoria": "sedan_hatchback",
+        "estado": true
+    },
+    "UDZ654": {
+        "marca": "peugeot",
+        "modelo": "408",
+        "calidad": "usado",
+        "año": 2010,
+        "precio": 50.0,
+        "categoria": "sedan_hatchback",
+        "estado": true
+    },
+    "ZVO999": {
+        "marca": "chevrolet",
+        "modelo": "cruze",
+        "calidad": "nuevo",
+        "año": 2000,
+        "precio": 25.0,
+        "categoria": "sedan_hatchback",
+        "estado": true
+    },
+    "LAG454": {
+        "marca": "toyota",
+        "modelo": "corolla",
+        "calidad": "como nuevo",
+        "año": 2006,
+        "precio": 40.0,
+        "categoria": "sedan_hatchback",
+        "estado": true
+    },
+    "ACD001": {
+        "marca": "fiat",
+        "modelo": "pulse",
+        "calidad": "nuevo",
+        "año": 2013,
+        "precio": 57.5,
+        "categoria": "suv_crossover",
+        "estado": true
+    },
+    "ERO981": {
+        "marca": "renault",
+        "modelo": "kangoo",
+        "calidad": "como nuevo",
+        "año": 2010,
+        "precio": 50.0,
+        "categoria": "monovolumen_mpv",
+        "estado": true
+    },
+    "AG696HJ": {
+        "marca": "peugeot",
+        "modelo": "2008",
+        "calidad": "usado",
+        "año": 2023,
+        "precio": 82.5,
+        "categoria": "suv_crossover",
+        "estado": true
+    },
+    "AD039ZT": {
+        "marca": "fiat",
+        "modelo": "argo",
+        "calidad": "nuevo",
+        "año": 2019,
+        "precio": 72.5,
+        "categoria": "sedan_hatchback",
+        "estado": true
+    },
+    "YDI855": {
+        "marca": "peugeot",
+        "modelo": "206",
+        "calidad": "como nuevo",
+        "año": 2012,
+        "precio": 55.0,
+        "categoria": "sedan_hatchback",
+        "estado": false
+    },
+    "AB660HA": {
+        "marca": "peugeot",
+        "modelo": "206",
+        "calidad": "nuevo",
+        "año": 2017,
+        "precio": 67.5,
+        "categoria": "sedan_hatchback",
+        "estado": true
+    },
+    "AE935BI": {
+        "marca": "fiat",
+        "modelo": "cronos",
+        "calidad": "nuevo",
+        "año": 2021,
+        "precio": 77.5,
+        "categoria": "sedan_hatchback",
+        "estado": true
+    },
+    "BTG715": {
+        "marca": "fiat",
+        "modelo": "toro",
+        "calidad": "como nuevo",
+        "año": 2013,
+        "precio": 57.5,
         "categoria": "pickup",
         "estado": true
     },
-    "AE799ZS": {
-        "marca": "peugeot",
-        "modelo": "3008",
-        "calidad": "como nuevo",
-        "año": 2021,
-        "precio": 77.5,
+    "ZQR575": {
+        "marca": "fiat",
+        "modelo": "pulse",
+        "calidad": "nuevo",
+        "año": 2015,
+        "precio": 62.5,
         "categoria": "suv_crossover",
         "estado": true
     }

@@ -73,7 +73,7 @@ def ingresa_usuario(lista):
         print("=" * 20)
         try: input("[Enter] ")
         except: pass
-        return list((lista[dni_usu], lista[dni_usu]["nombre"], lista[dni_usu]["autos_rentados"]))
+        return list((dni_usu, lista[dni_usu]["nombre"], lista[dni_usu]["autos_rentados"]))
     elif dni_usu == "0" or clave_usu == "0":
         return 
 

@@ -23,7 +23,7 @@ import informe as inf
 # Ruta del archivo JSON donde se guarda el catalogo de autos.
 # (Req 2 y 3 del TP: persistencia y precarga desde archivo).
 RUTA_AUTOS = inf.RUTA_AUTOS_JSON
-
+RUTA_USUARIOS = inf.RUTA_USUARIOS_JSON
 # Tuplas con los valores permitidos para cada campo.
 # (Req 4 del TP: uso de tuplas como parte de la logica / validaciones).
 CALIDAD = inf.CALIDADES
@@ -301,6 +301,32 @@ def ver_auto():
         input("\n Presiona ENTER para volver")
     except:
         pass
+
+def open_autos():
+    try:
+        with open(inf.RUTA_AUTOS_JSON, 'r', encoding="utf-8") as archivo:
+            lista_aut = json.load(archivo)
+            return lista_aut
+    except OSError as e:
+        limpiar()
+        print(f"/// Ocurrió un error de sistema: {e} ///")
+        try: input("[Enter] ")
+        except: pass
+        return 
+    
+
+def open_usuarios():
+    try:
+        with open(inf.RUTA_USUARIOS_JSON, 'r', encoding="utf-8") as archivo:
+            lista_usu = json.load(archivo)
+        return lista_usu
+    except OSError as e:
+        limpiar()
+        print(f"/// Ocurrió un error de sistema: {e} ///")
+        try: input("[Enter] ")
+        except: pass
+        return 
+    
 
 
 # ---------- CREATE ----------
