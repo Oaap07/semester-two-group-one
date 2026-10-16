@@ -129,8 +129,6 @@ def rentar_auto(usu_info, lista_usu, lista_aut):
 
                         try: opcion3 : str = input("\nSeleccione una opción: ").strip()
                         except: opcion3 : str = ""
-                        
-                        
                         if opcion3 == '0':
                             # Volver al nivel de modelos.
                             break
@@ -139,19 +137,13 @@ def rentar_auto(usu_info, lista_usu, lista_aut):
                             print("\nOpción no válida. Intente de nuevo.")
                             try: input("[Enter] ")
                             except: pass
-                        
                         else:
                             # --- Confirmacion y registro del alquiler ---
                             limpiar()
                             patente_elegida = patentes[int(opcion3)-1]
                             cd.modificar_estado_auto(patente_elegida, True)
                             lista_usu[usu_info[0]]["autos_rentados"].append(patente_elegida)
-                            with open("usuarios.json", 'w', encoding="utf-8") as archivo:
-                                json.dump(lista_usu, archivo, indent=4, ensure_ascii=False)
-
-                            print(f"\n¡Auto con patente: {patente_elegida} RENTADO!")
-                            try: input("[Enter] ")
-                            except: pass
+                            cd.escribir_usuario(lista_usu)
                             # Salir del bucle de patentes tras alquilar.
                             return 
 
@@ -167,11 +159,37 @@ def devolver_auto(usu_info, lista_usu, lista_aut):
     limpiar()
     # TODO(TP - Req 1): manejar excepciones al cargar.
     #en desarrollo
-    for i, j in enumerate(patentes):
-        print(f"\n[{i+1}]:Patente[{j}\n]")
+    while True:
+        limpiar()
+        print(f"--- Autos rentados --- [{usu_info[1]}]\n")
+        for i, j in enumerate(lista_usu[usu_info[0]]["autos_rentados"]):
+            print(f"\n[{i+1}]:Patente[{j}]\n")
         print("-------------------------")
         print("[0] Para salir a Modelos")
 
+        try: opcion4 : str = input("\nSeleccione una patente: ").strip()
+        except: opcion4 : str = ""
+        
+        if opcion4 == '0':
+            # Volver al nivel de modelos.
+            print(opcion4)
+        elif opcion4 not in list(map(str, list(range(1, len(lista_usu[usu_info[0]]["autos_rentados"])+1)))):
+            # Validacion: la opcion debe corresponder a una patente mostrada.
+            print("\nOpción no válida. Intente de nuevo.")
+            try: input("[Enter] ")
+            except: pass
+        else:
+            # --- Confirmacion y registro del alquiler ---
+            limpiar()
+            patente_elegida = lista_usu[usu_info[0]]["autos_rentados"][int(opcion4)-1]
+            cd.modificar_estado_auto(patente_elegida, False)
+            lista_usu[usu_info[0]]["autos_rentados"].pop(int(opcion4)-1)
+            cd.escribir_usuario(lista_usu)
+            print(f"\n¡Auto con patente: {patente_elegida} DEVUELTO!")
+            try: input("[Enter] ")
+            except: pass
+            # Salir del bucle de patentes tras alquilar.
+            return 
 
 # Muestra autos disponibles aplicando filtros por categoria/modelo (contexto global: lista, opcion, opcion2)
 def informe_disponibilidad():
@@ -187,25 +205,17 @@ def informe_disponibilidad():
     Returns:
         None
     """
-    filtrados = {str(i+1): j.capitalize() for i ,j in enumerate(list({lista[i]["modelo"] for i in lista if lista[i]["categoria"] == categ_preset[opcion] and lista[i]["estado"] == True }))}
-    patentes = [i for i in lista if lista[i]["modelo"].capitalize() == filtrados[opcion2] and lista[i]["estado"] == True]
+    print("sdsdsd")
 
-    if len(patentes) == 0: #no se si esto anda, pense en poner filtrados tmb
-        limpiar()
-        print("No hay autos disponibles actualmente.")
-        input("\n[Enter]")
-    else:
-        for i, j in enumerate(patentes):
+def estado_rentas():
 
-            print(f"\n[{i+1}]: {j}\n"
-                f"\tCalidad: {lista[j]['calidad']}\n"\
-                f"\tAño: {lista[j]['año']}\n"\
-                f"\tPrecio: u$d {lista[j]['precio']:.1f}")
-            print("-------------------------")
+    print("hola")
 
-# ---------- Menus ----------
+def informe_estadisticas():
 
-def menu_principal():
+    print("hola")
+
+def menu_principal():   
     """
     Menu principal del sistema.
 
@@ -237,7 +247,6 @@ def menu_principal():
                 except: pass
         except: opcion : str = ""
 
-    
 def submenu_usuario():
     """
     Submenu destinado al usuario final.
@@ -263,7 +272,8 @@ def submenu_usuario():
                 if not usu_info: usu_info
                 else: break
             elif opcion == "2":
-                us.registro_usuario(lista_usu)
+                usu_dni = cd.open_usuarios()
+                us.registro_usuario([i for i in usu_dni ])
             elif opcion == "0":
                 return
             else:
@@ -285,7 +295,6 @@ def submenu_usuario():
             opcion : str = input("\nSeleccione una opción: ").strip()
             
             if opcion == "1":
-                print("hoal")
                 rentar_auto(usu_info, lista_usu, lista_aut)
             elif opcion == "2":
                 devolver_auto(usu_info, lista_usu, lista_aut)
@@ -297,10 +306,7 @@ def submenu_usuario():
                 try: input("[Enter] ")
                 except: pass
         except: 
-            print("hoal")
-            input()
             opcion : str = ""
-
 
 def submenu_empresa():
     """

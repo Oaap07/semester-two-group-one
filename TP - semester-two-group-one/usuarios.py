@@ -91,27 +91,29 @@ def registro_usuario(lista):
         limpiar()
         #  Manejo de excepciones en inputs.
         #  Se pide el DNI y la contraseña al usuario.
-        try: 
-            print("--- REGISTRO: USUARIOS ---")
-            print("[0] en cualquier campo para salir.\n")
-            
-            dni_usu = int(input("Ingrese su DNI: "))
-
-            if len(dni_usu) != 9:
-                print("\nDNI inválido, intente de nuevo.")
-                try: input("[Enter] ")
-                except: pass
-                return ()
-            elif dni_usu in lista:
-                print("\nDNI ya existente, vaya a 'INGRESAR'")
-                try: input("[Enter] ")
-                except: pass
-                return ()
-
+        print("--- REGISTRO: USUARIOS ---")
+        print("[0] en cualquier campo para salir.\n")
+        
+        dni_usu = int(input("Ingrese su DNI: "))
+        print(lista)
+        input()
+        if len(dni_usu) != 8:
+            print("\nDNI inválido, intente de nuevo.")
+            try: input("[Enter] ")
+            except: pass
+            return ()
+        elif dni_usu in lista:
+            print("\nDNI ya existente, vaya a 'INGRESAR'")
+            try: input("[Enter] ")
+            except: pass
+            return ()
+        else:
+            print("hola")
+            input()
             nombre_usu : str = input("Ingrese su nombre: ")
             clave_usu : str = input("Ingrese una nueva contraseña: ").lower()
             
-            if clave_usu == "0" or dni_usu == "0" or nombre_usu == "0": return ()
+            if clave_usu == "0" or nombre_usu == "0": return ()
             while True:
                 
                 clave_usu2 : str = input("Comprueba contraseña: ").lower()
@@ -119,13 +121,7 @@ def registro_usuario(lista):
                 if clave_usu == clave_usu2: break
                 elif clave_usu2 == "0": return ()
                 else: limpiar(), print("| Clave incorrecta, intente de nuevo |")
-            break
-
-        except:
-            print()
-            print("[ERROR] Intente de nuevo.")
-            try: input("[Enter] ")
-            except: pass    
+            break  
 
     lista[str(dni_usu)] = {
         "nombre": nombre_usu,

@@ -260,8 +260,6 @@ def ver_stock():
     `_mostrar_auto()`. Si el catalogo esta vacio, lo informa.
     """
     autos = _cargar_autos()
-    filtrados = {str(i+1): j.capitalize() for i ,j in enumerate(list({autos[i]["modelo"] for i in autos if autos[i]["categoria"] == categ_preset[opcion] and autos[i]["estado"] == True }))}
-    patentes = [i for i in autos if autos[i]["modelo"].capitalize() == filtrados[opcion2] and autos[i]["estado"] == True]
     # Si el diccionario esta vacio, no hay nada para mostrar.
     if not autos:
         print("\nNo hay autos en el catálogo.")
@@ -273,7 +271,7 @@ def ver_stock():
     # TODO(TP - Req 5): aqui se podria aplicar una lista por comprension
     # o una lambda para generar un resumen del catalogo.
     
-    for patente, datos in patentes.items():
+    for patente, datos in autos.items():
         _mostrar_auto(patente, datos)
         try: 
             res = input(" ")
@@ -313,7 +311,7 @@ def open_autos():
         try: input("[Enter] ")
         except: pass
         return 
-    
+
 
 def open_usuarios():
     try:
@@ -326,8 +324,14 @@ def open_usuarios():
         try: input("[Enter] ")
         except: pass
         return 
-    
 
+def escribir_usuario(lista_usu):
+    with open(inf.RUTA_USUARIOS_JSON, 'w', encoding="utf-8") as archivo:
+        json.dump(lista_usu, archivo, indent=4, ensure_ascii=False)
+
+def escribir_auto(lista_aut):
+    with open(inf.RUTA_AUTOS_JSON, 'w', encoding="utf-8") as archivo:
+        json.dump(lista_aut, archivo, indent=4, ensure_ascii=False)
 
 # ---------- CREATE ----------
 
