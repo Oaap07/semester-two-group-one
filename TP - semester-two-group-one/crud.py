@@ -356,10 +356,13 @@ def modificar_estado_auto(patente, estado_auto):
     Returns:
         None
     """
+    # Invierte el estado: True = disponible -> pasa a False (rentado)
+    if estado_auto == True:
         autos = _cargar_autos()
         autos[patente]["estado"] = False
         with open("autos.json", 'w', encoding="utf-8") as archivo:
             json.dump(autos, archivo, indent=4, ensure_ascii=False)
+    # Invierte el estado: False = rentado -> pasa a True (disponible)
     elif estado_auto == False:
         autos = _cargar_autos()
         autos[patente]["estado"] = True

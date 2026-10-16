@@ -287,28 +287,21 @@ def devolver_auto():
     """
     Interfaz para registrar la devolucion de un auto rentado.
 
-    Muestra los autos marcados como no disponibles (rentados) y permite
-    seleccionar uno para marcarlo como disponible nuevamente.
-
-    NOTA: Implementacion parcial. En la version actual se espera que
-    ciertas variables ('lista', 'opcion', 'opcion2') existan en el
-    contexto desde donde se llama. No se agregan parametros nuevos.
-
-    Returns:
-        None
+    Actualmente solo muestra los autos rentados y los devuelve(creo).
+    TODO(TP): completar la funcionalidad:
+        - Pedir la patente a devolver, validando que exista.
+        - Informar que la devolucion se realizo correctamente.
     """
     limpiar()
     # TODO(TP - Req 1): manejar excepciones al cargar.
-
-    filtrados = {str(i+1): j.capitalize() for i ,j in enumerate(list({lista[i]["modelo"] for i in lista if lista[i]["categoria"] == categ_preset[opcion] and lista[i]["estado"] == False }))}
+    #en desarrollo
     patentes = [i for i in lista if lista[i]["modelo"].capitalize() == filtrados[opcion2] and lista[i]["estado"] == False]
     # Si no hay autos rentados, se avisa y se sale de la funcion.
-    if len(filtrados) == 0: #no se si esto anda, pense en poner patentes tmb
+    if len() == 0:
         limpiar()
         print("No hay autos rentados actualmente.")
         input("\n[Enter]")
     else:
-        # Interfaz base (en desarrollo).
         print("¿Que auto desea devolver?")
         print("="*15)
         for i, j in enumerate(patentes):
@@ -344,6 +337,7 @@ def devolver_auto():
         try: input("[Enter] ")
         except: pass
 
+# Muestra autos disponibles aplicando filtros por categoria/modelo (contexto global: lista, opcion, opcion2)
 def informe_disponibilidad():
     """
     Muestra la lista de autos disponibles segun filtros seleccionados.
