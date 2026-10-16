@@ -30,6 +30,12 @@ CALIDAD = inf.CALIDADES
 MARCA = inf.MARCAS
 CATEGORIA = inf.CATEGORIAS
 ESTADO = ("true", "false")
+categ_preset = {
+    "1": "sedan_hatchback",
+    "2": "suv_crossover",
+    "3": "pickup",
+    "4": "monovolumen_mpv"
+}
 
 # Mapeo entre la opcion numerica del menu de modificacion y el campo del JSON.
 # Formato: "clave de menu": ("nombre del campo en el JSON", "nombre para mostrar").
@@ -254,6 +260,8 @@ def ver_stock():
     `_mostrar_auto()`. Si el catalogo esta vacio, lo informa.
     """
     autos = _cargar_autos()
+    filtrados = {str(i+1): j.capitalize() for i ,j in enumerate(list({autos[i]["modelo"] for i in autos if autos[i]["categoria"] == categ_preset[opcion] and autos[i]["estado"] == True }))}
+    patentes = [i for i in autos if autos[i]["modelo"].capitalize() == filtrados[opcion2] and autos[i]["estado"] == True]
     # Si el diccionario esta vacio, no hay nada para mostrar.
     if not autos:
         print("\nNo hay autos en el catálogo.")
@@ -265,7 +273,7 @@ def ver_stock():
     # TODO(TP - Req 5): aqui se podria aplicar una lista por comprension
     # o una lambda para generar un resumen del catalogo.
     
-    for patente, datos in autos.items():
+    for patente, datos in patentes.items():
         _mostrar_auto(patente, datos)
         try: 
             res = input(" ")
@@ -337,12 +345,26 @@ def agregar_auto():
 
 
 # ---------- UPDATE ----------
-def modificar_estado_auto(patente):
+def modificar_estado_auto(patente, estado_auto):
+    """
+    Modifica el estado de un auto en el archivo autos.json.
 
-    autos = _cargar_autos()
-    autos[patente]["estado"] = False
-    with open("autos.json", 'w', encoding="utf-8") as archivo:
-        json.dump(autos, archivo, indent=4, ensure_ascii=False)
+    Args:
+        patente (str): Patente del auto a modificar.
+        estado_auto (bool): Estado actual del auto (True = disponible, False = no disponible).
+                            La funcion invierte este estado al guardar.
+    Returns:
+        None
+    """
+        autos = _cargar_autos()
+        autos[patente]["estado"] = False
+        with open("autos.json", 'w', encoding="utf-8") as archivo:
+            json.dump(autos, archivo, indent=4, ensure_ascii=False)
+    elif estado_auto == False:
+        autos = _cargar_autos()
+        autos[patente]["estado"] = True
+        with open("autos.json", 'w', encoding="utf-8") as archivo:
+            json.dump(autos, archivo, indent=4, ensure_ascii=False)
 
 def modificar_auto():
     """

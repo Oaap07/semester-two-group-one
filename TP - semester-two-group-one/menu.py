@@ -10,6 +10,13 @@ import json, os
 import informe as inf
 import crud as cd
 
+categ_preset = {
+    "1": "sedan_hatchback",
+    "2": "suv_crossover",
+    "3": "pickup",
+    "4": "monovolumen_mpv"
+}
+
 def limpiar():
     """
     Limpia la consola segun el sistema operativo.
@@ -188,12 +195,6 @@ def rentar_auto(usu_info):
         except:
             opcion: str = ""
         # Relaciona cada opcion numerica con el valor interno de la categoria.
-        categ_preset = {
-            "1": "sedan_hatchback",
-            "2": "suv_crossover",
-            "3": "pickup",
-            "4": "monovolumen_mpv"
-        }
 
         if opcion == '0':
             # Volver al submenu de usuario.
@@ -275,7 +276,7 @@ def rentar_auto(usu_info):
                             # --- Confirmacion y registro del alquiler ---
                             limpiar()
                             patente_elegida = patentes[int(opcion3)-1]
-                            cd.modificar_estado_auto(patente_elegida)
+                            cd.modificar_estado_auto(patente_elegida, True)
                             print(f"\n¡Auto con patente: {patente_elegida} RENTADO!")
                             try: input("[Enter] ")
                             except: pass
@@ -286,27 +287,91 @@ def devolver_auto():
     """
     Interfaz para registrar la devolucion de un auto rentado.
 
-    Actualmente solo muestra un mensaje informativo y espera confirmacion.
-    TODO(TP): completar la funcionalidad:
-        - Listar los autos rentados (patente + datos).
-        - Pedir la patente a devolver, validando que exista.
-        - Eliminarla de `rentados.json` (sobreescribir el archivo con la
-        - ultima version del diccionario).
-        - Informar que la devolucion se realizo correctamente.
+    Muestra los autos marcados como no disponibles (rentados) y permite
+    seleccionar uno para marcarlo como disponible nuevamente.
+
+    NOTA: Implementacion parcial. En la version actual se espera que
+    ciertas variables ('lista', 'opcion', 'opcion2') existan en el
+    contexto desde donde se llama. No se agregan parametros nuevos.
+
+    Returns:
+        None
     """
     limpiar()
-    
     # TODO(TP - Req 1): manejar excepciones al cargar.
 
+    filtrados = {str(i+1): j.capitalize() for i ,j in enumerate(list({lista[i]["modelo"] for i in lista if lista[i]["categoria"] == categ_preset[opcion] and lista[i]["estado"] == False }))}
+    patentes = [i for i in lista if lista[i]["modelo"].capitalize() == filtrados[opcion2] and lista[i]["estado"] == False]
     # Si no hay autos rentados, se avisa y se sale de la funcion.
-    print("No hay autos rentados actualmente.")
-    input("\n[Enter]")
+    if len(filtrados) == 0: #no se si esto anda, pense en poner patentes tmb
+        limpiar()
+        print("No hay autos rentados actualmente.")
+        input("\n[Enter]")
+    else:
+        # Interfaz base (en desarrollo).
+        print("¿Que auto desea devolver?")
+        print("="*15)
+        for i, j in enumerate(patentes):
 
-    # Interfaz base (en desarrollo).
-    print("¿Que auto desea devolver?")
-    print("="*15)
-    try: input("[Enter] ")
-    except: pass
+            print(f"\n[{i+1}]: {j}\n"
+                f"\tCalidad: {lista[j]['calidad']}\n"\
+                f"\tAño: {lista[j]['año']}\n"\
+                f"\tPrecio: u$d {lista[j]['precio']:.1f}")
+            print("-------------------------")
+            print("[0] Para salir a Modelos")
+
+            try: opcion3 : str = input("\nSeleccione una opción: ").strip()
+            except: opcion3 : str = ""
+
+            if opcion3 == '0':
+                # Volver.
+                break
+            elif opcion3 not in list(map(str, list(range(1, len(patentes)+1)))):
+                # Validacion: la opcion debe corresponder a una patente mostrada.
+                print("\nOpción no válida. Intente de nuevo.")
+                try: input("[Enter] ")
+                except: pass
+            else:
+                # --- Confirmacion y registro de devolucion ---
+                limpiar()
+                patente_elegida = patentes[int(opcion3)-1]
+                cd.modificar_estado_auto(patente_elegida, False)
+                print(f"\n¡Auto con patente: {patente_elegida} DEVUELTO!")
+                try: input("[Enter] ")
+                except: pass
+                # Salir del bucle de patentes tras devolver.
+                return 
+        try: input("[Enter] ")
+        except: pass
+
+def informe_disponibilidad():
+    """
+    Muestra la lista de autos disponibles segun filtros seleccionados.
+
+    Esta funcion forma parte de los informes para el submenu de empresa.
+    NOTA: Esta funcion esta incompleta en la implementacion actual (utiliza
+    variables globales como 'lista', 'opcion' y 'opcion2' que se espera
+    que esten definidas en el contexto desde donde se llama). No modifica
+    el comportamiento existente.
+
+    Returns:
+        None
+    """
+    filtrados = {str(i+1): j.capitalize() for i ,j in enumerate(list({lista[i]["modelo"] for i in lista if lista[i]["categoria"] == categ_preset[opcion] and lista[i]["estado"] == True }))}
+    patentes = [i for i in lista if lista[i]["modelo"].capitalize() == filtrados[opcion2] and lista[i]["estado"] == True]
+
+    if len(patentes) == 0: #no se si esto anda, pense en poner filtrados tmb
+        limpiar()
+        print("No hay autos disponibles actualmente.")
+        input("\n[Enter]")
+    else:
+        for i, j in enumerate(patentes):
+
+            print(f"\n[{i+1}]: {j}\n"
+                f"\tCalidad: {lista[j]['calidad']}\n"\
+                f"\tAño: {lista[j]['año']}\n"\
+                f"\tPrecio: u$d {lista[j]['precio']:.1f}")
+            print("-------------------------")
 
 # ---------- Menus ----------
 
@@ -434,11 +499,11 @@ def submenu_empresa():
         if opcion == "1":
             # Informe de disponibilidad (modulo informe).
             # TODO(TP - Req 8): verificar que incluya un reporte matricial.
-            inf.informe_disponibilidad()
+            informe_disponibilidad()
         elif opcion == "2":
             # Informe de estadisticas (modulo informe).
             # TODO(TP - Req 8): verificar que incluya un reporte matricial.
-            inf.informe_estadisticas()
+            informe_estadisticas()
         elif opcion == "3":
             # Estado local de los autos rentados.
             estado_rentas()
