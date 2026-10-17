@@ -73,7 +73,7 @@ def ingresa_usuario(lista):
         print("=" * 20)
         try: input("[Enter] ")
         except: pass
-        return list((lista[dni_usu], lista[dni_usu]["nombre"], lista[dni_usu]["autos_rentados"]))
+        return list((dni_usu, lista[dni_usu]["nombre"], lista[dni_usu]["autos_rentados"]))
     elif dni_usu == "0" or clave_usu == "0":
         return 
 
@@ -88,53 +88,58 @@ def registro_usuario(lista):
         
     """
     while True:
-        limpiar()
-        #  Manejo de excepciones en inputs.
-        #  Se pide el DNI y la contraseña al usuario.
-        try: 
+        try:
+            limpiar()
+            #  Manejo de excepciones en inputs.
+            #  Se pide el DNI y la contraseña al usuario.
             print("--- REGISTRO: USUARIOS ---")
             print("[0] en cualquier campo para salir.\n")
-            
-            dni_usu = int(input("Ingrese su DNI: "))
-
-            if len(dni_usu) != 9:
-                print("\nDNI inválido, intente de nuevo.")
-                try: input("[Enter] ")
-                except: pass
-                return ()
-            elif dni_usu in lista:
-                print("\nDNI ya existente, vaya a 'INGRESAR'")
-                try: input("[Enter] ")
-                except: pass
-                return ()
-
-            nombre_usu : str = input("Ingrese su nombre: ")
-            clave_usu : str = input("Ingrese una nueva contraseña: ").lower()
-            
-            if clave_usu == "0" or dni_usu == "0" or nombre_usu == "0": return ()
             while True:
-                
-                clave_usu2 : str = input("Comprueba contraseña: ").lower()
-                
-                if clave_usu == clave_usu2: break
-                elif clave_usu2 == "0": return ()
-                else: limpiar(), print("| Clave incorrecta, intente de nuevo |")
-            break
+                limpiar
 
+                try: dni_usu = int(input("Ingrese su DNI: "))
+                except: print("\nError, sólo se permiten números"); input("[Enter] "); break
+                
+                if dni_usu == 0: return
+                elif len(str(dni_usu)) != 8:
+                    print("\nDNI inválido, intente de nuevo.")
+                    try: input("[Enter] ")
+                    except: pass
+                    break
+                elif str(dni_usu) in lista:
+                    print("\nDNI ya existente, vaya a 'INGRESAR'")
+                    try: input("[Enter] ")
+                    except: pass
+                    return ()
+                else:
+                    nombre_usu : str = input("Ingrese su nombre: ")
+                    clave_usu : str = input("Ingrese una contraseña: ").lower()
+                    
+                    if clave_usu == "0" or nombre_usu == "0": return ()
+                    clave_usu2 : str = input("Comprueba contraseña: ").lower()
+                    
+                    while True:
+                        if clave_usu == clave_usu2: break
+                        elif clave_usu2 == "0": return
+                        else: clave_usu2 = input("|| Clave incorrecta, intente de nuevo: ")
+                break  
         except:
             print()
             print("[ERROR] Intente de nuevo.")
             try: input("[Enter] ")
-            except: pass    
+            except: pass
+        break
 
     lista[str(dni_usu)] = {
         "nombre": nombre_usu,
         "clave": clave_usu,
-        "autos_rentados": [],
+        "autos_rentados": []
     }
-    
+
     with open(inf.RUTA_USUARIOS_JSON, "w", encoding="utf-8") as f:
         json.dump(lista, f, indent=4, ensure_ascii=False)
+    
+    limpiar()
     print(f"||| ¡Usuario [{nombre_usu.capitalize()}] registrado exitosamente! |||")
     try: input("[Enter] ")
     except: pass  

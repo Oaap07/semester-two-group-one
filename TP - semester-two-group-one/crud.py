@@ -24,7 +24,7 @@ import pandas as pd
 # Ruta del archivo JSON donde se guarda el catalogo de autos.
 # (Req 2 y 3 del TP: persistencia y precarga desde archivo).
 RUTA_AUTOS = inf.RUTA_AUTOS_JSON
-
+RUTA_USUARIOS = inf.RUTA_USUARIOS_JSON
 # Tuplas con los valores permitidos para cada campo.
 # (Req 4 del TP: uso de tuplas como parte de la logica / validaciones).
 CALIDAD = inf.CALIDADES
@@ -254,6 +254,7 @@ def _mostrar_auto(patente, datos):
 # ---------- READ EBZ899-HHE013 ----------
 
 def ver_stock():
+    limpiar()
     """
     Muestra todo el catalogo de autos (lectura general / Read).
 
@@ -263,13 +264,9 @@ def ver_stock():
     autos : dict = _cargar_autos()
     for i in autos:
         autos[i]["estado"] = "disponible" if autos[i]["estado"] == True else "ocupado"
-
-    # for i in autos:
-    #     if autos[i]["estado"] == True:
-    #         autos[i]["estado"] = "disponible"
-    #     else:
-    #         autos[i]["estado"] = "ocupado"
+        autos[i]["precio"] = "$" + str(autos[i]["precio"])
     autos_excel_modificado = pd.DataFrame(autos)
+    
     # Si el diccionario esta vacio, no hay nada para mostrar.
     if not autos:
         print("\nNo hay autos en el catálogo.")
@@ -282,7 +279,7 @@ def ver_stock():
     print("--"*39)
     
     try: 
-        res = input(" ")
+        res = input("[q] Para salir: ")
         if res == "q":
             return
     except: pass
@@ -308,6 +305,38 @@ def ver_auto():
     except:
         pass
 
+def open_autos():
+    try:
+        with open(inf.RUTA_AUTOS_JSON, 'r', encoding="utf-8") as archivo:
+            lista_aut = json.load(archivo)
+            return lista_aut
+    except OSError as e:
+        limpiar()
+        print(f"/// Ocurrió un error de sistema: {e} ///")
+        try: input("[Enter] ")
+        except: pass
+        return 
+
+
+def open_usuarios():
+    try:
+        with open(inf.RUTA_USUARIOS_JSON, 'r', encoding="utf-8") as archivo:
+            lista_usu = json.load(archivo)
+        return lista_usu
+    except OSError as e:
+        limpiar()
+        print(f"/// Ocurrió un error de sistema: {e} ///")
+        try: input("[Enter] ")
+        except: pass
+        return 
+
+def escribir_usuario(lista_usu):
+    with open(inf.RUTA_USUARIOS_JSON, 'w', encoding="utf-8") as archivo:
+        json.dump(lista_usu, archivo, indent=4, ensure_ascii=False)
+
+def escribir_auto(lista_aut):
+    with open(inf.RUTA_AUTOS_JSON, 'w', encoding="utf-8") as archivo:
+        json.dump(lista_aut, archivo, indent=4, ensure_ascii=False)
 
 # ---------- CREATE ----------
 
@@ -504,4 +533,6 @@ def menu_crud():
 if __name__ == "__main__":
     # Punto de entrada: ejecuta el menu CRUD si se corre este archivo directamente.
     # TODO(TP - Req 3): verificar que autos.json contenga al menos 5 registros (precarga).
+    limpiar()
     menu_crud()
+    limpiar()
