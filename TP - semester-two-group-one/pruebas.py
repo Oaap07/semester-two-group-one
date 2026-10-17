@@ -1,9 +1,16 @@
-import usuarios as us
+import pandas as pd
+import informe as inf
 import json
-import menu as m
-with open("usuarios.json", 'r', encoding="utf-8") as archivo:
-    lista = json.load(archivo)
-usu_info = us.ingresa_usuario(lista)
+try:
+    with open(inf.RUTA_AUTOS_JSON, 'r', encoding="utf-8") as archivo:
+        lista = json.load(archivo)
+except OSError as e:
+    print(f"/// Ocurrió un error de sistema: {e} ///")
+    try: input("[Enter] ")
+    except: pass
+data = lista 
 
-print(usu_info)
-print(type(usu_info))
+df = pd.DataFrame(data)
+print(df.T)
+
+

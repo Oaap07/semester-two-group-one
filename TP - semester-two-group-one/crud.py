@@ -14,6 +14,7 @@ excepciones, ademas de los requisitos minimos del programa.
 
 import json, os
 import informe as inf
+import pandas as pd
 
 
 # ==========================================
@@ -259,27 +260,32 @@ def ver_stock():
     Carga el archivo JSON y, si hay autos, los lista uno por uno usando
     `_mostrar_auto()`. Si el catalogo esta vacio, lo informa.
     """
-    autos = _cargar_autos()
-    filtrados = {str(i+1): j.capitalize() for i ,j in enumerate(list({autos[i]["modelo"] for i in autos if autos[i]["categoria"] == categ_preset[opcion] and autos[i]["estado"] == True }))}
-    patentes = [i for i in autos if autos[i]["modelo"].capitalize() == filtrados[opcion2] and autos[i]["estado"] == True]
+    autos : dict = _cargar_autos()
+    for i in autos:
+        autos[i]["estado"] = "disponible" if autos[i]["estado"] == True else "ocupado"
+
+    # for i in autos:
+    #     if autos[i]["estado"] == True:
+    #         autos[i]["estado"] = "disponible"
+    #     else:
+    #         autos[i]["estado"] = "ocupado"
+    autos_excel_modificado = pd.DataFrame(autos)
     # Si el diccionario esta vacio, no hay nada para mostrar.
     if not autos:
         print("\nNo hay autos en el catálogo.")
         try: input("[Enter] ")
         except: pass
         return
-    print("\n--- CATÁLOGO DE AUTOS ---")
-    # Recorre cada par (patente, datos) del diccionario de diccionarios.
-    # TODO(TP - Req 5): aqui se podria aplicar una lista por comprension
-    # o una lambda para generar un resumen del catalogo.
+    print("\n")
+    print("--"*15,"CATALOGO DE AUTOS","--"*15)
+    print(autos_excel_modificado.T)
+    print("--"*39)
     
-    for patente, datos in patentes.items():
-        _mostrar_auto(patente, datos)
-        try: 
-            res = input(" ")
-            if res == "q":
-                return
-        except: pass
+    try: 
+        res = input(" ")
+        if res == "q":
+            return
+    except: pass
 
 
 def ver_auto():

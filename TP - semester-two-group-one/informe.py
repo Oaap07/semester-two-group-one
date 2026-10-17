@@ -10,7 +10,7 @@ AUTOS : dict[tuple] = {
     "chevrolet": ("cruze", "onix", "spin", "tracker", "montana")
 }
 MARCAS: tuple = tuple(AUTOS.keys())
-CALIDADES: tuple = ("nuevo", "como nuevo", "usado")
+CALIDADES: tuple = ("nuevo", "cuidado", "usado")
 DISPONIBLE:tuple = ("true", "false")
 ANIOS: tuple = (2000, 2026)
 CATEGORIAS: tuple = ("sedan_hatchback", "suv_crossover", "pickup", "monovolumen_mpv")

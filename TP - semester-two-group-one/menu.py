@@ -48,7 +48,7 @@ def rentar_auto(usu_info):
     # Carga el catalogo completo de autos desde el archivo.
     try:
         with open(inf.RUTA_AUTOS_JSON, 'r', encoding="utf-8") as archivo:
-            lista_aut = json.load(archivo)
+            lista = json.load(archivo)
     except OSError as e:
         limpiar()
         print(f"/// Ocurrió un error de sistema: {e} ///")
