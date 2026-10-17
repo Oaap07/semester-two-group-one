@@ -41,6 +41,9 @@ categ_preset = {
 # Mapeo entre la opcion numerica del menu de modificacion y el campo del JSON.
 # Formato: "clave de menu": ("nombre del campo en el JSON", "nombre para mostrar").
 # Se usa para no repetir la lista de campos editables en varios lugares.
+# NOTA (comentario huerfano): describe un diccionario de mapeo que ya no existe
+# en el codigo; `modificar_auto` arma las opciones en forma dinamica segun las
+# claves del auto elegido.
 
 def limpiar():
     """
@@ -76,6 +79,8 @@ def _cargar_autos() -> dict:
     except FileNotFoundError:
         return {}
     except OSError as e:
+        # NOTA (posible error): en caso de fallo no se retorna nada (None), por
+        # lo que quien use esta funcion como diccionario puede romper.
         limpiar()
         print(f"/// Ocurrió un error de sistema: {e} ///")
         input("[Enter] ")
@@ -241,6 +246,8 @@ def _mostrar_auto(patente, datos):
     """
     # TODO(TP - Req 1): proteger el acceso a claves con try/except (KeyError)
     # por si al auto le falta algun atributo en el JSON.
+    # NOTA (dato agregado): tambien imprime el "estado"; si el auto no tiene esa
+    # clave (por ejemplo, uno creado con `agregar_auto`), la ultima linea lanza KeyError.
     print(f"\n[{patente}]")
     print(f"\tMarca: {datos['marca'].capitalize()}")
     print(f"\tModelo: {datos['modelo'].capitalize()}")
@@ -254,17 +261,34 @@ def _mostrar_auto(patente, datos):
 # ---------- READ EBZ899-HHE013 ----------
 
 def ver_stock():
-    limpiar()
     """
-    Muestra todo el catalogo de autos (lectura general / Read).
+    Muestra todo el catalogo de autos como una tabla (lectura general / Read).
 
-    Carga el archivo JSON y, si hay autos, los lista uno por uno usando
-    `_mostrar_auto()`. Si el catalogo esta vacio, lo informa.
+    Carga el catalogo con `_cargar_autos()`, transforma dos campos para que se
+    lean mejor y muestra el resultado como tabla usando pandas (DataFrame).
+
+    NOTA (funcion nueva / modificada): reemplaza a la antigua `ver_autos()`.
+    Se apoya en pandas (DataFrame), que la documentacion tecnica recomienda
+    para armar reportes matriciales (Req 8 del TP).
+
+    Returns:
+        None
     """
+    limpiar()
     autos : dict = _cargar_autos()
+
+    # Recorre el catalogo preparando los campos para mostrarlos en la tabla.
     for i in autos:
+        # Traduce el estado booleano a un texto legible para el usuario.
+        # NOTA (posible error): si un auto no tiene la clave "estado" (por
+        # ejemplo, uno dado de alta con `agregar_auto`), esto lanza KeyError.
         autos[i]["estado"] = "disponible" if autos[i]["estado"] == True else "ocupado"
+        # Antepone "$" al precio para mostrarlo como importe.
         autos[i]["precio"] = "$" + str(autos[i]["precio"])
+
+    # Arma un DataFrame de pandas a partir del catalogo: las patentes quedan
+    # como columnas y los atributos como filas; luego se transpone (.T) para
+    # dejar una fila por auto.
     autos_excel_modificado = pd.DataFrame(autos)
     
     # Si el diccionario esta vacio, no hay nada para mostrar.
@@ -306,11 +330,22 @@ def ver_auto():
         pass
 
 def open_autos():
+    """
+    Lee y devuelve el catalogo de autos desde el archivo JSON.
+
+    Funcion de persistencia nueva, usada por el menu (submenu_usuario) para
+    tener el catalogo cargado en memoria.
+
+    Returns:
+        dict: Catalogo {patente: {atributos}}; o None si ocurre un error de sistema.
+    """
     try:
         with open(inf.RUTA_AUTOS_JSON, 'r', encoding="utf-8") as archivo:
             lista_aut = json.load(archivo)
             return lista_aut
     except OSError as e:
+        # NOTA (posible error): devuelve None (sin valor). Quien lo use como
+        # diccionario puede romper; el Req 1 del TP pide manejo mas especifico.
         limpiar()
         print(f"/// Ocurrió un error de sistema: {e} ///")
         try: input("[Enter] ")
@@ -319,11 +354,19 @@ def open_autos():
 
 
 def open_usuarios():
+    """
+    Lee y devuelve los usuarios desde el archivo JSON.
+
+    Returns:
+        dict: Usuarios {dni: {nombre, clave, autos_rentados}}; o None si ocurre
+        un error de sistema.
+    """
     try:
         with open(inf.RUTA_USUARIOS_JSON, 'r', encoding="utf-8") as archivo:
             lista_usu = json.load(archivo)
         return lista_usu
     except OSError as e:
+        # NOTA (posible error): devuelve None; manejar en quien lo consuma.
         limpiar()
         print(f"/// Ocurrió un error de sistema: {e} ///")
         try: input("[Enter] ")
@@ -331,10 +374,24 @@ def open_usuarios():
         return 
 
 def escribir_usuario(lista_usu):
+    """
+    Sobreescribe el archivo de usuarios con el diccionario recibido.
+
+    Args:
+        lista_usu (dict): Diccionario completo de usuarios a guardar.
+    """
+    # TODO(TP - Req 1): envolver en try/except (OSError) para el guardado.
     with open(inf.RUTA_USUARIOS_JSON, 'w', encoding="utf-8") as archivo:
         json.dump(lista_usu, archivo, indent=4, ensure_ascii=False)
 
 def escribir_auto(lista_aut):
+    """
+    Sobreescribe el archivo del catalogo de autos con el diccionario recibido.
+
+    Args:
+        lista_aut (dict): Diccionario completo de autos a guardar.
+    """
+    # TODO(TP - Req 1): envolver en try/except (OSError) para el guardado.
     with open(inf.RUTA_AUTOS_JSON, 'w', encoding="utf-8") as archivo:
         json.dump(lista_aut, archivo, indent=4, ensure_ascii=False)
 
@@ -366,6 +423,9 @@ def agregar_auto():
     categoria = _pedir_de_tupla("Categoría: ", CATEGORIA)
 
     # Se crea el registro usando la patente como clave del diccionario.
+    # NOTA (dato faltante / posible error): esta alta no agrega la clave "estado",
+    # a diferencia de informe.informe_autos (que la inicializa en True). Sin
+    # "estado", `_mostrar_auto` y `ver_stock` lanzan KeyError al leer el auto.
     autos[patente] = {
         "marca": marca,
         "modelo": modelo,
@@ -392,6 +452,8 @@ def modificar_estado_auto(patente, estado_auto):
         None
     """
     # Invierte el estado: True = disponible -> pasa a False (rentado)
+    # NOTA (posible error): la ruta "autos.json" esta escrita a mano (no usa la
+    # constante RUTA_AUTOS) y si la patente no existe, autos[patente] da KeyError.
     if estado_auto == True:
         autos = _cargar_autos()
         autos[patente]["estado"] = False
@@ -421,6 +483,9 @@ def modificar_auto():
             except: pass
             return
 
+    # NOTA (posible error): si el usuario escribe "0" para salir,
+    # _pedir_patente_existente devuelve "0" y autos["0"] lanza KeyError
+    # en el bucle de abajo.
     patente = _pedir_patente_existente(autos)
 
     while True:
@@ -438,11 +503,15 @@ def modificar_auto():
         if opcion == "0":
             break
         # Validacion de la opcion ingresada.
+        # NOTA (posible error): int(opcion) lanza ValueError si el usuario escribe
+        # algo que no sea un numero (solo se controla la opcion "0" antes).
         elif int(opcion) not in list(range(1, len(autos[patente]) + 1)):
             print("\nOpción no válida. Intente de nuevo.")
             continue
 
         # Se pide el nuevo valor segun el tipo de campo elegido.
+        # NOTA: el mapeo 1-7 es fijo; si el auto tiene menos claves (por ejemplo,
+        # no tiene "estado"), las opciones mostradas no coinciden con estos casos.
         
         if opcion == "1":
             autos[patente]["marca"] = _pedir_de_tupla("Marca", MARCA)

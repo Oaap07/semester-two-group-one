@@ -11,6 +11,7 @@ import informe as inf
 import crud as cd
 import usuarios as us
 
+# Mapeo de la opcion de menu a la categoria interna usada en autos.json.
 categ_preset = {
     "1": "sedan_hatchback",
     "2": "suv_crossover",
@@ -35,10 +36,16 @@ def rentar_auto(usu_info, lista_usu, lista_aut):
     1. Muestra las categorias de autos.
     2. Filtra los modelos disponibles de esa categoria, excluyendo los ya rentados.
     3. Muestra las patentes de ese modelo, tambien excluyendo los ya rentados.
-    4. Confirma el alquiler guardando la ficha completa en `rentados.json`.
+    4. Confirma el alquiler: marca el auto como no disponible en `autos.json` y
+       agrega la patente a `autos_rentados` del usuario en `usuarios.json`.
 
     El flujo esta anidado con bucles while para poder volver entre niveles
     (Categorias -> Modelos -> Patentes).
+
+    Args:
+        usu_info (list): [dni, nombre, autos_rentados] del usuario logueado.
+        lista_usu (dict): Todos los usuarios (para guardar el alquiler).
+        lista_aut (dict): Catalogo de autos (para filtrar los disponibles).
 
     Notas (Req 5 del TP):
         Se usan listas por comprension y conjuntos (set) para filtrar los datos.
@@ -141,22 +148,42 @@ def rentar_auto(usu_info, lista_usu, lista_aut):
                             else:
                                 # --- Confirmacion y registro del alquiler ---
                                 limpiar()
+                                # El usuario eligio un numero; se obtiene la patente.
                                 patente_elegida = patentes[int(opcion3)-1]
+                                # Marca el auto como no disponible (rentado) en autos.json.
                                 cd.modificar_estado_auto(patente_elegida, True)
+                                # Agrega la patente a los autos rentados del usuario
+                                # (usu_info[0] es el DNI, que es la clave en lista_usu).
                                 lista_usu[usu_info[0]]["autos_rentados"].append(patente_elegida)
+                                # NOTA (bug conocido "renta infinita"): modificar_estado_auto
+                                # escribe el cambio en autos.json, pero 'lista_aut' en memoria
+                                # no se actualiza; el auto sigue con estado True y se puede
+                                # volver a rentar en la misma sesion.
+                                # Persiste los usuarios (con el nuevo alquiler).
                                 cd.escribir_usuario(lista_usu)
                                 # Salir del bucle de patentes tras alquilar.
                                 return 
+                    # NOTA (manejo generico): atrapa cualquier excepcion y la
+                    # muestra con input(e). El Req 1 del TP pide excepciones
+                    # especificas en lugar de un except generico.
                     except Exception as e: input(e)
 
 def devolver_auto(usu_info, lista_usu, lista_aut):
     """
     Interfaz para registrar la devolucion de un auto rentado.
 
-    Actualmente solo muestra los autos rentados y los devuelve(creo).
-    TODO(TP): completar la funcionalidad:
-        - Pedir la patente a devolver, validando que exista.
-        - Informar que la devolucion se realizo correctamente.
+    Lista los autos que el usuario tiene rentados, pide cual devolver y, al
+    confirmar:
+        - marca el auto como disponible otra vez en `autos.json`;
+        - quita la patente de `autos_rentados` del usuario en `usuarios.json`.
+
+    Args:
+        usu_info (list): [dni, nombre, autos_rentados] del usuario logueado.
+        lista_usu (dict): Todos los usuarios (para guardar la devolucion).
+        lista_aut (dict): Catalogo de autos (no se usa por ahora).
+
+    NOTA (docstring actualizado): el texto anterior decia que estaba incompleto;
+    esta version ya devuelve el auto.
     """
     limpiar()
     # TODO(TP - Req 1): manejar excepciones al cargar.
@@ -183,9 +210,13 @@ def devolver_auto(usu_info, lista_usu, lista_aut):
         else:
             # --- Confirmacion y registro del alquiler ---
             limpiar()
+            # Se obtiene la patente elegida de la lista de autos rentados.
             patente_elegida = lista_usu[usu_info[0]]["autos_rentados"][int(opcion4)-1]
+            # Marca el auto como disponible otra vez en autos.json.
             cd.modificar_estado_auto(patente_elegida, False)
+            # Quita la patente de la lista de autos rentados del usuario.
             lista_usu[usu_info[0]]["autos_rentados"].pop(int(opcion4)-1)
+            # Persiste los usuarios (sin ese auto rentado).
             cd.escribir_usuario(lista_usu)
             print(f"\n¡Auto con patente: {patente_elegida} DEVUELTO!")
             try: input("[Enter] ")
@@ -193,7 +224,10 @@ def devolver_auto(usu_info, lista_usu, lista_aut):
             # Salir del bucle de patentes tras alquilar.
             return 
 
-# Muestra autos disponibles aplicando filtros por categoria/modelo (contexto global: lista, opcion, opcion2)
+# Muestra autos disponibles aplicando filtros por categoria/modelo.
+# NOTA (funcion incompleta / placeholder): el cuerpo es solo un print de prueba
+# ("sdsdsd"); falta implementar el informe real. El texto "(contexto global:
+# lista, opcion, opcion2)" del comentario original quedo de una version vieja.
 def informe_disponibilidad():
     """
     Muestra la lista de autos disponibles segun filtros seleccionados.
@@ -207,14 +241,33 @@ def informe_disponibilidad():
     Returns:
         None
     """
+    # TODO(TP - Req 8): implementar el informe de disponibilidad real.
     print("sdsdsd")
 
 def estado_rentas():
+    """
+    Muestra el estado de los autos rentados.
 
+    NOTA (funcion incompleta / placeholder): por ahora solo imprime "hola";
+    falta implementar el listado de autos alquilados.
+
+    Returns:
+        None
+    """
+    # TODO(TP - Req 8): recorrer los autos rentados y mostrar su ficha.
     print("hola")
 
 def informe_estadisticas():
+    """
+    Muestra estadisticas del catalogo de autos.
 
+    NOTA (funcion incompleta / placeholder): por ahora solo imprime "hola";
+    falta implementarla (Req 8 del TP: reporte matricial).
+
+    Returns:
+        None
+    """
+    # TODO(TP - Req 8): calcular y mostrar las estadisticas.
     print("hola")
 
 def menu_principal():   
@@ -256,6 +309,8 @@ def submenu_usuario():
     Ofrece acciones de alquiler: ingresar, registrarse, rentar auto o devolver auto.
     Permite volver al menu principal con [0].
     """
+    # Carga en memoria los usuarios y el catalogo de autos (se usan durante
+    # todo el submenu: alquilar y devolver).
     lista_usu = cd.open_usuarios()
     lista_aut = cd.open_autos()
 
@@ -271,9 +326,14 @@ def submenu_usuario():
             
             if opcion == "1":
                 usu_info = us.ingresa_usuario(lista_usu)
+                # NOTA (linea sin efecto): "if not usu_info: usu_info" no hace
+                # nada; el "else" corta el bucle cuando el ingreso fue valido.
                 if not usu_info: usu_info
                 else: break
             elif opcion == "2":
+                # NOTA (posible error): se recarga el archivo en 'usu_info'
+                # (nombre confuso) y NO se actualiza 'lista_usu' en memoria; el
+                # registro igual se guarda porque registro_usuario escribe en disco.
                 usu_info = cd.open_usuarios()
                 us.registro_usuario(usu_info)
             elif opcion == "0":

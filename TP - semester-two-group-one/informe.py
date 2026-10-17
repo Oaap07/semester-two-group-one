@@ -1,3 +1,11 @@
+"""
+Modulo: informe.py - Generacion de datos (precarga) e informes.
+
+Tema del trabajo: Administracion de una concesionaria (catalogo de autos + alquileres).
+Reune constantes compartidas (marcas, categorias, rutas y campos permitidos) y
+las funciones que generan el catalogo de autos y el archivo de usuarios.
+"""
+
 import json
 import random
 import os
@@ -9,11 +17,22 @@ AUTOS : dict[tuple] = {
     "peugeot": ("208", "3008", "2008", "408", "206"),
     "chevrolet": ("cruze", "onix", "spin", "tracker", "montana")
 }
+# Marcas disponibles: claves del diccionario AUTOS.
 MARCAS: tuple = tuple(AUTOS.keys())
+# Calidades permitidas de un auto.
+# NOTA (dato desactualizado): los autos ya cargados en autos.json usan la
+# calidad "como nuevo", que ya no figura aqui; validar con esta tupla rechaza
+# ese valor.
 CALIDADES: tuple = ("nuevo", "cuidado", "usado")
+# Valores permitidos para el estado, como texto.
+# NOTA (mezcla de tipos): informe_autos guarda "estado" como booleano (True),
+# mientras que esta tupla (usada por el CRUD) usa los textos "true"/"false".
 DISPONIBLE:tuple = ("true", "false")
+# Rango de anios permitidos (inclusive).
 ANIOS: tuple = (2000, 2026)
+# Categorias internas de los autos.
 CATEGORIAS: tuple = ("sedan_hatchback", "suv_crossover", "pickup", "monovolumen_mpv")
+# Prefijos de patente que corresponden a cada anio (para anios >= 2016).
 preset: dict = {
     2016: ["AA"],
     2017: ["AB"],
@@ -28,6 +47,7 @@ preset: dict = {
     2026: ["AI"]
 }
 
+# Categoria -> modelos que pertenecen a esa categoria.
 categorias_modelos: dict = {
     "sedan_hatchback": [
         "etios", "yaris", "corolla", "clio", "sandero",
@@ -41,6 +61,7 @@ categorias_modelos: dict = {
     "monovolumen_mpv": ["kangoo", "spin"]
 }
 
+# Rutas de los archivos de persistencia (autos y usuarios).
 RUTA_AUTOS_JSON: str = "autos.json"
 RUTA_USUARIOS_JSON : str = "usuarios.json"
 
@@ -75,7 +96,9 @@ def informe_autos(
         dict: Diccionario con el listado de autos generado.
     """
     listado = {}
+    # NOTA (parametro ignorado): se fuerza la cantidad a 25, sin usar 'cant_autos'.
     cant_autos = 25
+    # Genera cada auto: patente, precio y atributos aleatorios.
     for _ in range(1, cant_autos + 1):
         anio = random.randint(ANIOS[0], ANIOS[1])
         patente = ""
@@ -100,10 +123,12 @@ def informe_autos(
                     patente += (random.choice(numeros))
                     contador += 1
             patente = patente.upper()
+        # Precio base de 90 u$d, con descuento por antiguedad.
         precio = 90
 
         if anio < 2026:
             a = 2026 - anio
+            # Baja 2.5 u$d por cada anio de antiguedad (la doc tecnica menciona 2).
             precio = precio - (a*2.5)
         marca = random.choice(MARCAS)
         modelo = random.choice(AUTOS[marca])
@@ -114,14 +139,18 @@ def informe_autos(
             "calidad": random.choice(CALIDADES),
             "año": anio,
             "precio": precio,
+            # Lista por comprension: busca la categoria a la que pertenece el modelo.
             "categoria": [i for i in categorias_modelos if modelo in categorias_modelos[i]][0],
+            # Estado inicial: disponible (True).
             "estado": True
         }
     
     try:
+        # Si el archivo ya existe, no se regenera: solo se avisa.
         with open(ruta_archivo, "r", encoding="utf-8") as f:
             print(f"___ Archivo [{ruta_archivo}] ya existente ___")
     except FileNotFoundError:
+        # Si no existe, se crea con el listado generado.
         with open(ruta_archivo, "w", encoding="utf-8") as f:
             json.dump(listado, f, indent=4, ensure_ascii=False)
             print(f"||| Archivo [{ruta_archivo}] creado exitosamente |||")
@@ -135,21 +164,25 @@ def informe_autos(
 def informe_usuarios(
     ruta_archivo: str) -> dict:
     """
-    Hace un conjunto vacío y lo guarda en un JSON
+    Hace un conjunto vacio y lo guarda en un JSON
 
     Args:
-        ruta_archivo: Dirección donde se guardará el diccionario
+        ruta_archivo: Direccion donde se guardara el diccionario
 
     Returns:
         dict: Diccionario sin usuarios
     """
 
+    # NOTA (docstring desactualizado): no crea un diccionario vacio; si el
+    # archivo no existe, deja un usuario de ejemplo precargado.
     listado = {}
     
     try:
+        # Si el archivo ya existe, no se toca.
         with open(ruta_archivo, "r", encoding="utf-8") as f:
             print(f"___ Archivo [{ruta_archivo}] ya existente ___")
     except FileNotFoundError:
+        # Usuario de ejemplo (dni 10101010) para poder probar INGRESAR.
         listado["10101010"] = {
             "nombre" : "Jorge",
             "clave" : "1010",

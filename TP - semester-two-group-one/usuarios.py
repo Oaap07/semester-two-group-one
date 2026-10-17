@@ -23,10 +23,11 @@ def ingresa_usuario(lista):
     Interfaz para el ingreso de un usuario ya registrado.
 
     Args:
-        lista (list): Diccionario con la información de todos los usuarios.
+        lista (dict): Diccionario con la informacion de todos los usuarios.
     
     Returns:
-        tupla: Con el Nombre y Autos rentados del usuario
+        list: [dni, nombre, autos_rentados] del usuario validado; None si se
+        cancela con "0" (NOTA: antes devolvia una tupla de 2 valores).
     """
     while True:
         limpiar()
@@ -52,10 +53,15 @@ def ingresa_usuario(lista):
             
             clave_usu : str = input("Ingrese contraseña: ").lower()
 
+            # Bucle de validacion de la contraseña.
             while True:
+                # Permitir salir escribiendo "0".
                 if clave_usu == "0": break
                 elif dni_usu in lista and clave_usu != lista[dni_usu]["clave"]:
                     clave_usu = input("Contraseña incorrecta, intente de nuevo: ").lower()
+                # NOTA (linea rara): int(clave_usu) con la clave vacia lanzaria
+                # ValueError (lo atrapa el except de mas abajo); la linea no
+                # valida realmente el campo vacio.
                 elif clave_usu.strip() == "" : int(clave_usu)
                 else: break
             break
@@ -65,10 +71,13 @@ def ingresa_usuario(lista):
             try: input("[Enter] ")
             except: pass
         
-    #  Se retorna el Nombre y una lista con los autos que rentó
+    #  Se retorna el dni, el Nombre y una lista con los autos que rento
+    #  (indice [0] = dni, [1] = nombre, [2] = autos rentados).
     if dni_usu in lista and clave_usu == lista[dni_usu]["clave"]:
         limpiar()
         print("=" * 20)
+        # NOTA (compatibilidad): las comillas dobles anidadas dentro del f-string
+        # requieren Python 3.12 o superior.
         print(f"Bienvenido/a {lista[dni_usu]["nombre"]}!")
         print("=" * 20)
         try: input("[Enter] ")
@@ -82,10 +91,10 @@ def registro_usuario(lista):
     Interfaz para el registro de usuarios nuevos.
 
     Args:
-        lista (list): Diccionario con la información de todos los usuarios.
+        lista (dict): Diccionario con la informacion de todos los usuarios.
     
     Returns:
-        
+        None: el usuario nuevo queda guardado en usuarios.json.
     """
     while True:
         try:
@@ -95,13 +104,21 @@ def registro_usuario(lista):
             print("--- REGISTRO: USUARIOS ---")
             print("[0] en cualquier campo para salir.\n")
             while True:
+                # NOTA (linea rota): "limpiar" sin parentesis NO ejecuta la
+                # funcion; falta limpiar().
                 limpiar
 
+                # NOTA (posible error): si el ingreso no es numerico se corta el
+                # bucle y se sigue hacia el registro (mas abajo), con lo que
+                # "dni_usu" puede quedar sin definir (NameError).
                 try: dni_usu = int(input("Ingrese su DNI: "))
                 except: print("\nError, sólo se permiten números"); input("[Enter] "); break
                 
                 if dni_usu == 0: return
                 elif len(str(dni_usu)) != 8:
+                    # NOTA (posible error): tras avisar, el "break" corta el bucle
+                    # pero NO sale de la funcion; el registro de mas abajo corre
+                    # igual y guarda el DNI invalido.
                     print("\nDNI inválido, intente de nuevo.")
                     try: input("[Enter] ")
                     except: pass
@@ -122,20 +139,25 @@ def registro_usuario(lista):
                         if clave_usu == clave_usu2: break
                         elif clave_usu2 == "0": return
                         else: clave_usu2 = input("|| Clave incorrecta, intente de nuevo: ")
+                # Sale del bucle interior tras un intento correcto.
                 break  
         except:
             print()
             print("[ERROR] Intente de nuevo.")
             try: input("[Enter] ")
             except: pass
+        # Sale del bucle exterior (el registro corre una sola vez).
         break
 
+    # NOTA (posible error): si se salio por los "break" anteriores, "dni_usu",
+    # "nombre_usu" y/o "clave_usu" pueden no existir y esto lanza NameError.
     lista[str(dni_usu)] = {
         "nombre": nombre_usu,
         "clave": clave_usu,
         "autos_rentados": []
     }
 
+    # Guarda el diccionario completo de usuarios en el archivo JSON.
     with open(inf.RUTA_USUARIOS_JSON, "w", encoding="utf-8") as f:
         json.dump(lista, f, indent=4, ensure_ascii=False)
     
@@ -144,4 +166,6 @@ def registro_usuario(lista):
     try: input("[Enter] ")
     except: pass  
 
-    #  Se retorna el Nombre y una lista con los autos que rentó
+    # NOTA (comentario huerfano): quedo el texto "se retorna el Nombre y una
+    # lista con los autos que rento", pero esta funcion no retorna nada: solo
+    # guarda el usuario nuevo en el archivo.
