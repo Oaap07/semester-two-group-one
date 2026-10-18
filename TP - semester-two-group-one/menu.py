@@ -168,7 +168,7 @@ def rentar_auto(usu_info, lista_usu, lista_aut):
                     # especificas en lugar de un except generico.
                     except Exception as e: input(e)
 
-def devolver_auto(usu_info, lista_usu, lista_aut):
+def devolver_auto(usu_info, lista_usu):
     """
     Interfaz para registrar la devolucion de un auto rentado.
 
@@ -310,12 +310,10 @@ def submenu_usuario():
     """
     # Carga en memoria los usuarios y el catalogo de autos (se usan durante
     # todo el submenu: alquilar y devolver).
-    lista_usu = cd.open_usuarios()
-    lista_aut = cd.open_autos()
-
+    
     while True:
         limpiar()
-        print("--- INGRESO: USUARIOS ---\n")
+        print("--- SUBMENÚ: USUARIOS ---\n")
         print("[1] Ingresar")
         print("[2] Registrarse")
         print("-------------------------")
@@ -324,12 +322,14 @@ def submenu_usuario():
             opcion : str = input("\nSeleccione una opción: ").strip()
             
             if opcion == "1":
+                lista_usu = cd.open_usuarios()
                 usu_info = us.ingresa_usuario(lista_usu)
                 # NOTA (linea sin efecto): "if not usu_info: usu_info" no hace
                 # nada; el "else" corta el bucle cuando el ingreso fue valido.
                 if not usu_info: usu_info
                 else: break
             elif opcion == "2":
+                lista_usu = cd.open_usuarios()
                 # NOTA (posible error): se recarga el archivo en 'usu_info'
                 # (nombre confuso) y NO se actualiza 'lista_usu' en memoria; el
                 # registro igual se guarda porque registro_usuario escribe en disco.
@@ -343,9 +343,12 @@ def submenu_usuario():
                 except: pass
         except: opcion = ""
 
+
+    
+
     while True:
         limpiar()
-        print("--- SUBMENÚ: MANEJO DE AUTOS ---", end="")
+        print("--- |USUARIOS| MENÚ: MANEJO DE AUTOS ---", end="")
         print(f"  [{usu_info[1]}]\n")
         print("[1] Rentar auto.")
         print("[2] Devolver auto.")
@@ -356,8 +359,10 @@ def submenu_usuario():
             opcion : str = input("\nSeleccione una opción: ").strip()
             
             if opcion == "1":
+                lista_aut = cd.open_autos()
                 rentar_auto(usu_info, lista_usu, lista_aut)
             elif opcion == "2":
+                lista_aut = cd.open_autos()
                 devolver_auto(usu_info, lista_usu, lista_aut)
             elif opcion == "0":
                 # Volver al menu principal.

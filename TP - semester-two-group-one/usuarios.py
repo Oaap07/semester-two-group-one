@@ -33,11 +33,12 @@ def ingresa_usuario(lista):
         limpiar()
         #  Manejo de excepciones en inputs.
         #  Se pide el DNI y la contraseña al usuario.
-        print("--- REGISTRO: USUARIOS ---")
+        print("--- INGRESO: USUARIOS ---")
         print("[0] en cualquier campo para salir.\n")
         try: 
 
             dni_usu = int(input("Ingrese DNI de usuario: "))
+            if dni_usu == 0: return 
             dni_usu = str(dni_usu)
 
             if len(dni_usu) != 8 and dni_usu != "0":
