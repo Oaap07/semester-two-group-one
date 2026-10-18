@@ -1,0 +1,227 @@
+{
+    "AE077DP": {
+        "marca": "peugeot",
+        "modelo": "206",
+        "calidad": "cuidado",
+        "año": 2020,
+        "precio": 75.0,
+        "categoria": "sedan_hatchback",
+        "estado": true
+    },
+    "AFQ588": {
+        "marca": "peugeot",
+        "modelo": "2008",
+        "calidad": "nuevo",
+        "año": 2007,
+        "precio": 42.5,
+        "categoria": "suv_crossover",
+        "estado": true
+    },
+    "GTF079": {
+        "marca": "peugeot",
+        "modelo": "206",
+        "calidad": "nuevo",
+        "año": 2006,
+        "precio": 40.0,
+        "categoria": "sedan_hatchback",
+        "estado": true
+    },
+    "AH472UJ": {
+        "marca": "fiat",
+        "modelo": "cronos",
+        "calidad": "usado",
+        "año": 2024,
+        "precio": 85.0,
+        "categoria": "sedan_hatchback",
+        "estado": true
+    },
+    "AE717QÑ": {
+        "marca": "chevrolet",
+        "modelo": "spin",
+        "calidad": "usado",
+        "año": 2020,
+        "precio": 75.0,
+        "categoria": "monovolumen_mpv",
+        "estado": true
+    },
+    "AG700PX": {
+        "marca": "peugeot",
+        "modelo": "3008",
+        "calidad": "nuevo",
+        "año": 2023,
+        "precio": 82.5,
+        "categoria": "suv_crossover",
+        "estado": true
+    },
+    "LFK941": {
+        "marca": "fiat",
+        "modelo": "toro",
+        "calidad": "cuidado",
+        "año": 2014,
+        "precio": 60.0,
+        "categoria": "pickup",
+        "estado": true
+    },
+    "UVD353": {
+        "marca": "renault",
+        "modelo": "duster",
+        "calidad": "nuevo",
+        "año": 2011,
+        "precio": 52.5,
+        "categoria": "suv_crossover",
+        "estado": true
+    },
+    "EGY340": {
+        "marca": "peugeot",
+        "modelo": "2008",
+        "calidad": "usado",
+        "año": 2002,
+        "precio": 30.0,
+        "categoria": "suv_crossover",
+        "estado": true
+    },
+    "FTK322": {
+        "marca": "fiat",
+        "modelo": "argo",
+        "calidad": "nuevo",
+        "año": 2004,
+        "precio": 35.0,
+        "categoria": "sedan_hatchback",
+        "estado": true
+    },
+    "AA617DV": {
+        "marca": "fiat",
+        "modelo": "pulse",
+        "calidad": "nuevo",
+        "año": 2016,
+        "precio": 65.0,
+        "categoria": "suv_crossover",
+        "estado": true
+    },
+    "WMI017": {
+        "marca": "chevrolet",
+        "modelo": "cruze",
+        "calidad": "nuevo",
+        "año": 2000,
+        "precio": 25.0,
+        "categoria": "sedan_hatchback",
+        "estado": true
+    },
+    "AB692OO": {
+        "marca": "renault",
+        "modelo": "clio",
+        "calidad": "usado",
+        "año": 2017,
+        "precio": 67.5,
+        "categoria": "sedan_hatchback",
+        "estado": true
+    },
+    "WBM960": {
+        "marca": "chevrolet",
+        "modelo": "montana",
+        "calidad": "nuevo",
+        "año": 2012,
+        "precio": 55.0,
+        "categoria": "pickup",
+        "estado": true
+    },
+    "TYP906": {
+        "marca": "toyota",
+        "modelo": "etios",
+        "calidad": "cuidado",
+        "año": 2010,
+        "precio": 50.0,
+        "categoria": "sedan_hatchback",
+        "estado": true
+    },
+    "AI146FB": {
+        "marca": "renault",
+        "modelo": "duster",
+        "calidad": "nuevo",
+        "año": 2026,
+        "precio": 90,
+        "categoria": "suv_crossover",
+        "estado": true
+    },
+    "AA988CZ": {
+        "marca": "fiat",
+        "modelo": "argo",
+        "calidad": "usado",
+        "año": 2016,
+        "precio": 65.0,
+        "categoria": "sedan_hatchback",
+        "estado": true
+    },
+    "GSM864": {
+        "marca": "peugeot",
+        "modelo": "208",
+        "calidad": "cuidado",
+        "año": 2000,
+        "precio": 25.0,
+        "categoria": "sedan_hatchback",
+        "estado": true
+    },
+    "BFN738": {
+        "marca": "fiat",
+        "modelo": "argo",
+        "calidad": "cuidado",
+        "año": 2010,
+        "precio": 50.0,
+        "categoria": "sedan_hatchback",
+        "estado": true
+    },
+    "AB555OX": {
+        "marca": "toyota",
+        "modelo": "corolla",
+        "calidad": "usado",
+        "año": 2017,
+        "precio": 67.5,
+        "categoria": "sedan_hatchback",
+        "estado": true
+    },
+    "AD441MY": {
+        "marca": "renault",
+        "modelo": "kangoo",
+        "calidad": "nuevo",
+        "año": 2018,
+        "precio": 70.0,
+        "categoria": "monovolumen_mpv",
+        "estado": true
+    },
+    "HPT903": {
+        "marca": "fiat",
+        "modelo": "cronos",
+        "calidad": "usado",
+        "año": 2010,
+        "precio": 50.0,
+        "categoria": "sedan_hatchback",
+        "estado": true
+    },
+    "AF327TI": {
+        "marca": "fiat",
+        "modelo": "toro",
+        "calidad": "nuevo",
+        "año": 2021,
+        "precio": 77.5,
+        "categoria": "pickup",
+        "estado": true
+    },
+    "AF672DC": {
+        "marca": "fiat",
+        "modelo": "argo",
+        "calidad": "usado",
+        "año": 2022,
+        "precio": 80.0,
+        "categoria": "sedan_hatchback",
+        "estado": true
+    },
+    "PTB909": {
+        "marca": "fiat",
+        "modelo": "toro",
+        "calidad": "usado",
+        "año": 2004,
+        "precio": 35.0,
+        "categoria": "pickup",
+        "estado": true
+    }
+}

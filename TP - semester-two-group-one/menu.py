@@ -242,7 +242,8 @@ def informe_disponibilidad():
         None
     """
     # TODO(TP - Req 8): implementar el informe de disponibilidad real.
-    print("sdsdsd")
+    limpiar()
+    cd.ver_stock(1,0)
 
 def estado_rentas():
     """
@@ -255,7 +256,8 @@ def estado_rentas():
         None
     """
     # TODO(TP - Req 8): recorrer los autos rentados y mostrar su ficha.
-    print("hola")
+    limpiar()
+    cd.ver_stock(0,1)
 
 def informe_estadisticas():
     """

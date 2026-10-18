@@ -1,0 +1,12 @@
+{
+    "10101010": {
+        "nombre": "Jorge",
+        "clave": "1010",
+        "autos_rentados": []
+    },
+    "46280291": {
+        "nombre": "juan",
+        "clave": "12345",
+        "autos_rentados": []
+    }
+}

@@ -260,7 +260,7 @@ def _mostrar_auto(patente, datos):
 
 # ---------- READ EBZ899-HHE013 ----------
 
-def ver_stock():
+def ver_stock(base,rentados):
     """
     Muestra todo el catalogo de autos como una tabla (lectura general / Read).
 
@@ -277,19 +277,37 @@ def ver_stock():
     limpiar()
     autos : dict = _cargar_autos()
 
-    # Recorre el catalogo preparando los campos para mostrarlos en la tabla.
-    for i in autos:
-        # Traduce el estado booleano a un texto legible para el usuario.
-        # NOTA (posible error): si un auto no tiene la clave "estado" (por
-        # ejemplo, uno dado de alta con `agregar_auto`), esto lanza KeyError.
-        autos[i]["estado"] = "disponible" if autos[i]["estado"] == True else "ocupado"
-        # Antepone "$" al precio para mostrarlo como importe.
-        autos[i]["precio"] = "$" + str(autos[i]["precio"])
+    if base == 1 and rentados == 0:
+        # Recorre el catalogo preparando los campos para mostrarlos en la tabla.
+        for i in autos:
+            # Traduce el estado booleano a un texto legible para el usuario.
+            # NOTA (posible error): si un auto no tiene la clave "estado" (por
+            # ejemplo, uno dado de alta con `agregar_auto`), esto lanza KeyError.
+            autos[i]["estado"] = "disponible" if autos[i]["estado"] == True else "ocupado"
+            # Antepone "$" al precio para mostrarlo como importe.
+            autos[i]["precio"] = "$" + str(autos[i]["precio"])
+    elif base == 0 and rentados == 1:
+        autos_rentados = {}
+        # Recorremos todos los autos, pero solo procesaremos los rentados
+        for i in autos:
+            
+            auto_visual = autos[i].copy()
+            # Usamos .get() . Si el estado es True (Disponible),
+            # lo ignoramos y saltamos directamente al siguiente auto.
+            if autos[i].get("estado") == True:
+                continue 
+            
+            # --- RENTADOS ---
+            
+            # Formateamos los textos solo para los autos que sí queremos mostrar
+            auto_visual["estado"] = "ocupado"
+            auto_visual["precio"] = "$" + str(auto_visual["precio"])   
+            autos_rentados[i] = auto_visual
 
     # Arma un DataFrame de pandas a partir del catalogo: las patentes quedan
     # como columnas y los atributos como filas; luego se transpone (.T) para
     # dejar una fila por auto.
-    autos_excel_modificado = pd.DataFrame(autos)
+    autos_excel_modificado = pd.DataFrame(autos if base == 1 else autos_rentados)
     
     # Si el diccionario esta vacio, no hay nada para mostrar.
     if not autos:
@@ -583,7 +601,7 @@ def menu_crud():
 
         # Despacho de la opcion elegida hacia la funcion correspondiente.
         if opcion == "1":
-            ver_stock()
+            ver_stock(1,0)
         elif opcion == "2":
             ver_auto()
         elif opcion == "3":
