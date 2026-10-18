@@ -262,14 +262,22 @@ def _mostrar_auto(patente, datos):
 
 def ver_stock(base,rentados):
     """
-    Muestra todo el catalogo de autos como una tabla (lectura general / Read).
+    Muestra autos del catalogo como una tabla (lectura general / Read).
 
-    Carga el catalogo con `_cargar_autos()`, transforma dos campos para que se
-    lean mejor y muestra el resultado como tabla usando pandas (DataFrame).
+    Carga el catalogo con `_cargar_autos()` y lo muestra como tabla usando
+    pandas (DataFrame). `base` y `rentados` funcionan como un "modo":
 
-    NOTA (funcion nueva / modificada): reemplaza a la antigua `ver_autos()`.
-    Se apoya en pandas (DataFrame), que la documentacion tecnica recomienda
-    para armar reportes matriciales (Req 8 del TP).
+        ver_stock(1, 0): muestra TODO el catalogo (estado legible y precio con "$").
+        ver_stock(0, 1): muestra SOLO los autos rentados (los no disponibles).
+
+    Args:
+        base (int): 1 para el catalogo completo; 0 para el listado de rentados.
+        rentados (int): 1 para armar el listado de rentados; 0 para el catalogo.
+
+    NOTA (funcion nueva / modificada): reemplaza a la antigua `ver_autos()` y
+    ahora es el "motor" de los informes de menu.py (`informe_disponibilidad` y
+    `estado_rentas`). Se apoya en pandas (DataFrame), que la documentacion
+    tecnica recomienda para armar reportes matriciales (Req 8 del TP).
 
     Returns:
         None
@@ -277,39 +285,46 @@ def ver_stock(base,rentados):
     limpiar()
     autos : dict = _cargar_autos()
 
+    # --- MODO 1: catalogo completo (base=1, rentados=0) ---
     if base == 1 and rentados == 0:
         # Recorre el catalogo preparando los campos para mostrarlos en la tabla.
         for i in autos:
-            # Traduce el estado booleano a un texto legible para el usuario.
             # NOTA (posible error): si un auto no tiene la clave "estado" (por
             # ejemplo, uno dado de alta con `agregar_auto`), esto lanza KeyError.
+            # Traduce el estado booleano a un texto legible para el usuario.
             autos[i]["estado"] = "disponible" if autos[i]["estado"] == True else "ocupado"
             # Antepone "$" al precio para mostrarlo como importe.
             autos[i]["precio"] = "$" + str(autos[i]["precio"])
+    # --- MODO 2: solo autos rentados (base=0, rentados=1) ---
     elif base == 0 and rentados == 1:
+        # Diccionario auxiliar con SOLO los autos que NO estan disponibles.
         autos_rentados = {}
-        # Recorremos todos los autos, pero solo procesaremos los rentados
+        # Recorre todo el catalogo, pero solo procesa los autos rentados.
         for i in autos:
-            
+            # Copia el auto para no modificar el original del catalogo.
             auto_visual = autos[i].copy()
-            # Usamos .get() . Si el estado es True (Disponible),
-            # lo ignoramos y saltamos directamente al siguiente auto.
+            # Usa .get(): si el estado es True (disponible), lo saltea.
             if autos[i].get("estado") == True:
                 continue 
             
             # --- RENTADOS ---
             
-            # Formateamos los textos solo para los autos que sí queremos mostrar
+            # Formatea los campos solo para los autos que si se van a mostrar.
             auto_visual["estado"] = "ocupado"
-            auto_visual["precio"] = "$" + str(auto_visual["precio"])   
+            auto_visual["precio"] = "$" + str(auto_visual["precio"])
             autos_rentados[i] = auto_visual
+    # NOTA (posible error): si se llama con otra combinacion (por ejemplo,
+    # ver_stock(0, 0)), no entra en ningun modo y "autos_rentados" queda sin
+    # definir -> NameError en la linea del DataFrame de mas abajo.
 
-    # Arma un DataFrame de pandas a partir del catalogo: las patentes quedan
-    # como columnas y los atributos como filas; luego se transpone (.T) para
-    # dejar una fila por auto.
+    # Arma un DataFrame de pandas: si base == 1 usa el catalogo completo; si no,
+    # usa el diccionario de rentados. Las patentes quedan como columnas y los
+    # atributos como filas; el .T deja una fila por auto.
     autos_excel_modificado = pd.DataFrame(autos if base == 1 else autos_rentados)
     
     # Si el diccionario esta vacio, no hay nada para mostrar.
+    # NOTA: en el modo rentados se controla "autos" (no "autos_rentados"), asi
+    # que si no hay autos rentados se muestra una tabla vacia en vez del aviso.
     if not autos:
         print("\nNo hay autos en el catálogo.")
         try: input("[Enter] ")
@@ -601,6 +616,7 @@ def menu_crud():
 
         # Despacho de la opcion elegida hacia la funcion correspondiente.
         if opcion == "1":
+            # ver_stock(base=1, rentados=0): muestra el catalogo completo.
             ver_stock(1,0)
         elif opcion == "2":
             ver_auto()

@@ -224,24 +224,21 @@ def devolver_auto(usu_info, lista_usu, lista_aut):
             # Salir del bucle de patentes tras alquilar.
             return 
 
-# Muestra autos disponibles aplicando filtros por categoria/modelo.
-# NOTA (funcion incompleta / placeholder): el cuerpo es solo un print de prueba
-# ("sdsdsd"); falta implementar el informe real. El texto "(contexto global:
-# lista, opcion, opcion2)" del comentario original quedo de una version vieja.
+# Muestra la disponibilidad de unidades (informe para la empresa).
+# NOTA (implementado): ahora delega en cd.ver_stock(1, 0), que arma con pandas
+# el catalogo completo. El texto viejo sobre "(contexto global: lista, opcion,
+# opcion2)" ya no aplica.
 def informe_disponibilidad():
     """
-    Muestra la lista de autos disponibles segun filtros seleccionados.
+    Muestra la disponibilidad de unidades.
 
-    Esta funcion forma parte de los informes para el submenu de empresa.
-    NOTA: Esta funcion esta incompleta en la implementacion actual (utiliza
-    variables globales como 'lista', 'opcion' y 'opcion2' que se espera
-    que esten definidas en el contexto desde donde se llama). No modifica
-    el comportamiento existente.
+    Reutiliza `cd.ver_stock(1, 0)`, que arma con pandas el catalogo completo
+    como tabla (Req 8 del TP: reporte matricial).
 
     Returns:
         None
     """
-    # TODO(TP - Req 8): implementar el informe de disponibilidad real.
+    # Limpia la pantalla y delega en el CRUD para mostrar el catalogo.
     limpiar()
     cd.ver_stock(1,0)
 
@@ -249,13 +246,13 @@ def estado_rentas():
     """
     Muestra el estado de los autos rentados.
 
-    NOTA (funcion incompleta / placeholder): por ahora solo imprime "hola";
-    falta implementar el listado de autos alquilados.
+    Reutiliza `cd.ver_stock(0, 1)`, que arma con pandas el listado de los autos
+    no disponibles (rentados).
 
     Returns:
         None
     """
-    # TODO(TP - Req 8): recorrer los autos rentados y mostrar su ficha.
+    # Limpia la pantalla y delega en el CRUD para mostrar solo los rentados.
     limpiar()
     cd.ver_stock(0,1)
 
@@ -376,14 +373,14 @@ def submenu_empresa():
     """
     Submenu destinado a la empresa (gestion e informes).
 
-    Accede a las funciones de informe del modulo `informe`:
-    - Disponibilidad de unidades.
-    - Estadisticas del mes.
-    - Estado de autos rentados (funcion local estado_rentas).
+    Llama a las funciones de informe definidas en ESTE modulo:
+    - informe_disponibilidad(): catalogo completo (via cd.ver_stock(1,0)).
+    - informe_estadisticas(): SIGUE PENDIENTE (stub, imprime "hola").
+    - estado_rentas(): solo autos rentados (via cd.ver_stock(0,1)).
     Permite volver al menu principal con [0].
 
-    Importante (Req 8 del TP): las funciones de informe deben generar al menos
-    UN REPORTE MATRICIAL (listas de listas). Recomendado NumPy/Pandas/Matplotlib.
+    Importante (Req 8 del TP): los informes usan pandas (DataFrame) para generar
+    el reporte matricial.
     """
     while True:
         limpiar()
@@ -397,15 +394,14 @@ def submenu_empresa():
         except: opcion : str = ""
 
         if opcion == "1":
-            # Informe de disponibilidad (modulo informe).
-            # TODO(TP - Req 8): verificar que incluya un reporte matricial.
+            # Disponibilidad: ya arma un reporte matricial con pandas (Req 8).
             informe_disponibilidad()
         elif opcion == "2":
-            # Informe de estadisticas (modulo informe).
-            # TODO(TP - Req 8): verificar que incluya un reporte matricial.
+            # NOTA (pendiente): informe_estadisticas() sigue siendo un stub
+            # (imprime "hola"); falta el reporte matricial (Req 8).
             informe_estadisticas()
         elif opcion == "3":
-            # Estado local de los autos rentados.
+            # Estado de los autos rentados: usa pandas (Req 8).
             estado_rentas()
         elif opcion == "0":
             # Volver al menu principal.
