@@ -61,11 +61,13 @@ semester-two-group-one/
 │   ├── Ejercicios - Octavio Da Silva/     # Nivel_1.py (ejercicios varios)
 │   └── TP - semester-two-group-one/       # Versión anterior del TP (legado)
 └── TP - semester-two-group-one/           # Trabajo Práctico integrador
-    ├── crud.py                # CRUD del catálogo de autos
     ├── menu.py                # Menú principal (usuario / empresa)
-    ├── informe.py             # Generación de datos y base de informes
-    ├── pruebas.py             # Script auxiliar de verificación
-    ├── autos.json             # Datos del catálogo (persistencia)
+    ├── crud.py                # CRUD del catálogo de autos
+    ├── usuarios.py            # Ingreso y registro de usuarios
+    ├── informe.py             # Constantes, rutas y precarga de datos
+    ├── pruebas.py             # Archivo vacío (placeholder)
+    ├── autos.json             # Datos del catálogo (se genera al ejecutar)
+    ├── usuarios.json          # Usuarios y sus alquileres (se genera al ejecutar)
     └── documentacion/         # Documentación técnica y manual de usuario
         ├── README.md
         ├── DOCUMENTACION_TECNICA.md
@@ -73,8 +75,9 @@ semester-two-group-one/
         └── presentacion_rentar.html
 ```
 
-> `rentados.json` (autos alquilados) lo genera el programa en tiempo de ejecución y
-> no se versiona.
+> `autos.json` y `usuarios.json` los genera el programa en tiempo de ejecución (con
+> `python informe.py`) y no se versionan. Los alquileres de cada usuario se guardan
+> dentro de `usuarios.json`; ya no existe un `rentados.json` aparte.
 
 ---
 
@@ -158,6 +161,8 @@ Cada enlace lleva al archivo con la resolución del ejercicio.
   de tipo como `list[dict]` / `dict[dict]`, que requieren 3.9+).
 - **Biblioteca estándar:** `random`, `json`, `os`, entre otros. La mayoría de los
   ejercicios no requiere instalar nada.
+- **Dependencia del TP:** el Trabajo Práctico (concesionaria) usa **`pandas`** para
+  las tablas de los informes (`pip install pandas`).
 - **Dependencias opcionales (Unidad 5 — para Colab):**
   - `numpy` (álgebra matricial),
   - `pandas` (DataFrames),
@@ -200,18 +205,21 @@ con CRUD y registro de alquileres, con persistencia en archivos JSON.
 
 | Módulo | Rol |
 |--------|-----|
+| `menu.py` | Menú principal: submenú de usuario (ingreso/alquileres) y de empresa (informes). |
 | `crud.py` | Alta, baja, modificación y consulta del catálogo de autos. |
-| `menu.py` | Menú principal: submenú de usuario (alquileres) y de empresa (informes). |
-| `informe.py` | Generación de la precarga de autos y base de los informes. |
-| `autos.json` | Persistencia del catálogo (diccionario de diccionarios). |
-| `rentados.json` | Persistencia de autos alquilados (se genera al ejecutar). |
+| `usuarios.py` | Ingreso (login) y registro de usuarios. |
+| `informe.py` | Constantes compartidas, rutas y precarga de autos/usuarios. |
+| `autos.json` | Persistencia del catálogo (diccionario de diccionarios; se genera al ejecutar). |
+| `usuarios.json` | Persistencia de usuarios y sus alquileres (se genera al ejecutar). |
 
 **Ejecución:**
 
 ```bash
 cd "TP - semester-two-group-one"
-python menu.py      # Aplicación principal (usuario / empresa)
-python crud.py      # Administración del catálogo (CRUD)
+pip install pandas   # dependencia para las tablas de los informes
+python informe.py    # genera autos.json y usuarios.json (si no existen)
+python menu.py       # Aplicación principal (usuario / empresa)
+python crud.py       # Administración del catálogo (CRUD)
 ```
 
 La documentación completa del TP está en la carpeta
@@ -933,8 +941,10 @@ plt.show()
 - **Carpeta de TP duplicada:** `Exercises-G1/TP - semester-two-group-one/` es una
   **versión anterior** del Trabajo Práctico (legado). La versión vigente es la de
   la raíz, `TP - semester-two-group-one/`.
-- **`autos.json` en la raíz:** es un archivo de datos generado por el programa. La
-  copia válida del catálogo se encuentra dentro de la carpeta del TP.
+- **`autos.json` en la raíz:** es un archivo de datos generado por el programa
+  (suelto, fuera del TP). Los datos que usa la aplicación son los de la carpeta del
+  TP (`TP - semester-two-group-one/`), que se generan con `python informe.py` y no se
+  versionan.
 - **Archivos `__pycache__`:** son archivos compilados que genera Python
   automáticamente; no forman parte del código fuente.
 - **Estado de los ejercicios:** algunos archivos pueden estar **incompletos o en

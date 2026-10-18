@@ -258,7 +258,7 @@ def _mostrar_auto(patente, datos):
     print(f"\tEstado: {datos['estado']}")
 
 
-# ---------- READ EBZ899-HHE013 ----------
+# ---------- READ ----------
 
 def ver_stock(base,rentados):
     """

@@ -6,6 +6,8 @@ Modulo: menu.py - Menu principal, alquileres y navegacion.
 Tema del trabajo: Administracion de una concesionaria (catalogo de autos + alquileres).
 """
 
+# NOTA (imports sin uso): 'json' y 'informe as inf' no se usan en este modulo
+# (se podrian quitar). 'os' si se usa en limpiar().
 import json, os
 import informe as inf
 import crud as cd
@@ -155,10 +157,11 @@ def rentar_auto(usu_info, lista_usu, lista_aut):
                                 # Agrega la patente a los autos rentados del usuario
                                 # (usu_info[0] es el DNI, que es la clave en lista_usu).
                                 lista_usu[usu_info[0]]["autos_rentados"].append(patente_elegida)
-                                # NOTA (bug conocido "renta infinita"): modificar_estado_auto
-                                # escribe el cambio en autos.json, pero 'lista_aut' en memoria
-                                # no se actualiza; el auto sigue con estado True y se puede
-                                # volver a rentar en la misma sesion.
+                                # NOTA (bug "renta infinita" - RESUELTO): antes 'lista_aut'
+                                # quedaba desactualizado en memoria y el auto se podia
+                                # volver a rentar en la misma sesion. Ahora submenu_usuario
+                                # recarga el catalogo desde disco (cd.open_autos()) antes de
+                                # cada operacion, por lo que el cambio ya se refleja.
                                 # Persiste los usuarios (con el nuevo alquiler).
                                 cd.escribir_usuario(lista_usu)
                                 # Salir del bucle de patentes tras alquilar.
@@ -180,14 +183,16 @@ def devolver_auto(usu_info, lista_usu):
     Args:
         usu_info (list): [dni, nombre, autos_rentados] del usuario logueado.
         lista_usu (dict): Todos los usuarios (para guardar la devolucion).
-        lista_aut (dict): Catalogo de autos (no se usa por ahora).
+
+    NOTA (cambio de firma): la version anterior tambien recibia 'lista_aut' (el
+    catalogo), pero ya no se usa porque el estado se cambia directo en el archivo.
+    submenu_usuario ya la llama con los 2 argumentos correctos.
 
     NOTA (docstring actualizado): el texto anterior decia que estaba incompleto;
     esta version ya devuelve el auto.
     """
     limpiar()
     # TODO(TP - Req 1): manejar excepciones al cargar.
-    #en desarrollo
     while True:
         limpiar()
         print(f"--- Autos rentados --- [{usu_info[1]}]\n")
@@ -208,7 +213,7 @@ def devolver_auto(usu_info, lista_usu):
             try: input("[Enter] ")
             except: pass
         else:
-            # --- Confirmacion y registro del alquiler ---
+            # --- Confirmacion y registro de la devolucion ---
             limpiar()
             # Se obtiene la patente elegida de la lista de autos rentados.
             patente_elegida = lista_usu[usu_info[0]]["autos_rentados"][int(opcion4)-1]
@@ -221,7 +226,7 @@ def devolver_auto(usu_info, lista_usu):
             print(f"\n¡Auto con patente: {patente_elegida} DEVUELTO!")
             try: input("[Enter] ")
             except: pass
-            # Salir del bucle de patentes tras alquilar.
+            # Salir del bucle de patentes tras devolver.
             return 
 
 # Muestra la disponibilidad de unidades (informe para la empresa).
@@ -308,9 +313,10 @@ def submenu_usuario():
     Ofrece acciones de alquiler: ingresar, registrarse, rentar auto o devolver auto.
     Permite volver al menu principal con [0].
     """
-    # Carga en memoria los usuarios y el catalogo de autos (se usan durante
-    # todo el submenu: alquilar y devolver).
-    
+    # NOTA (cambio): antes se cargaban 'lista_usu' y 'lista_aut' una sola vez al
+    # entrar al submenu. Ahora se recargan desde disco antes de cada accion
+    # (Ingresar, Registrarse, Rentar, Devolver) para reflejar los cambios: esto es
+    # lo que resolvio los bugs "error al ingresar" y "renta infinita".
     while True:
         limpiar()
         print("--- SUBMENÚ: USUARIOS ---\n")
@@ -329,10 +335,13 @@ def submenu_usuario():
                 if not usu_info: usu_info
                 else: break
             elif opcion == "2":
+                # NOTA (bug "error al ingresar" - RESUELTO): antes NO se recargaba
+                # 'lista_usu' tras registrarse y el usuario nuevo no podia ingresar
+                # hasta reiniciar. Ahora se relee el archivo, igual que en [1].
                 lista_usu = cd.open_usuarios()
-                # NOTA (posible error): se recarga el archivo en 'usu_info'
-                # (nombre confuso) y NO se actualiza 'lista_usu' en memoria; el
-                # registro igual se guarda porque registro_usuario escribe en disco.
+                # NOTA (nombre confuso): 'usu_info' aca NO es el usuario logueado,
+                # sino el diccionario completo de usuarios que necesita
+                # registro_usuario(). Conviene renombrarlo (por ejemplo 'usuarios').
                 usu_info = cd.open_usuarios()
                 us.registro_usuario(usu_info)
             elif opcion == "0":
@@ -359,11 +368,15 @@ def submenu_usuario():
             opcion : str = input("\nSeleccione una opción: ").strip()
             
             if opcion == "1":
+                # Se recarga el catalogo desde disco y se pasa completo a
+                # rentar_auto() (necesita los 3: usuario, usuarios y catalogo).
                 lista_aut = cd.open_autos()
                 rentar_auto(usu_info, lista_usu, lista_aut)
             elif opcion == "2":
-                lista_aut = cd.open_autos()
-                devolver_auto(usu_info, lista_usu, lista_aut)
+                # NOTA (BUG corregido): devolver_auto() recibe 2 parametros
+                # (usu_info, lista_usu). Antes se le pasaban 3 -> TypeError que el
+                # 'except' de abajo ocultaba (la opcion [2] no hacia nada).
+                devolver_auto(usu_info, lista_usu)
             elif opcion == "0":
                 # Volver al menu principal.
                 break
@@ -418,7 +431,9 @@ def submenu_empresa():
 
 if __name__ == "__main__":
     # Inicio de la aplicacion.
-    # TODO(TP - Req 3): confirmar que autos.json tenga al menos 5 registros (precarga).
+    # NOTA (datos): menu.py NO genera autos.json ni usuarios.json; asume que ya
+    # existen (se crean ejecutando 'python informe.py'). Si faltan, open_autos()
+    # y open_usuarios() devuelven None y el sistema falla al ingresar/rentar.
     limpiar()
     menu_principal()
     limpiar()

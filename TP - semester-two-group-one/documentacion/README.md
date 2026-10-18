@@ -1,16 +1,17 @@
 # Documentación del Proyecto — TPO SPRINT
 
-Índice de la documentación del sistema de gestión de concesionaria
-(Programación I).
+Índice de la documentación del sistema de gestión de concesionaria (Programación I).
 
 | Documento | Contenido | Audiencia |
 |-----------|-----------|-----------|
-| [DOCUMENTACION_TECNICA.md](./DOCUMENTACION_TECNICA.md) | Descripción del sistema, estructura de módulos, modelo de datos, persistencia, requisitos técnicos, instalación/ejecución y estado de cumplimiento del TP. | Desarrolladores / docentes |
-| [MANUAL_DE_USUARIO.md](./MANUAL_DE_USUARIO.md) | Guía de uso paso a paso: inicio rápido, navegación de menús, gestión del catálogo, alquileres, validaciones y solución de problemas. | Usuarios finales |
+| [DOCUMENTACION_TECNICA.md](./DOCUMENTACION_TECNICA.md) | Descripción del sistema, estructura de módulos, modelo de datos, persistencia, requisitos técnicos, instalación/ejecución, manejo de errores y problemas conocidos. | Desarrolladores / docentes |
+| [MANUAL_DE_USUARIO.md](./MANUAL_DE_USUARIO.md) | Guía de uso paso a paso: inicio rápido, navegación de menús, registro e ingreso, gestión del catálogo, alquileres, validaciones y solución de problemas. | Usuarios finales |
+| [presentacion_rentar.html](./presentacion_rentar.html) | Presentación HTML del flujo de alquiler. | Usuarios / docentes |
 
 ## Resumen rápido
 
 - **Punto de entrada principal:** `python menu.py`
 - **Administración del catálogo (CRUD):** `python crud.py`
-- **Persistencia:** `autos.json` (catálogo) y `rentados.json` (alquilados)
-- **Lenguaje:** Python 3 (solo biblioteca estándar)
+- **Generar los datos (si no existen):** `python informe.py`
+- **Persistencia:** `autos.json` (catálogo) y `usuarios.json` (usuarios y sus alquileres)
+- **Lenguaje:** Python 3.12+ (requiere `pandas` para las tablas de los informes)

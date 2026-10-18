@@ -28,6 +28,8 @@ def ingresa_usuario(lista):
     Returns:
         list: [dni, nombre, autos_rentados] del usuario validado; None si se
         cancela con "0" (NOTA: antes devolvia una tupla de 2 valores).
+        NOTA (inconsistencia): en los rechazos devuelve la tupla vacia () (no
+        None); ambos son "falsy", por eso el llamador los trata igual.
     """
     while True:
         limpiar()
@@ -38,6 +40,7 @@ def ingresa_usuario(lista):
         try: 
 
             dni_usu = int(input("Ingrese DNI de usuario: "))
+            # Salida rapida: 0 (o un valor no numerico, que cae en el except) corta.
             if dni_usu == 0: return 
             dni_usu = str(dni_usu)
 
