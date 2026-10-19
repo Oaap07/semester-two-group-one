@@ -77,9 +77,9 @@ def ingresa_usuario(lista):
                 elif clave_usu.strip() == "" : int(clave_usu)
                 else: break
             break
-        # TODO(TP - Req 1): capturar excepciones especificas (ValueError para int(input), TypeError si 'lista' es None);
-        # el except generico oculta cualquier fallo y solo muestra "[ERROR] Intente de nuevo.".
-        except:
+        # RESUELTO (Req 1): se capturan excepciones especificas (ValueError del int(input); TypeError/KeyError si
+        # 'lista' no es un diccionario valido) en lugar de un 'except' generico.
+        except (ValueError, TypeError, KeyError):
             print()
             print("[ERROR] Intente de nuevo.")
             try: input("[Enter] ")
@@ -154,9 +154,9 @@ def registro_usuario(lista):
                         else: clave_usu2 = input("|| Clave incorrecta, intente de nuevo: ")
                 # Sale del bucle interior tras un intento correcto.
                 break  
-        # TODO(TP - Req 1): except generico; capturar excepciones especificas (ValueError para int(input)) en lugar de
-        # tragar cualquier error.
-        except:
+        # RESUELTO (Req 1): se capturan excepciones especificas (ValueError, TypeError/KeyError si 'lista' no es
+        # valido) en lugar de un 'except' generico.
+        except (ValueError, TypeError, KeyError):
             print()
             print("[ERROR] Intente de nuevo.")
             try: input("[Enter] ")
@@ -173,10 +173,14 @@ def registro_usuario(lista):
     }
 
     # Guarda el diccionario completo de usuarios en el archivo JSON.
-    # BUG (OSError): sin try/except; si el archivo no se puede escribir, el OSError se propaga y corta el programa.
-    # TODO(TP - Req 1): envolver en try/except (OSError) para el guardado.
-    with open(inf.RUTA_USUARIOS_JSON, "w", encoding="utf-8") as f:
-        json.dump(lista, f, indent=4, ensure_ascii=False)
+    # RESUELTO (Req 1): el guardado se envuelve en try/except OSError; si el archivo no se puede escribir se informa y
+    # se retorna sin reportar un registro exitoso.
+    try:
+        with open(inf.RUTA_USUARIOS_JSON, "w", encoding="utf-8") as f:
+            json.dump(lista, f, indent=4, ensure_ascii=False)
+    except OSError as e:
+        print(f"/// No se pudo escribir el archivo de usuarios: {e} ///")
+        return
     
     limpiar()
     print(f"||| ¡Usuario [{nombre_usu.capitalize()}] registrado exitosamente! |||")

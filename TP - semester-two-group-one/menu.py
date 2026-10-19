@@ -172,10 +172,9 @@ def rentar_auto(usu_info, lista_usu, lista_aut):
                                 cd.escribir_usuario(lista_usu)
                                 # Salir del bucle de patentes tras alquilar.
                                 return 
-                    # NOTA (manejo generico): atrapa cualquier excepcion y la
-                    # muestra con input(e). El Req 1 del TP pide excepciones
-                    # especificas en lugar de un except generico.
-                    except Exception as e: input(e)
+                    # RESUELTO (Req 1): en lugar de 'except Exception' se capturan las excepciones esperadas del
+                    # bloque (KeyError, IndexError, TypeError, ValueError).
+                    except (KeyError, IndexError, TypeError, ValueError) as e: input(e)
 
 def devolver_auto(usu_info, lista_usu):
     """
@@ -198,7 +197,7 @@ def devolver_auto(usu_info, lista_usu):
     esta version ya devuelve el auto.
     """
     cd.limpiar()
-    # TODO(TP - Req 1): manejar excepciones al cargar.
+    # RESUELTO (Req 1): el guardado se delega en cd.escribir_usuario(), que ya maneja las excepciones (OSError).
     while True:
         cd.limpiar()
         print(f"--- Autos rentados --- [{usu_info[1]}]\n")
@@ -300,23 +299,24 @@ def menu_principal():
         print("-------------------------")
         print("[0] Salir.")
         
-        try: 
-            opcion = input("\nSeleccione una opción: ").strip()
+        # RESUELTO (Req 1): se captura solo EOFError al leer la opcion (en lugar de un 'except' generico que tragaba
+        # cualquier fallo); el despacho quedo fuera del try para no ocultar errores de los submenus.
+        try:
+            opcion : str = input("\nSeleccione una opción: ").strip()
+        except EOFError:
+            break
         # Despacho de la opcion elegida hacia el submenu correspondiente.
-            if opcion == "1":
-                submenu_usuario()
-            elif opcion == "2":
-                submenu_empresa()
-            elif opcion == "0":
-                # Finalizar la ejecucion del programa.
-                break
-            else:
-                print("\nOpción no válida. Intente de nuevo.")
-                try: input("[Enter] ")
-                except: pass
-        # TODO(TP - Req 1): reemplazar el except generico por excepciones especificas (por ejemplo ValueError para
-        # int(input)); hoy cualquier fallo se traga y el menu parece no responder.
-        except: opcion : str = ""
+        if opcion == "1":
+            submenu_usuario()
+        elif opcion == "2":
+            submenu_empresa()
+        elif opcion == "0":
+            # Finalizar la ejecucion del programa.
+            break
+        else:
+            print("\nOpción no válida. Intente de nuevo.")
+            try: input("[Enter] ")
+            except EOFError: pass
 
 def submenu_usuario():
     """
@@ -336,38 +336,37 @@ def submenu_usuario():
         print("[2] Registrarse")
         print("-------------------------")
         print("[0] Volver al menú principal")
+        # RESUELTO (Req 1): se captura solo EOFError al leer la opcion (en lugar de un 'except' generico que ocultaba
+        # los errores). Ademas, open_usuarios() ya no devuelve None, asi ingresa_usuario() no recibe None y desaparece
+        # el bucle de "[ERROR] Intente de nuevo.".
         try:
             opcion : str = input("\nSeleccione una opción: ").strip()
-            
-            if opcion == "1":
-                # BUG (TypeError): si usuarios.json no existe, open_usuarios() devuelve None e ingresa_usuario(None)
-                # falla al evaluar 'dni_usu not in lista'; el except generico de mas abajo lo oculta y el login queda en
-                # un bucle de "[ERROR] Intente de nuevo.".
-                lista_usu = cd.open_usuarios()
-                usu_info = us.ingresa_usuario(lista_usu)
-                # NOTA (linea sin efecto): "if not usu_info: usu_info" no hace
-                # nada; el "else" corta el bucle cuando el ingreso fue valido.
-                if not usu_info: usu_info
-                else: break
-            elif opcion == "2":
-                # NOTA (bug "error al ingresar" - RESUELTO): antes NO se recargaba
-                # 'lista_usu' tras registrarse y el usuario nuevo no podia ingresar
-                # hasta reiniciar. Ahora se relee el archivo, igual que en [1].
-                lista_usu = cd.open_usuarios()
-                # NOTA (nombre confuso): 'usu_info' aca NO es el usuario logueado,
-                # sino el diccionario completo de usuarios que necesita
-                # registro_usuario(). Conviene renombrarlo (por ejemplo 'usuarios').
-                usu_info = cd.open_usuarios()
-                us.registro_usuario(usu_info)
-            elif opcion == "0":
-                return
-            else:
-                print("\nOpción no válida. Intente de nuevo.")
-                try: input("[Enter] ")
-                except: pass
-        # TODO(TP - Req 1): except generico; capturar excepciones especificas (ValueError, OSError, TypeError) para no
-        # ocultar los errores de arriba.
-        except: opcion = ""
+        except EOFError:
+            break
+
+        if opcion == "1":
+            lista_usu = cd.open_usuarios()
+            usu_info = us.ingresa_usuario(lista_usu)
+            # NOTA (linea sin efecto): "if not usu_info: usu_info" no hace
+            # nada; el "else" corta el bucle cuando el ingreso fue valido.
+            if not usu_info: usu_info
+            else: break
+        elif opcion == "2":
+            # NOTA (bug "error al ingresar" - RESUELTO): antes NO se recargaba
+            # 'lista_usu' tras registrarse y el usuario nuevo no podia ingresar
+            # hasta reiniciar. Ahora se relee el archivo, igual que en [1].
+            lista_usu = cd.open_usuarios()
+            # NOTA (nombre confuso): 'usu_info' aca NO es el usuario logueado,
+            # sino el diccionario completo de usuarios que necesita
+            # registro_usuario(). Conviene renombrarlo (por ejemplo 'usuarios').
+            usu_info = cd.open_usuarios()
+            us.registro_usuario(usu_info)
+        elif opcion == "0":
+            return
+        else:
+            print("\nOpción no válida. Intente de nuevo.")
+            try: input("[Enter] ")
+            except EOFError: pass
 
 
     
@@ -381,25 +380,25 @@ def submenu_usuario():
         print("-------------------------")
         print("[0] Volver al menú principal")
 
-        try: 
+        # RESUELTO (Req 1): se captura solo EOFError al leer la opcion; antes el 'except' generico tragaba los errores
+        # de rentar_auto() / devolver_auto().
+        try:
             opcion : str = input("\nSeleccione una opción: ").strip()
-            
-            if opcion == "1":
-                lista_aut = cd.open_autos()
-                rentar_auto(usu_info, lista_usu, lista_aut)
-            elif opcion == "2":
-                devolver_auto(usu_info, lista_usu)
-            elif opcion == "0":
-                # Volver al menu principal.
-                break
-            else:
-                print("\nOpción no válida. Intente de nuevo.")
-                try: input("[Enter] ")
-                except: pass
-        # TODO(TP - Req 1): except generico; conviene capturar excepciones especificas para no tragar errores de
-        # rentar_auto / devolver_auto.
-        except: 
-            opcion : str = ""
+        except EOFError:
+            break
+
+        if opcion == "1":
+            lista_aut = cd.open_autos()
+            rentar_auto(usu_info, lista_usu, lista_aut)
+        elif opcion == "2":
+            devolver_auto(usu_info, lista_usu)
+        elif opcion == "0":
+            # Volver al menu principal.
+            break
+        else:
+            print("\nOpción no válida. Intente de nuevo.")
+            try: input("[Enter] ")
+            except EOFError: pass
 
 def submenu_empresa():
     """
