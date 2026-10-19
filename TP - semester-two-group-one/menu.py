@@ -241,6 +241,20 @@ def devolver_auto(usu_info, lista_usu):
 # NOTA (implementado): ahora delega en cd.ver_stock(1, 0), que arma con pandas
 # el catalogo completo. El texto viejo sobre "(contexto global: lista, opcion,
 # opcion2)" ya no aplica.
+def ver_catalogo():
+    """
+    Muestra la disponibilidad de unidades.
+
+    Reutiliza `cd.ver_stock(1, 0)`, que arma con pandas el catalogo completo
+    como tabla (Req 8 del TP: reporte matricial).
+
+    Returns:
+        None
+    """
+    # Limpia la pantalla y delega en el CRUD para mostrar el catalogo.   
+    cd.limpiar()
+    cd.ver_stock(1,0)
+
 def informe_disponibilidad():
     """
     Muestra la disponibilidad de unidades.
@@ -253,7 +267,7 @@ def informe_disponibilidad():
     """
     # Limpia la pantalla y delega en el CRUD para mostrar el catalogo.
     cd.limpiar()
-    cd.ver_stock(1,0)
+    cd.ver_stock(1,1)
 
 def estado_rentas():
     """
@@ -417,24 +431,29 @@ def submenu_empresa():
     while True:
         cd.limpiar()
         print("--- SUBMENÚ: INFORMES ---\n")
-        print("[1] Disponibilidad de unidades")
-        print("[2] Estadisticas del mes")
-        print("[3] Estado de autos rentados")
+        print("[1] Ver STOCK completo")
+        print("[2] Autos Disponibles")
+        print("[3] Autos rentados")
+        print("[4] Estadísticas generales")
+        print("-------------------------------")
         print("[0] Volver al menú principal")
 
         try: opcion : str = input("\nSeleccione una opción: ").strip()
         except: opcion : str = ""
 
         if opcion == "1":
+            # Estado de los autos rentados: usa pandas (Req 8).
+            ver_catalogo()
+        elif opcion == "2":
             # Disponibilidad: ya arma un reporte matricial con pandas (Req 8).
             informe_disponibilidad()
-        elif opcion == "2":
+        elif opcion == "3":
             # NOTA (pendiente): informe_estadisticas() sigue siendo un stub
             # (imprime "hola"); falta el reporte matricial (Req 8).
-            informe_estadisticas()
-        elif opcion == "3":
-            # Estado de los autos rentados: usa pandas (Req 8).
             estado_rentas()
+        elif opcion == "4":
+            # Estado de los autos rentados: usa pandas (Req 8).
+            informe_estadisticas()
         elif opcion == "0":
             # Volver al menu principal.
             break

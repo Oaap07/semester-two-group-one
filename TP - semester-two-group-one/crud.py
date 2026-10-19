@@ -26,6 +26,7 @@ excepciones, ademas de los requisitos minimos del programa.
 import json, os
 import informe as inf
 import pandas as pd
+import matplotlib as mt
 
 
 # ==========================================
@@ -295,6 +296,7 @@ def ver_stock(base,rentados):
     limpiar()
     autos : dict = _cargar_autos()
 
+    input("Te metes a los condicionales")
     # --- MODO 1: catalogo completo (base=1, rentados=0) ---
     if base == 1 and rentados == 0:
         # Recorre el catalogo preparando los campos para mostrarlos en la tabla.
@@ -317,12 +319,26 @@ def ver_stock(base,rentados):
             if autos[i].get("estado") == True:
                 continue 
             
-            # --- RENTADOS ---
-            
-            # Formatea los campos solo para los autos que si se van a mostrar.
             auto_visual["estado"] = "ocupado"
             auto_visual["precio"] = "$" + str(auto_visual["precio"])
             autos_rentados[i] = auto_visual
+    elif base == 1 and rentados == 1:
+            # Diccionario auxiliar con SOLO los autos que NO estan disponibles.
+            autos_disponibles = {}
+            # Recorre todo el catalogo, pero solo procesa los autos rentados.
+            
+            for i in autos:
+                # Copia el auto para no modificar el original del catalogo.
+                auto_visual = autos[i].copy()
+                # Usa .get(): si el estado es True (disponible), lo saltea.
+                if autos[i].get("estado") == False:
+                    continue
+        
+                # --- DISPONIBLES ---
+                # Formatea los campos solo para los autos que si se van a mostrar.
+                auto_visual["estado"] = "disponible"
+                auto_visual["precio"] = "$" + str(auto_visual["precio"])
+                autos_disponibles[i] = auto_visual
     # BUG (UnboundLocalError): con otra combinacion (por ejemplo, ver_stock(0, 0)) no entra en ningun modo y
     # "autos_rentados" queda sin definir -> UnboundLocalError (subclase de NameError) en la linea del DataFrame de
     # abajo.
@@ -330,8 +346,9 @@ def ver_stock(base,rentados):
     # Arma un DataFrame de pandas: si base == 1 usa el catalogo completo; si no,
     # usa el diccionario de rentados. Las patentes quedan como columnas y los
     # atributos como filas; el .T deja una fila por auto.
-    autos_excel_modificado = pd.DataFrame(autos if base == 1 else autos_rentados)
-    
+    input("Te metes al try")
+    try: autos_excel_modificado = pd.DataFrame(autos if base == 1 and rentados == 0 else (autos_disponibles if base == 1 and rentados == 1 else autos_rentados))
+    except Exception: input(autos_excel_modificado)
     # BUG (logica): en el modo rentados se controla "autos" (no "autos_rentados"), asi que si no hay autos rentados se
     # muestra una tabla vacia en vez del aviso.
     # RECOMENDACION (Req 8): controlar "autos_rentados" para que el informe de rentados avise correctamente cuando no
@@ -347,9 +364,8 @@ def ver_stock(base,rentados):
     print("--"*39)
     
     try: 
-        res = input("[q] Para salir: ")
-        if res == "q":
-            return
+        input("Presione cualquier tecla para salir: ")
+        return
     except: pass
 
 

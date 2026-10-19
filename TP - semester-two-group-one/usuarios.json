@@ -1,0 +1,20 @@
+{
+    "95823279": {
+        "nombre": "Jorge Adrian Gonzalez Padron",
+        "clave": "1234",
+        "autos_rentados": [
+            "AH747LB",
+            "AF827OR"
+        ]
+    },
+    "4817866": {
+        "nombre": "Benjamin Nahuel Baez",
+        "clave": "1234",
+        "autos_rentados": []
+    },
+    "46280291": {
+        "nombre": "Juan Ignacio Cayla",
+        "clave": "1234",
+        "autos_rentados": []
+    }
+}
