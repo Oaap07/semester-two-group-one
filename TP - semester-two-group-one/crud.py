@@ -11,6 +11,17 @@ Objetivo del trabajo
 Aplicar los conocimientos vistos en clase sobre archivos/JSON y manejo de
 excepciones, ademas de los requisitos minimos del programa.
 """
+# ------------------------------------------------------------------
+# CUMPLIMIENTO DEL SPRINT - requisitos que aporta ESTE modulo:
+#   Req 1 (excepciones especificas) ....... PARCIAL (sobran except genericos)
+#   Req 2 (persistencia en JSON) .......... CUMPLIDO (autos.json / usuarios.json)
+#   Req 4 (tuplas en la logica) ........... CUMPLIDO (CALIDAD, MARCA, CATEGORIA, ESTADO)
+#   Req 6 (diccionario de diccionarios) .... CUMPLIDO (7 atributos por auto)
+#   Req 7 (menu con CRUD completo) ........ CUMPLIDO (Create / Read / Update / Delete)
+#   Req 8 (reporte matricial) ............. CUMPLIDO (ver_stock con pandas)
+# Los trabajos pendientes estan marcados en el codigo como "TODO(TP - Req N)" y las mejoras sugeridas como
+# "RECOMENDACION (Req N)".
+# ------------------------------------------------------------------
 
 import json, os
 import informe as inf
@@ -71,16 +82,16 @@ def _cargar_autos() -> dict:
         FileNotFoundError: Si el archivo autos.json no existe.
         OSError: Si ocurre un problema a nivel operativo
     """
-    # TODO(TP - Req 1): envolver en try/except para manejar apertura/lectura
-    # del archivo (FileNotFoundError, json.JSONDecodeError, OSError).
+    # TODO(TP - Req 1): envolver en try/except para manejar apertura/lectura del archivo (FileNotFoundError,
+    # json.JSONDecodeError, OSError).
     try: 
         with open(RUTA_AUTOS, "r", encoding="utf-8") as archivo:
             return json.load(archivo)
     except FileNotFoundError:
         return {}
     except OSError as e:
-        # BUG (TypeError): en caso de fallo no retorna nada (None); quien use el
-        # resultado como diccionario lanza TypeError (NoneType no es subscriptable).
+        # BUG (TypeError): en caso de fallo no retorna nada (None); quien use el resultado como diccionario lanza
+        # TypeError (NoneType no es subscriptable).
         limpiar()
         print(f"/// Ocurrió un error de sistema: {e} ///")
         input("[Enter] ")
@@ -101,8 +112,8 @@ def _guardar_autos(autos):
         OSError: Si ocurre un error al abrir o escribir el archivo.
         TypeError: Si algun valor no es serializable a JSON.
     """
-    # TODO(TP - Req 1): envolver en try/except para el guardado (OSError)
-    # y validar que 'autos' sea un diccionario antes de escribir.
+    # TODO(TP - Req 1): envolver en try/except para el guardado (OSError) y validar que 'autos' sea un diccionario antes
+    # de escribir.
     try:
         with open(RUTA_AUTOS, "w", encoding="utf-8") as archivo:
             json.dump(autos, archivo, indent=4, ensure_ascii=False)
@@ -160,8 +171,8 @@ def _pedir_entero(etiqueta, minimo, maximo):
     Returns:
         int: Numero entero valido ingresado por el usuario.
     """
-    # TODO(TP - Req 1): convertir con try/except (ValueError) en lugar de
-    # depender solo de .isdigit(), para un manejo de excepciones mas robusto.
+    # TODO(TP - Req 1): convertir con try/except (ValueError) en lugar de depender solo de .isdigit(), para un manejo de
+    # excepciones mas robusto.
     valor = input(f"{etiqueta} ({minimo}-{maximo}): ").strip()
     # Se repite mientras no sea un digito o este fuera del rango permitido.
     while not valor.isdigit() or not (minimo <= int(valor) <= maximo):
@@ -208,8 +219,8 @@ def _pedir_patente_existente(autos : dict) -> str:
     Returns:
         str: Patente existente, en mayusculas.
     """
-    # TODO(TP - Req 1): validar el tipo de 'autos' (dict) para evitar errores
-    # al manipular diccionarios si llega un valor inesperado.
+    # TODO(TP - Req 1): validar el tipo de 'autos' (dict) para evitar errores al manipular diccionarios si llega un
+    # valor inesperado.
     if not autos:
             print("\nNo hay autos en el catálogo.")
             try: input("[Enter] ")
@@ -244,10 +255,10 @@ def _mostrar_auto(patente, datos):
         patente (str): Patente del auto (clave del diccionario).
         datos (dict): Diccionario con los atributos del auto.
     """
-    # TODO(TP - Req 1): proteger el acceso a claves con try/except (KeyError)
-    # por si al auto le falta algun atributo en el JSON.
-    # NOTA (dato agregado): tambien imprime el "estado"; si el auto no tiene esa
-    # clave (por ejemplo, uno creado con `agregar_auto`), la ultima linea lanza KeyError.
+    # TODO(TP - Req 1): proteger el acceso a claves con try/except (KeyError) por si al auto le falta algun atributo en
+    # el JSON.
+    # NOTA (dato agregado): tambien imprime el "estado"; si el auto no tiene esa clave (por ejemplo, uno creado con
+    # `agregar_auto`), la ultima linea lanza KeyError.
     print(f"\n[{patente}]")
     print(f"\tMarca: {datos['marca'].capitalize()}")
     print(f"\tModelo: {datos['modelo'].capitalize()}")
@@ -313,18 +324,19 @@ def ver_stock(base,rentados):
             auto_visual["estado"] = "ocupado"
             auto_visual["precio"] = "$" + str(auto_visual["precio"])
             autos_rentados[i] = auto_visual
-    # BUG (UnboundLocalError): con otra combinacion (por ejemplo, ver_stock(0, 0))
-    # no entra en ningun modo y "autos_rentados" queda sin definir ->
-    # UnboundLocalError (subclase de NameError) en la linea del DataFrame de abajo.
+    # BUG (UnboundLocalError): con otra combinacion (por ejemplo, ver_stock(0, 0)) no entra en ningun modo y
+    # "autos_rentados" queda sin definir -> UnboundLocalError (subclase de NameError) en la linea del DataFrame de
+    # abajo.
 
     # Arma un DataFrame de pandas: si base == 1 usa el catalogo completo; si no,
     # usa el diccionario de rentados. Las patentes quedan como columnas y los
     # atributos como filas; el .T deja una fila por auto.
     autos_excel_modificado = pd.DataFrame(autos if base == 1 else autos_rentados)
     
-    # Si el diccionario esta vacio, no hay nada para mostrar.
-    # NOTA: en el modo rentados se controla "autos" (no "autos_rentados"), asi
-    # que si no hay autos rentados se muestra una tabla vacia en vez del aviso.
+    # BUG (logica): en el modo rentados se controla "autos" (no "autos_rentados"), asi que si no hay autos rentados se
+    # muestra una tabla vacia en vez del aviso.
+    # RECOMENDACION (Req 8): controlar "autos_rentados" para que el informe de rentados avise correctamente cuando no
+    # hay unidades alquiladas.
     if not autos:
         print("\nNo hay autos en el catálogo.")
         try: input("[Enter] ")
@@ -356,8 +368,8 @@ def ver_auto():
         except: pass
         return
     patente = _pedir_patente_existente(autos)
-    # BUG (KeyError): si el usuario escribe "0" (o la funcion devuelve None),
-    # 'autos[patente]' no existe y lanza KeyError (sin try/except).
+    # BUG (KeyError): si el usuario escribe "0" (o la funcion devuelve None), 'autos[patente]' no existe y lanza
+    # KeyError (sin try/except).
     _mostrar_auto(patente, autos[patente])
     try: 
         input("\n Presiona ENTER para volver")
@@ -374,14 +386,15 @@ def open_autos():
     Returns:
         dict: Catalogo {patente: {atributos}}; o None si ocurre un error de sistema.
     """
+    # TODO(TP - Req 1): capturar tambien FileNotFoundError y json.JSONDecodeError, y validar el None antes de
+    # devolverlo.
     try:
         with open(inf.RUTA_AUTOS_JSON, 'r', encoding="utf-8") as archivo:
             lista_aut = json.load(archivo)
             return lista_aut
     except OSError as e:
-        # BUG (TypeError): devuelve None (sin valor); quien lo use como
-        # diccionario (por ejemplo menu.py) lanza TypeError. El Req 1 del TP
-        # pide manejo mas especifico.
+        # BUG (TypeError): devuelve None (sin valor); quien lo use como diccionario (por ejemplo menu.py) lanza
+        # TypeError. El Req 1 del TP pide manejo mas especifico.
         limpiar()
         print(f"/// Ocurrió un error de sistema: {e} ///")
         try: input("[Enter] ")
@@ -402,8 +415,8 @@ def open_usuarios():
             lista_usu = json.load(archivo)
         return lista_usu
     except OSError as e:
-        # BUG (TypeError): devuelve None; quien lo consuma como diccionario lanza
-        # TypeError (en menu.py el except generico lo oculta).
+        # BUG (TypeError): devuelve None; quien lo consuma como diccionario lanza TypeError (en menu.py el except
+        # generico lo oculta).
         limpiar()
         print(f"/// Ocurrió un error de sistema: {e} ///")
         try: input("[Enter] ")
@@ -417,8 +430,8 @@ def escribir_usuario(lista_usu):
     Args:
         lista_usu (dict): Diccionario completo de usuarios a guardar.
     """
-    # BUG (OSError): sin try/except; si el archivo no se puede escribir (permisos,
-    # disco lleno) el OSError se propaga y corta el programa.
+    # BUG (OSError): sin try/except; si el archivo no se puede escribir (permisos, disco lleno) el OSError se propaga y
+    # corta el programa.
     # TODO(TP - Req 1): envolver en try/except (OSError) para el guardado.
     with open(inf.RUTA_USUARIOS_JSON, 'w', encoding="utf-8") as archivo:
         json.dump(lista_usu, archivo, indent=4, ensure_ascii=False)
@@ -430,8 +443,7 @@ def escribir_auto(lista_aut):
     Args:
         lista_aut (dict): Diccionario completo de autos a guardar.
     """
-    # BUG (OSError): sin try/except; si el archivo no se puede escribir, el error
-    # se propaga y corta el programa.
+    # BUG (OSError): sin try/except; si el archivo no se puede escribir, el error se propaga y corta el programa.
     # TODO(TP - Req 1): envolver en try/except (OSError) para el guardado.
     with open(inf.RUTA_AUTOS_JSON, 'w', encoding="utf-8") as archivo:
         json.dump(lista_aut, archivo, indent=4, ensure_ascii=False)
@@ -449,8 +461,8 @@ def agregar_auto():
     autos = _cargar_autos()
 
     # Se pide la patente y se valida que no exista (una patente es unica).
-    # BUG (NameError): si el input falla (por ejemplo, EOFError), el except lo
-    # ignora y 'patente' queda sin definir -> NameError en la linea de abajo.
+    # BUG (NameError): si el input falla (por ejemplo, EOFError), el except lo ignora y 'patente' queda sin definir ->
+    # NameError en la linea de abajo.
     try: patente = input("Patente del nuevo auto: ").strip().upper()
     except: pass
     while patente in autos:
@@ -466,9 +478,10 @@ def agregar_auto():
     categoria = _pedir_de_tupla("Categoría: ", CATEGORIA)
 
     # Se crea el registro usando la patente como clave del diccionario.
-    # NOTA (dato faltante / posible error): esta alta no agrega la clave "estado",
-    # a diferencia de informe.informe_autos (que la inicializa en True). Sin
-    # "estado", `_mostrar_auto` y `ver_stock` lanzan KeyError al leer el auto.
+    # BUG (KeyError): esta alta no agrega la clave "estado", a diferencia de informe.informe_autos (que la inicializa en
+    # True). Sin "estado", `_mostrar_auto`, `ver_stock` y `rentar_auto` lanzan KeyError al leerlo.
+    # TODO(TP - Req 6): agregar "estado": True para respetar el esquema de 7 atributos por auto que exige la entidad del
+    # Req 6.
     autos[patente] = {
         "marca": marca,
         "modelo": modelo,
@@ -595,8 +608,8 @@ def eliminar_auto():
             return
 
     patente = _pedir_patente_existente(autos)
-    # BUG (KeyError): con la patente "0" (o None), 'del autos[patente]' intenta
-    # borrar una clave inexistente y lanza KeyError.
+    # BUG (KeyError): con la patente "0" (o None), 'del autos[patente]' intenta borrar una clave inexistente y lanza
+    # KeyError.
     # Se elimina el registro del diccionario y se guarda el estado actualizado.
     del autos[patente]
     _guardar_autos(autos)
@@ -623,8 +636,8 @@ def menu_crud():
         print("[5] Eliminar auto")
         print("[0] Salir")
         # TODO(TP - Req 1): manejar excepciones en el ingreso de datos.
-        # BUG (NameError): si el input falla, el except lo ignora y 'opcion' queda
-        # sin definir -> NameError en el despacho de mas abajo.
+        # BUG (NameError): si el input falla, el except lo ignora y 'opcion' queda sin definir -> NameError en el
+        # despacho de mas abajo.
         try: opcion = input("Seleccione una opción: ").strip()
         except: pass
 

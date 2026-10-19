@@ -5,6 +5,14 @@ Facultad de Ingenieria Informatica
 Modulo: usuarios.py - Logica de ingreso y registro de usuarios.
 Tema del trabajo: Administracion de una concesionaria (catalogo de autos + alquileres).
 """
+# ------------------------------------------------------------------
+# CUMPLIMIENTO DEL SPRINT - requisitos que aporta ESTE modulo:
+#   Req 1 (excepciones especificas) ....... PARCIAL (except genericos en el
+#                                             login y en el registro)
+#   Req 2 (persistencia en JSON) .......... CUMPLIDO (escribe usuarios.json)
+# Los trabajos pendientes estan marcados en el codigo como "TODO(TP - Req N)" y las mejoras sugeridas como
+# "RECOMENDACION (Req N)".
+# ------------------------------------------------------------------
 
 import json, os
 import informe as inf
@@ -69,6 +77,8 @@ def ingresa_usuario(lista):
                 elif clave_usu.strip() == "" : int(clave_usu)
                 else: break
             break
+        # TODO(TP - Req 1): capturar excepciones especificas (ValueError para int(input), TypeError si 'lista' es None);
+        # el except generico oculta cualquier fallo y solo muestra "[ERROR] Intente de nuevo.".
         except:
             print()
             print("[ERROR] Intente de nuevo.")
@@ -108,8 +118,8 @@ def registro_usuario(lista):
             print("--- REGISTRO: USUARIOS ---")
             print("[0] en cualquier campo para salir.\n")
             while True:
-                # NOTA (linea rota): "limpiar" sin parentesis NO ejecuta la
-                # funcion; falta limpiar().
+                # BUG (logica): "limpiar" sin parentesis NO ejecuta la funcion; solo se referencia el objeto funcion;
+                # falta limpiar().
                 limpiar
 
                 # NOTA (posible error): si el ingreso no es numerico se corta el
@@ -120,9 +130,8 @@ def registro_usuario(lista):
                 
                 if dni_usu == 0: return
                 elif len(str(dni_usu)) != 8:
-                    # NOTA (posible error): tras avisar, el "break" corta el bucle
-                    # pero NO sale de la funcion; el registro de mas abajo corre
-                    # igual y guarda el DNI invalido.
+                    # BUG (logica): tras avisar, el "break" corta el bucle pero NO sale de la funcion; el registro de
+                    # mas abajo corre igual y guarda un DNI invalido (por ejemplo, de 7 digitos).
                     print("\nDNI inválido, intente de nuevo.")
                     try: input("[Enter] ")
                     except: pass
@@ -145,6 +154,8 @@ def registro_usuario(lista):
                         else: clave_usu2 = input("|| Clave incorrecta, intente de nuevo: ")
                 # Sale del bucle interior tras un intento correcto.
                 break  
+        # TODO(TP - Req 1): except generico; capturar excepciones especificas (ValueError para int(input)) en lugar de
+        # tragar cualquier error.
         except:
             print()
             print("[ERROR] Intente de nuevo.")
@@ -153,8 +164,8 @@ def registro_usuario(lista):
         # Sale del bucle exterior (el registro corre una sola vez).
         break
 
-    # NOTA (posible error): si se salio por los "break" anteriores, "dni_usu",
-    # "nombre_usu" y/o "clave_usu" pueden no existir y esto lanza NameError.
+    # BUG (NameError): si se salio por los "break" anteriores, "dni_usu", "nombre_usu" y/o "clave_usu" pueden no existir
+    # y esto lanza NameError.
     lista[str(dni_usu)] = {
         "nombre": nombre_usu,
         "clave": clave_usu,
@@ -162,6 +173,8 @@ def registro_usuario(lista):
     }
 
     # Guarda el diccionario completo de usuarios en el archivo JSON.
+    # BUG (OSError): sin try/except; si el archivo no se puede escribir, el OSError se propaga y corta el programa.
+    # TODO(TP - Req 1): envolver en try/except (OSError) para el guardado.
     with open(inf.RUTA_USUARIOS_JSON, "w", encoding="utf-8") as f:
         json.dump(lista, f, indent=4, ensure_ascii=False)
     

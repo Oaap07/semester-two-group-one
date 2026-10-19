@@ -5,6 +5,16 @@ Tema del trabajo: Administracion de una concesionaria (catalogo de autos + alqui
 Reune constantes compartidas (marcas, categorias, rutas y campos permitidos) y
 las funciones que generan el catalogo de autos y el archivo de usuarios.
 """
+# ------------------------------------------------------------------
+# CUMPLIMIENTO DEL SPRINT - requisitos que aporta ESTE modulo:
+#   Req 2 (persistencia en JSON) .......... CUMPLIDO (rutas y creacion de archivos)
+#   Req 3 (precarga >= 5 registros) ........ CUMPLIDO (25 autos); observacion:
+#                                             ignora 'cant_autos' (ver TODO)
+#   Req 4 (tuplas en la logica) ........... CUMPLIDO (MARCAS, CALIDADES, ANIOS, CATEGORIAS)
+#   Req 5 (listas por comprension) ........ CUMPLIDO (categoria en informe_autos)
+# Los trabajos pendientes estan marcados en el codigo como "TODO(TP - Req N)" y las mejoras sugeridas como
+# "RECOMENDACION (Req N)".
+# ------------------------------------------------------------------
 
 import json
 import random
@@ -20,13 +30,16 @@ AUTOS : dict[tuple] = {
 # Marcas disponibles: claves del diccionario AUTOS.
 MARCAS: tuple = tuple(AUTOS.keys())
 # Calidades permitidas de un auto.
-# NOTA (dato desactualizado): los autos ya cargados en autos.json usan la
-# calidad "como nuevo", que ya no figura aqui; validar con esta tupla rechaza
-# ese valor.
+# BUG (logica): los autos ya cargados en autos.json usan la calidad "como nuevo", que NO figura en esta tupla; validar
+# con _pedir_de_tupla rechaza ese valor.
+# RECOMENDACION (Req 2 / Req 6): sumar "como nuevo" a la tupla (o migrar los datos) para que el CRUD valide lo que
+# realmente existe en el JSON.
 CALIDADES: tuple = ("nuevo", "cuidado", "usado")
 # Valores permitidos para el estado, como texto.
-# NOTA (mezcla de tipos): informe_autos guarda "estado" como booleano (True),
-# mientras que esta tupla (usada por el CRUD) usa los textos "true"/"false".
+# NOTA (mezcla de tipos): informe_autos guarda "estado" como booleano (True), mientras que esta tupla (usada por el
+# CRUD) usa los textos "true"/"false".
+# RECOMENDACION (Req 2): unificar el formato (usar siempre True/False) y eliminar esta tupla, o convertir el valor al
+# leerlo; hoy conviven dos representaciones.
 DISPONIBLE:tuple = ("true", "false")
 # Rango de anios permitidos (inclusive).
 ANIOS: tuple = (2000, 2026)
@@ -97,6 +110,8 @@ def informe_autos(
     """
     listado = {}
     # NOTA (parametro ignorado): se fuerza la cantidad a 25, sin usar 'cant_autos'.
+    # TODO(TP - Req 3): respetar el parametro 'cant_autos' y validar que sea >= 5 (el Req 3 pide precargar al menos 5
+    # registros); hoy siempre genera 25.
     cant_autos = 25
     # Genera cada auto: patente, precio y atributos aleatorios.
     for _ in range(1, cant_autos + 1):
@@ -123,6 +138,10 @@ def informe_autos(
                     patente += (random.choice(numeros))
                     contador += 1
             patente = patente.upper()
+        # BUG (logica): si una patente generada al azar se repite, se sobreescribe en 'listado' y quedan menos autos de
+        # los pedidos (puede bajar de los 5 minimos que pide el Req 3).
+        # RECOMENDACION (Req 3): generar la patente en un while mientras exista en 'listado', para garantizar unicidad y
+        # la cantidad pedida.
         # Precio base de 90 u$d, con descuento por antiguedad.
         precio = 90
 
@@ -140,8 +159,8 @@ def informe_autos(
             "año": anio,
             "precio": precio,
             # Lista por comprension: busca la categoria a la que pertenece el modelo.
-            # BUG (IndexError): si 'modelo' no estuviera en ninguna categoria, la
-            # lista queda vacia y el [0] lanza IndexError.
+            # BUG (IndexError): si 'modelo' no estuviera en ninguna categoria, la lista queda vacia y el [0] lanza
+            # IndexError.
             "categoria": [i for i in categorias_modelos if modelo in categorias_modelos[i]][0],
             # Estado inicial: disponible (True).
             "estado": True
@@ -160,8 +179,8 @@ def informe_autos(
     try: input("[Enter] ")
     except: pass
 
-    # BUG (TypeError): la funcion esta anotada "-> dict" pero retorna None; si el
-    # llamador usa el resultado como diccionario, lanza TypeError.
+    # BUG (TypeError): la funcion esta anotada "-> dict" pero retorna None; si el llamador usa el resultado como
+    # diccionario, lanza TypeError.
     return
 
 
@@ -177,8 +196,10 @@ def informe_usuarios(
         dict: Diccionario sin usuarios
     """
 
-    # NOTA (docstring desactualizado): no crea un diccionario vacio; si el
-    # archivo no existe, deja un usuario de ejemplo precargado.
+    # NOTA (docstring desactualizado): no crea un diccionario vacio; si el archivo no existe, deja un usuario de ejemplo
+    # precargado.
+    # RECOMENDACION (Req 3): precargar al menos 5 usuarios de ejemplo (ademas del DNI 10101010) para poder probar
+    # ingreso y registro sin registrarlos a mano.
     listado = {}
     
     try:
@@ -207,12 +228,14 @@ if __name__ == "__main__":
     limpiar()
     try:
         # Intento de generar un informe inicial al arrancar el programa.
-        # TODO(TP - Req 1): usar manejo de excepciones especifico
-        # (FileNotFoundError, JSONDecodeError) en lugar de 'except' generico.
+        # TODO(TP - Req 1): usar manejo de excepciones especifico (FileNotFoundError, JSONDecodeError) en lugar de
+        # 'except' generico.
         informe_autos(RUTA_AUTOS_JSON, 25)
         print()
         informe_usuarios(RUTA_USUARIOS_JSON)
     except:
         # Si falla (archivo faltante, formato invalido, etc.) se continua igual.
+        # TODO(TP - Req 1): capturar excepciones especificas (FileNotFoundError, json.JSONDecodeError, OSError) en lugar
+        # del except generico.
         pass
     limpiar()

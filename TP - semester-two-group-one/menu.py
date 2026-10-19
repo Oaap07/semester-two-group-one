@@ -5,9 +5,20 @@ Facultad de Ingenieria Informatica
 Modulo: menu.py - Menu principal, alquileres y navegacion.
 Tema del trabajo: Administracion de una concesionaria (catalogo de autos + alquileres).
 """
+# ------------------------------------------------------------------
+# CUMPLIMIENTO DEL SPRINT - requisitos que aporta ESTE modulo:
+#   Req 1 (excepciones especificas) ....... PARCIAL (sobran except genericos)
+#   Req 4 (tuplas / conjuntos) ............ CUMPLIDO (sets en rentar_auto)
+#   Req 5 (listas por comprension) ........ CUMPLIDO (filtros de modelos y patentes)
+#   Req 7 (menu con CRUD completo) ........ CUMPLIDO (menu_principal y submenus)
+#   Req 8 (reporte matricial) ............. PARCIAL (falta informe_estadisticas)
+# Los trabajos pendientes estan marcados en el codigo como "TODO(TP - Req N)" y las mejoras sugeridas como
+# "RECOMENDACION (Req N)".
+# ------------------------------------------------------------------
 
 # NOTA (imports sin uso): 'json' y 'informe as inf' no se usan en este modulo
 # (se podrian quitar). 'os' si se usa en limpiar().
+# RECOMENDACION: quitar 'json' e 'informe as inf' (imports sin uso) al cerrar el sprint.
 import json, os
 import informe as inf
 import crud as cd
@@ -85,14 +96,13 @@ def rentar_auto(usu_info, lista_usu, lista_aut):
                 limpiar()
                 print(f"--- Modelos disponibles --- [{usu_info[1]}]\n")
 
-                # Filtra modelos unicos disponibles de la categoria elegida.
-                # Se considera "disponible" si pertenece a la categoria y su
-                # patente NO esta en 'rentados'. Es una lista por comprension
-                # que alimenta un conjunto (set) para eliminar duplicados.
+                # Filtra modelos unicos disponibles de la categoria elegida. Se considera "disponible" si pertenece a la
+                # categoria y su patente NO esta en 'rentados'. Es una lista por comprension que alimenta un conjunto
+                # (set) para eliminar duplicados.
                 # TODO(TP - Req 5): esta comprension es un uso valido del requisito.
-                # BUG (KeyError): si un auto no tiene la clave "estado" (por ejemplo,
-                # uno dado de alta con `agregar_auto`) o "categoria", esta comprension
-                # lanza KeyError. Ademas, si 'lista_aut' es None, lanza TypeError.
+                # BUG (KeyError): si un auto no tiene la clave "estado" (por ejemplo, uno dado de alta con
+                # `agregar_auto`) o "categoria", esta comprension lanza KeyError. Ademas, si 'lista_aut' es None, lanza
+                # TypeError.
                 filtrados = {str(i+1): j.capitalize() for i ,j in enumerate(list({lista_aut[i]["modelo"] for i in lista_aut if lista_aut[i]["categoria"] == categ_preset[opcion] and lista_aut[i]["estado"] == True }))}
 
                 # Si no quedan modelos disponibles, se avisa y se vuelve a categorias.
@@ -125,8 +135,7 @@ def rentar_auto(usu_info, lista_usu, lista_aut):
                             limpiar()
                             print(f"--- PATENTES con Modelo: {filtrados[opcion2]}---  [{usu_info[1]}]")
 
-                            # Lista por comprension: patentes de ese modelo que
-                            # todavia no estan rentadas.
+                            # Lista por comprension: patentes de ese modelo que todavia no estan rentadas.
                             # TODO(TP - Req 5): otro uso de lista por comprension.
                             patentes = [i for i in lista_aut.keys() if lista_aut[i]["modelo"].capitalize() == filtrados[opcion2] and lista_aut[i]["estado"] == True]
 
@@ -199,8 +208,8 @@ def devolver_auto(usu_info, lista_usu):
     while True:
         limpiar()
         print(f"--- Autos rentados --- [{usu_info[1]}]\n")
-        # BUG (KeyError): si el DNI ('usu_info[0]') no esta en 'lista_usu', o al
-        # usuario le falta la clave "autos_rentados", este acceso lanza KeyError.
+        # BUG (KeyError): si el DNI ('usu_info[0]') no esta en 'lista_usu', o al usuario le falta la clave
+        # "autos_rentados", este acceso lanza KeyError.
         for i, j in enumerate(lista_usu[usu_info[0]]["autos_rentados"]):
             print(f"\n[{i+1}]:Patente[{j}]\n")
         print("-------------------------")
@@ -277,6 +286,8 @@ def informe_estadisticas():
         None
     """
     # TODO(TP - Req 8): calcular y mostrar las estadisticas.
+    # RECOMENDACION (Req 8): armar la matriz con pandas igual que en ver_stock, por ejemplo un DataFrame con filas =
+    # categoria y columnas = cantidad de autos disponibles y rentados, impreso con .T (reporte matricial).
     print("hola")
 
 def menu_principal():   
@@ -309,6 +320,8 @@ def menu_principal():
                 print("\nOpción no válida. Intente de nuevo.")
                 try: input("[Enter] ")
                 except: pass
+        # TODO(TP - Req 1): reemplazar el except generico por excepciones especificas (por ejemplo ValueError para
+        # int(input)); hoy cualquier fallo se traga y el menu parece no responder.
         except: opcion : str = ""
 
 def submenu_usuario():
@@ -333,10 +346,9 @@ def submenu_usuario():
             opcion : str = input("\nSeleccione una opción: ").strip()
             
             if opcion == "1":
-                # BUG (TypeError): si usuarios.json no existe, open_usuarios()
-                # devuelve None e ingresa_usuario(None) falla al evaluar
-                # 'dni_usu not in lista'; el except generico de mas abajo lo
-                # oculta y el login queda en un bucle de "[ERROR] Intente de nuevo.".
+                # BUG (TypeError): si usuarios.json no existe, open_usuarios() devuelve None e ingresa_usuario(None)
+                # falla al evaluar 'dni_usu not in lista'; el except generico de mas abajo lo oculta y el login queda en
+                # un bucle de "[ERROR] Intente de nuevo.".
                 lista_usu = cd.open_usuarios()
                 usu_info = us.ingresa_usuario(lista_usu)
                 # NOTA (linea sin efecto): "if not usu_info: usu_info" no hace
@@ -359,6 +371,8 @@ def submenu_usuario():
                 print("\nOpción no válida. Intente de nuevo.")
                 try: input("[Enter] ")
                 except: pass
+        # TODO(TP - Req 1): except generico; capturar excepciones especificas (ValueError, OSError, TypeError) para no
+        # ocultar los errores de arriba.
         except: opcion = ""
 
 
@@ -393,6 +407,8 @@ def submenu_usuario():
                 print("\nOpción no válida. Intente de nuevo.")
                 try: input("[Enter] ")
                 except: pass
+        # TODO(TP - Req 1): except generico; conviene capturar excepciones especificas para no tragar errores de
+        # rentar_auto / devolver_auto.
         except: 
             opcion : str = ""
 
