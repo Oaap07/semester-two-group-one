@@ -140,6 +140,8 @@ def informe_autos(
             "año": anio,
             "precio": precio,
             # Lista por comprension: busca la categoria a la que pertenece el modelo.
+            # BUG (IndexError): si 'modelo' no estuviera en ninguna categoria, la
+            # lista queda vacia y el [0] lanza IndexError.
             "categoria": [i for i in categorias_modelos if modelo in categorias_modelos[i]][0],
             # Estado inicial: disponible (True).
             "estado": True
@@ -158,6 +160,8 @@ def informe_autos(
     try: input("[Enter] ")
     except: pass
 
+    # BUG (TypeError): la funcion esta anotada "-> dict" pero retorna None; si el
+    # llamador usa el resultado como diccionario, lanza TypeError.
     return
 
 

@@ -79,8 +79,8 @@ def _cargar_autos() -> dict:
     except FileNotFoundError:
         return {}
     except OSError as e:
-        # NOTA (posible error): en caso de fallo no se retorna nada (None), por
-        # lo que quien use esta funcion como diccionario puede romper.
+        # BUG (TypeError): en caso de fallo no retorna nada (None); quien use el
+        # resultado como diccionario lanza TypeError (NoneType no es subscriptable).
         limpiar()
         print(f"/// Ocurrió un error de sistema: {e} ///")
         input("[Enter] ")
@@ -313,9 +313,9 @@ def ver_stock(base,rentados):
             auto_visual["estado"] = "ocupado"
             auto_visual["precio"] = "$" + str(auto_visual["precio"])
             autos_rentados[i] = auto_visual
-    # NOTA (posible error): si se llama con otra combinacion (por ejemplo,
-    # ver_stock(0, 0)), no entra en ningun modo y "autos_rentados" queda sin
-    # definir -> NameError en la linea del DataFrame de mas abajo.
+    # BUG (UnboundLocalError): con otra combinacion (por ejemplo, ver_stock(0, 0))
+    # no entra en ningun modo y "autos_rentados" queda sin definir ->
+    # UnboundLocalError (subclase de NameError) en la linea del DataFrame de abajo.
 
     # Arma un DataFrame de pandas: si base == 1 usa el catalogo completo; si no,
     # usa el diccionario de rentados. Las patentes quedan como columnas y los
@@ -356,6 +356,8 @@ def ver_auto():
         except: pass
         return
     patente = _pedir_patente_existente(autos)
+    # BUG (KeyError): si el usuario escribe "0" (o la funcion devuelve None),
+    # 'autos[patente]' no existe y lanza KeyError (sin try/except).
     _mostrar_auto(patente, autos[patente])
     try: 
         input("\n Presiona ENTER para volver")
@@ -377,8 +379,9 @@ def open_autos():
             lista_aut = json.load(archivo)
             return lista_aut
     except OSError as e:
-        # NOTA (posible error): devuelve None (sin valor). Quien lo use como
-        # diccionario puede romper; el Req 1 del TP pide manejo mas especifico.
+        # BUG (TypeError): devuelve None (sin valor); quien lo use como
+        # diccionario (por ejemplo menu.py) lanza TypeError. El Req 1 del TP
+        # pide manejo mas especifico.
         limpiar()
         print(f"/// Ocurrió un error de sistema: {e} ///")
         try: input("[Enter] ")
@@ -399,7 +402,8 @@ def open_usuarios():
             lista_usu = json.load(archivo)
         return lista_usu
     except OSError as e:
-        # NOTA (posible error): devuelve None; manejar en quien lo consuma.
+        # BUG (TypeError): devuelve None; quien lo consuma como diccionario lanza
+        # TypeError (en menu.py el except generico lo oculta).
         limpiar()
         print(f"/// Ocurrió un error de sistema: {e} ///")
         try: input("[Enter] ")
@@ -413,6 +417,8 @@ def escribir_usuario(lista_usu):
     Args:
         lista_usu (dict): Diccionario completo de usuarios a guardar.
     """
+    # BUG (OSError): sin try/except; si el archivo no se puede escribir (permisos,
+    # disco lleno) el OSError se propaga y corta el programa.
     # TODO(TP - Req 1): envolver en try/except (OSError) para el guardado.
     with open(inf.RUTA_USUARIOS_JSON, 'w', encoding="utf-8") as archivo:
         json.dump(lista_usu, archivo, indent=4, ensure_ascii=False)
@@ -424,6 +430,8 @@ def escribir_auto(lista_aut):
     Args:
         lista_aut (dict): Diccionario completo de autos a guardar.
     """
+    # BUG (OSError): sin try/except; si el archivo no se puede escribir, el error
+    # se propaga y corta el programa.
     # TODO(TP - Req 1): envolver en try/except (OSError) para el guardado.
     with open(inf.RUTA_AUTOS_JSON, 'w', encoding="utf-8") as archivo:
         json.dump(lista_aut, archivo, indent=4, ensure_ascii=False)
@@ -441,6 +449,8 @@ def agregar_auto():
     autos = _cargar_autos()
 
     # Se pide la patente y se valida que no exista (una patente es unica).
+    # BUG (NameError): si el input falla (por ejemplo, EOFError), el except lo
+    # ignora y 'patente' queda sin definir -> NameError en la linea de abajo.
     try: patente = input("Patente del nuevo auto: ").strip().upper()
     except: pass
     while patente in autos:
@@ -585,6 +595,8 @@ def eliminar_auto():
             return
 
     patente = _pedir_patente_existente(autos)
+    # BUG (KeyError): con la patente "0" (o None), 'del autos[patente]' intenta
+    # borrar una clave inexistente y lanza KeyError.
     # Se elimina el registro del diccionario y se guarda el estado actualizado.
     del autos[patente]
     _guardar_autos(autos)
@@ -611,6 +623,8 @@ def menu_crud():
         print("[5] Eliminar auto")
         print("[0] Salir")
         # TODO(TP - Req 1): manejar excepciones en el ingreso de datos.
+        # BUG (NameError): si el input falla, el except lo ignora y 'opcion' queda
+        # sin definir -> NameError en el despacho de mas abajo.
         try: opcion = input("Seleccione una opción: ").strip()
         except: pass
 

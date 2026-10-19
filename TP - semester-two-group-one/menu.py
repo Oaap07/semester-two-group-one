@@ -90,6 +90,9 @@ def rentar_auto(usu_info, lista_usu, lista_aut):
                 # patente NO esta en 'rentados'. Es una lista por comprension
                 # que alimenta un conjunto (set) para eliminar duplicados.
                 # TODO(TP - Req 5): esta comprension es un uso valido del requisito.
+                # BUG (KeyError): si un auto no tiene la clave "estado" (por ejemplo,
+                # uno dado de alta con `agregar_auto`) o "categoria", esta comprension
+                # lanza KeyError. Ademas, si 'lista_aut' es None, lanza TypeError.
                 filtrados = {str(i+1): j.capitalize() for i ,j in enumerate(list({lista_aut[i]["modelo"] for i in lista_aut if lista_aut[i]["categoria"] == categ_preset[opcion] and lista_aut[i]["estado"] == True }))}
 
                 # Si no quedan modelos disponibles, se avisa y se vuelve a categorias.
@@ -184,7 +187,7 @@ def devolver_auto(usu_info, lista_usu):
         usu_info (list): [dni, nombre, autos_rentados] del usuario logueado.
         lista_usu (dict): Todos los usuarios (para guardar la devolucion).
 
-    NOTA (cambio de firma): la version anterior tambien recibia 'lista_aut' (el
+    NOTA: la version anterior tambien recibia 'lista_aut' (el
     catalogo), pero ya no se usa porque el estado se cambia directo en el archivo.
     submenu_usuario ya la llama con los 2 argumentos correctos.
 
@@ -196,6 +199,8 @@ def devolver_auto(usu_info, lista_usu):
     while True:
         limpiar()
         print(f"--- Autos rentados --- [{usu_info[1]}]\n")
+        # BUG (KeyError): si el DNI ('usu_info[0]') no esta en 'lista_usu', o al
+        # usuario le falta la clave "autos_rentados", este acceso lanza KeyError.
         for i, j in enumerate(lista_usu[usu_info[0]]["autos_rentados"]):
             print(f"\n[{i+1}]:Patente[{j}]\n")
         print("-------------------------")
@@ -328,6 +333,10 @@ def submenu_usuario():
             opcion : str = input("\nSeleccione una opción: ").strip()
             
             if opcion == "1":
+                # BUG (TypeError): si usuarios.json no existe, open_usuarios()
+                # devuelve None e ingresa_usuario(None) falla al evaluar
+                # 'dni_usu not in lista'; el except generico de mas abajo lo
+                # oculta y el login queda en un bucle de "[ERROR] Intente de nuevo.".
                 lista_usu = cd.open_usuarios()
                 usu_info = us.ingresa_usuario(lista_usu)
                 # NOTA (linea sin efecto): "if not usu_info: usu_info" no hace
@@ -430,10 +439,6 @@ def submenu_empresa():
             except: pass
 
 if __name__ == "__main__":
-    # Inicio de la aplicacion.
-    # NOTA (datos): menu.py NO genera autos.json ni usuarios.json; asume que ya
-    # existen (se crean ejecutando 'python informe.py'). Si faltan, open_autos()
-    # y open_usuarios() devuelven None y el sistema falla al ingresar/rentar.
     limpiar()
     menu_principal()
     limpiar()
