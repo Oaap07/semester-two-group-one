@@ -164,8 +164,8 @@ def registro_usuario(lista):
         # Sale del bucle exterior (el registro corre una sola vez).
         break
 
-    # BUG (NameError): si se salio por los "break" anteriores, "dni_usu", "nombre_usu" y/o "clave_usu" pueden no existir
-    # y esto lanza NameError.
+    # BUG (NameError): si se salio por los "break" anteriores, "dni_usu", "nombre_usu" y/o "clave_usu" pueden no
+    # existir y esto lanza NameError.
     lista[str(dni_usu)] = {
         "nombre": nombre_usu,
         "clave": clave_usu,

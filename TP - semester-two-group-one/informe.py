@@ -189,8 +189,8 @@ def informe_usuarios(
         dict: Diccionario sin usuarios
     """
 
-    # NOTA (docstring desactualizado): no crea un diccionario vacio; si el archivo no existe, deja un usuario de ejemplo
-    # precargado.
+    # NOTA (docstring desactualizado): no crea un diccionario vacio; si el archivo no existe, deja un usuario de
+    # ejemplo precargado.
     # RECOMENDACION (Req 3): precargar al menos 5 usuarios de ejemplo (ademas del DNI 10101010) para poder probar
     # ingreso y registro sin registrarlos a mano.
     listado = {}

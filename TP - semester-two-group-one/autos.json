@@ -1,13 +1,4 @@
 {
-    "AI866EO": {
-        "marca": "chevrolet",
-        "modelo": "tracker",
-        "calidad": "nuevo",
-        "año": 2026,
-        "precio": 90,
-        "categoria": "suv_crossover",
-        "estado": true
-    },
     "JIA737": {
         "marca": "peugeot",
         "modelo": "408",
@@ -195,7 +186,7 @@
         "año": 2025,
         "precio": 87.5,
         "categoria": "monovolumen_mpv",
-        "estado": false
+        "estado": true
     },
     "SYÑ770": {
         "marca": "fiat",
@@ -213,7 +204,7 @@
         "año": 2022,
         "precio": 80.0,
         "categoria": "sedan_hatchback",
-        "estado": false
+        "estado": true
     },
     "BZO620": {
         "marca": "toyota",

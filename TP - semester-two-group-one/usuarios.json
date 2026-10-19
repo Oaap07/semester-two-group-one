@@ -2,10 +2,7 @@
     "95823279": {
         "nombre": "Jorge Adrian Gonzalez Padron",
         "clave": "1234",
-        "autos_rentados": [
-            "AH747LB",
-            "AF827OR"
-        ]
+        "autos_rentados": []
     },
     "4817866": {
         "nombre": "Benjamin Nahuel Baez",

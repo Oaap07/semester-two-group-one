@@ -13,7 +13,7 @@ excepciones, ademas de los requisitos minimos del programa.
 """
 # ------------------------------------------------------------------
 # CUMPLIMIENTO DEL SPRINT - requisitos que aporta ESTE modulo:
-#   Req 1 (excepciones especificas) ....... PARCIAL (sobran except genericos)
+#   Req 1 (excepciones especificas) ....... CUMPLIDO (except especificos y entradas validadas)
 #   Req 2 (persistencia en JSON) .......... CUMPLIDO (autos.json / usuarios.json)
 #   Req 4 (tuplas en la logica) ........... CUMPLIDO (CALIDAD, MARCA, CATEGORIA, ESTADO)
 #   Req 6 (diccionario de diccionarios) .... CUMPLIDO (7 atributos por auto)
@@ -66,6 +66,30 @@ def limpiar():
     """
     os.system('cls' if os.name == 'nt' else 'clear')
 
+
+# ---------- Utilidades de entrada ----------
+
+def _entrada(mensaje: str = "") -> str | None:
+    """
+    Lee una linea por teclado manejando el fin de entrada (EOFError).
+
+    Centraliza la lectura de datos para no repetir un try/except en cada prompt
+    y evita que un cierre de la entrada (Ctrl+Z en Windows, Ctrl+D en Linux)
+    corte el programa o deje variables sin definir.
+
+    Args:
+        mensaje (str): Texto del prompt que se muestra al usuario.
+
+    Returns:
+        str | None: El texto ingresado, recortado con strip(); o None si no hay
+        mas entrada (EOFError), para que quien llama pueda salir ordenadamente.
+    """
+    try:
+        return input(mensaje).strip()
+    except EOFError:
+        return None
+
+
 # ---------- Persistencia ----------
 
 def _cargar_autos() -> dict:
@@ -78,27 +102,34 @@ def _cargar_autos() -> dict:
 
     Returns:
         dict: Estructura {patente: {marca, modelo, calidad, ano, precio, categoria}, ...}.
+        Devuelve {} si el archivo no existe, no es JSON valido, no es un
+        diccionario o hay un error de sistema; nunca devuelve None.
 
-    Raises:
-        FileNotFoundError: Si el archivo autos.json no existe.
-        OSError: Si ocurre un problema a nivel operativo
+    Nota:
+        No propaga excepciones: FileNotFoundError, json.JSONDecodeError y OSError
+        se manejan internamente y se informan por pantalla.
     """
     # RESUELTO (Req 1): la lectura se maneja con excepciones especificas; FileNotFoundError y json.JSONDecodeError
     # devuelven un diccionario vacio y OSError informa el error de sistema. Siempre retorna un dict.
     try:
         with open(RUTA_AUTOS, "r", encoding="utf-8") as archivo:
-            return json.load(archivo)
+            contenido = json.load(archivo)
+        # Validacion: el JSON debe ser un diccionario (patente -> atributos).
+        if not isinstance(contenido, dict):
+            print("/// El archivo de autos no tiene la estructura esperada (dict). ///")
+            return {}
+        return contenido
     except FileNotFoundError:
         return {}
     except json.JSONDecodeError:
         limpiar()
         print("/// El archivo de autos no tiene un formato JSON válido. ///")
-        input("[Enter] ")
+        _entrada("[Enter] ")
         return {}
     except OSError as e:
         limpiar()
         print(f"/// Ocurrió un error de sistema: {e} ///")
-        input("[Enter] ")
+        _entrada("[Enter] ")
         return {}
 
 
@@ -113,24 +144,34 @@ def _guardar_autos(autos):
     Args:
         autos (dict): Diccionario con el catalogo a guardar.
 
-    Raises:
-        OSError: Si ocurre un error al abrir o escribir el archivo.
-        TypeError: Si algun valor no es serializable a JSON.
+    Returns:
+        bool: True si se guardo correctamente; False si 'autos' no es un
+        diccionario, no es serializable a JSON o hay un error de escritura.
+
+    Nota:
+        No propaga excepciones: valida el tipo y captura los errores de tipo,
+        valor y E/S.
     """
-    # RESUELTO (Req 1): el guardado se envuelve en try/except (OSError) y se valida que 'autos' sea un diccionario
-    # antes de escribir; un tipo inesperado avisa y no corta el programa.
+    # Validacion: solo se guarda un diccionario.
     if not isinstance(autos, dict):
         print("/// No se pudo guardar: 'autos' debe ser un diccionario. ///")
-        return
+        return False
     try:
         with open(RUTA_AUTOS, "w", encoding="utf-8") as archivo:
             json.dump(autos, archivo, indent=4, ensure_ascii=False)
     except FileNotFoundError:
         print(f"/// ¡El archivo {RUTA_AUTOS} no existe! ///")
+        return False
+    except (TypeError, ValueError) as e:
+        # Algun valor del catalogo no es serializable a JSON.
+        print(f"/// No se pudo guardar el catalogo: {e} ///")
+        return False
     except OSError as e:
         limpiar()
         print(f"/// Ocurrió un error de sistema: {e} ///")
-        input("[Enter] ")
+        _entrada("[Enter] ")
+        return False
+    return True
 
 
 # ---------- Validaciones de entrada ----------
@@ -140,22 +181,30 @@ def _pedir_de_tupla(etiqueta, opciones):
     Pide un valor que obligatoriamente debe estar dentro de 'opciones'.
 
     Repite la solicitud hasta que el usuario ingrese una opcion valida. Se usa
-    para campos con valores predefinidos (marca, calidad, categoria).
+    para campos con valores predefinidos (marca, calidad, categoria, estado).
 
     Args:
         etiqueta (str): Nombre del campo a pedir (ej. "Marca").
-        opciones (tuple): Tupla con los valores validos aceptados.
+        opciones (tuple): Tupla con los valores validos aceptados (todos str).
 
     Returns:
-        str | bool: Valor elegido por el usuario, validado (bool si es 'estado').
+        str | bool | None: Valor validado (bool si es 'estado'); o None si se
+        corto la entrada (EOFError) o las opciones no estan bien configuradas.
     """
+    # Validacion: 'opciones' debe ser una coleccion no vacia de textos.
+    if not opciones or not all(isinstance(o, str) for o in opciones):
+        print(f"/// El campo {etiqueta} no tiene opciones validas configuradas. ///")
+        return None
     print(f"{etiqueta} (opciones: {', '.join(opciones)}): ")
-    
-    valor = input().strip().lower()
-    # Bucle de validacion: no se sale hasta que el valor pertenezca a 'opciones'.
-    while valor not in opciones:
+    while True:
+        # Bucle de validacion: no se sale hasta que el valor pertenezca a 'opciones'.
+        valor = _entrada()
+        if valor is None:
+            return None
+        valor = valor.lower()
+        if valor in opciones:
+            break
         print(f"Valor inválido. {etiqueta} debe ser una de: {', '.join(opciones)}")
-        valor = input().strip().lower()
     # El campo 'estado' se guarda como booleano en el JSON.
     if valor == "true":
         return True
@@ -177,19 +226,25 @@ def _pedir_entero(etiqueta, minimo, maximo):
         maximo (int): Valor maximo permitido.
 
     Returns:
-        int: Numero entero valido ingresado por el usuario.
+        int | None: Numero entero valido ingresado; o None si el rango esta mal
+        formado o se corto la entrada (EOFError).
     """
-    # RESUELTO (Req 1): la conversion se hace con try/except ValueError en lugar de depender solo de .isdigit().
-    valor = input(f"{etiqueta} ({minimo}-{maximo}): ").strip()
-    # Se repite hasta que el valor se pueda convertir a un entero dentro del rango permitido.
+    # Validacion: el rango debe estar bien formado (enteros con minimo <= maximo).
+    if not isinstance(minimo, int) or not isinstance(maximo, int) or minimo > maximo:
+        print(f"/// Rango inválido para {etiqueta}: {minimo}-{maximo}. ///")
+        return None
     while True:
+        valor = _entrada(f"{etiqueta} ({minimo}-{maximo}): ")
+        if valor is None:
+            return None
+        # Se repite hasta que el valor se pueda convertir a un entero dentro del rango permitido.
         try:
             numero = int(valor)
         except ValueError:
             numero = None
         if numero is not None and minimo <= numero <= maximo:
             return numero
-        valor = input(f"Inválido. {etiqueta} debe ser un número entre {minimo} y {maximo}: ").strip()
+        print(f"Inválido. {etiqueta} debe ser un número entre {minimo} y {maximo}.")
 
 
 def _pedir_float(etiqueta):
@@ -203,22 +258,24 @@ def _pedir_float(etiqueta):
         etiqueta (str): Nombre del campo a pedir (ej. "Precio (u$d)").
 
     Returns:
-        float: Valor decimal positivo ingresado por el usuario.
+        float | None: Valor decimal positivo ingresado; o None si se corto la
+        entrada (EOFError).
     """
-    valor = input(f"{etiqueta}: ").strip().replace(",", ".")
     while True:
+        valor = _entrada(f"{etiqueta}: ")
+        if valor is None:
+            return None
         try:
-            numero = float(valor)
-            # Solo se acepta si el numero es positivo.
-            if numero > 0:
-                return numero
+            # Solo se acepta si el numero es convertible a float y es positivo.
+            numero = float(valor.replace(",", "."))
         except ValueError:
-            # Si no se puede convertir a float, se vuelve a pedir el valor.
-            pass
-        valor = input(f"Inválido. {etiqueta} debe ser un número positivo: ").strip().replace(",", ".")
+            numero = None
+        if numero is not None and numero > 0:
+            return numero
+        print(f"Inválido. {etiqueta} debe ser un número positivo.")
 
 
-def _pedir_patente_existente(autos : dict) -> str:
+def _pedir_patente_existente(autos : dict) -> str | None:
     """
     Pide una patente y valida que ya exista en el catalogo.
 
@@ -229,36 +286,31 @@ def _pedir_patente_existente(autos : dict) -> str:
         autos (dict): Diccionario con el catalogo cargado.
 
     Returns:
-        str: Patente existente, en mayusculas.
+        str | None: Patente existente en mayusculas; o None si el catalogo no es
+        valido, esta vacio, el usuario cancela ("0") o se corta la entrada.
     """
-    # RESUELTO (Req 1): se valida que 'autos' sea un diccionario y se reemplazaron los 'except: pass' por 'except
-    # EOFError', de modo que 'patente' quede siempre definida (antes un ingreso fallido daba NameError).
+    # Validacion: el catalogo debe ser un diccionario con datos.
     if not isinstance(autos, dict):
         print("\nEl catalogo recibido no es valido.")
-        try: input("[Enter] ")
-        except EOFError: pass
+        _entrada("[Enter] ")
         return None
     if not autos:
         print("\nNo hay autos en el catálogo.")
-        try: input("[Enter] ")
-        except EOFError: pass
+        _entrada("[Enter] ")
         return None
 
-    try:
-        patente = input("Ingrese la patente del auto: ").strip().upper()
-    except EOFError:
-        return None
-    if patente == '0':
-        return patente
-
-    while patente not in autos:
-        try:
-            patente = input("Patente no encontrada. Ingrese una patente válida: ").strip().upper()
-        except EOFError:
+    while True:
+        patente = _entrada("Ingrese la patente del auto (0 para cancelar): ")
+        if patente is None:
             return None
-        if patente == '0':
-            break
-    return patente
+        patente = patente.upper()
+        # El usuario cancelo: se devuelve None (antes se devolvia "0", que los
+        # llamadores usaban como patente y provocaba KeyError).
+        if patente == "0":
+            return None
+        if patente in autos:
+            return patente
+        print("Patente no encontrada. Ingrese una patente válida (0 para cancelar): ")
 
 
 # ---------- Mostrar ----------
@@ -300,10 +352,11 @@ def ver_stock(base,rentados):
 
         ver_stock(1, 0): muestra TODO el catalogo (estado legible y precio con "$").
         ver_stock(0, 1): muestra SOLO los autos rentados (los no disponibles).
+        ver_stock(1, 1): muestra SOLO los autos disponibles.
 
     Args:
         base (int): 1 para el catalogo completo; 0 para el listado de rentados.
-        rentados (int): 1 para armar el listado de rentados; 0 para el catalogo.
+        rentados (int): 1 para armar un listado filtrado; 0 para el catalogo.
 
     NOTA (funcion nueva / modificada): reemplaza a la antigua `ver_autos()` y
     ahora es el "motor" de los informes de menu.py (`informe_disponibilidad` y
@@ -316,14 +369,13 @@ def ver_stock(base,rentados):
     limpiar()
     autos : dict = _cargar_autos()
 
-    input("Te metes a los condicionales")
     # --- MODO 1: catalogo completo (base=1, rentados=0) ---
     if base == 1 and rentados == 0:
         # Recorre el catalogo preparando los campos para mostrarlos en la tabla.
         for i in autos:
             # NOTA (posible error): si un auto no tiene la clave "estado" (por
-            # ejemplo, uno dado de alta con `agregar_auto`), esto lanza KeyError.
-            # Traduce el estado booleano a un texto legible para el usuario.
+            # ejemplo, un JSON editado a mano o previo a esta version), esto
+            # lanza KeyError. Traduce el estado booleano a un texto legible.
             autos[i]["estado"] = "disponible" if autos[i]["estado"] == True else "ocupado"
             # Antepone "$" al precio para mostrarlo como importe.
             autos[i]["precio"] = "$" + str(autos[i]["precio"])
@@ -359,34 +411,44 @@ def ver_stock(base,rentados):
                 auto_visual["estado"] = "disponible"
                 auto_visual["precio"] = "$" + str(auto_visual["precio"])
                 autos_disponibles[i] = auto_visual
-    # BUG (UnboundLocalError): con otra combinacion (por ejemplo, ver_stock(0, 0)) no entra en ningun modo y
-    # "autos_rentados" queda sin definir -> UnboundLocalError (subclase de NameError) en la linea del DataFrame de
-    # abajo.
+    # ======== INICIO DEL CODIGO AGREGADO (aviso de catalogo vacio) ========
+    # BUG CORREGIDO (logica / Req 8): ANTES se controlaba "autos" (el catalogo
+    # completo, que casi siempre tiene datos), asi que al pedir el informe de
+    # rentados o de disponibles con la lista vacia se mostraba una tabla vacia en
+    # vez del aviso.
+    # AHORA se elige el diccionario del modo y se controla ESE.
+    if base == 1 and rentados == 0:
+        autos_a_mostrar = autos
+        aviso_vacio = "\nNo hay autos en el catálogo."
+    elif base == 1 and rentados == 1:
+        autos_a_mostrar = autos_disponibles
+        aviso_vacio = "\nNo hay autos disponibles en el catálogo."
+    else:
+        autos_a_mostrar = autos_rentados
+        aviso_vacio = "\nNo hay autos rentados en el catálogo."
+    if not autos_a_mostrar:
+        print(aviso_vacio)
+        _entrada("[Enter] ")
+        return
+    # ========= FIN DEL CODIGO AGREGADO (aviso de catalogo vacio) =========
 
-    # Arma un DataFrame de pandas: si base == 1 usa el catalogo completo; si no,
-    # usa el diccionario de rentados. Las patentes quedan como columnas y los
-    # atributos como filas; el .T deja una fila por auto.
-    input("Te metes al try")
-    try: autos_excel_modificado = pd.DataFrame(autos if base == 1 and rentados == 0 else (autos_disponibles if base == 1 and rentados == 1 else autos_rentados))
-    except Exception: input(autos_excel_modificado)
-    # BUG (logica): en el modo rentados se controla "autos" (no "autos_rentados"), asi que si no hay autos rentados se
-    # muestra una tabla vacia en vez del aviso.
-    # RECOMENDACION (Req 8): controlar "autos_rentados" para que el informe de rentados avise correctamente cuando no
-    # hay unidades alquiladas.
-    if not autos:
-        print("\nNo hay autos en el catálogo.")
-        try: input("[Enter] ")
-        except: pass
+    # Arma un DataFrame de pandas sobre el diccionario del modo elegido. Las
+    # patentes quedan como columnas y los atributos como filas; el .T deja una
+    # fila por auto.
+    # RESUELTO (Req 1): se reemplazo el 'except Exception' (que ademas usaba una
+    # variable sin definir) por excepciones especificas del armado de la tabla.
+    try:
+        autos_excel_modificado = pd.DataFrame(autos_a_mostrar)
+    except (TypeError, ValueError) as e:
+        print(f"\nNo se pudo generar la tabla: {e}")
+        _entrada("[Enter] ")
         return
     print("\n")
     print("--"*15,"CATALOGO DE AUTOS","--"*15)
     print(autos_excel_modificado.T)
     print("--"*39)
     
-    try: 
-        input("Presione cualquier tecla para salir: ")
-        return
-    except: pass
+    _entrada("Presione cualquier tecla para salir: ")
 
 
 def ver_auto():
@@ -395,21 +457,22 @@ def ver_auto():
 
     Pide una patente existente y muestra unicamente la ficha de ese auto.
     Si el catalogo esta vacio, lo informa.
+
+    Returns:
+        None
     """
     autos = _cargar_autos()
     if not autos:
         print("\nNo hay autos en el catálogo.")
-        try: input(" ")
-        except: pass
+        _entrada(" ")
         return
     patente = _pedir_patente_existente(autos)
-    # BUG (KeyError): si el usuario escribe "0" (o la funcion devuelve None), 'autos[patente]' no existe y lanza
-    # KeyError (sin try/except).
+    # RESUELTO (Req 1): se valida el resultado antes de indexar; si el usuario
+    # cancelo (None) se sale sin lanzar KeyError.
+    if patente is None:
+        return
     _mostrar_auto(patente, autos[patente])
-    try: 
-        input("\n Presiona ENTER para volver")
-    except:
-        pass
+    _entrada("\n Presiona ENTER para volver")
 
 def open_autos():
     """
@@ -419,7 +482,9 @@ def open_autos():
     tener el catalogo cargado en memoria.
 
     Returns:
-        dict: Catalogo {patente: {atributos}}; o None si ocurre un error de sistema.
+        dict: Catalogo {patente: {atributos}}. Devuelve {} si el archivo no
+        existe, no es JSON valido, no es un diccionario o hay un error de
+        sistema; nunca devuelve None.
     """
     # RESUELTO (Req 1): se capturan FileNotFoundError, json.JSONDecodeError y OSError, y SIEMPRE se retorna un
     # diccionario ({} en caso de error) en vez de None, para que quien lo use no reciba un TypeError.
@@ -434,14 +499,12 @@ def open_autos():
     except json.JSONDecodeError:
         limpiar()
         print("/// El archivo de autos no tiene un formato JSON válido. ///")
-        try: input("[Enter] ")
-        except: pass
+        _entrada("[Enter] ")
         return {}
     except OSError as e:
         limpiar()
         print(f"/// Ocurrió un error de sistema: {e} ///")
-        try: input("[Enter] ")
-        except: pass
+        _entrada("[Enter] ")
         return {}
 
 
@@ -450,8 +513,9 @@ def open_usuarios():
     Lee y devuelve los usuarios desde el archivo JSON.
 
     Returns:
-        dict: Usuarios {dni: {nombre, clave, autos_rentados}}; o None si ocurre
-        un error de sistema.
+        dict: Usuarios {dni: {nombre, clave, autos_rentados}}. Devuelve {} si el
+        archivo no existe, no es JSON valido, no es un diccionario o hay un
+        error de sistema; nunca devuelve None.
     """
     # RESUELTO (Req 1): se capturan FileNotFoundError, json.JSONDecodeError y OSError, y SIEMPRE se retorna un
     # diccionario ({} en caso de error) en vez de None, para que quien lo use no reciba un TypeError.
@@ -466,14 +530,12 @@ def open_usuarios():
     except json.JSONDecodeError:
         limpiar()
         print("/// El archivo de usuarios no tiene un formato JSON válido. ///")
-        try: input("[Enter] ")
-        except: pass
+        _entrada("[Enter] ")
         return {}
     except OSError as e:
         limpiar()
         print(f"/// Ocurrió un error de sistema: {e} ///")
-        try: input("[Enter] ")
-        except: pass
+        _entrada("[Enter] ")
         return {}
 
 def escribir_usuario(lista_usu):
@@ -482,14 +544,27 @@ def escribir_usuario(lista_usu):
 
     Args:
         lista_usu (dict): Diccionario completo de usuarios a guardar.
+
+    Returns:
+        bool: True si se guardo correctamente; False si el dato no es un
+        diccionario, no es serializable a JSON o hay un error de escritura.
     """
+    # Validacion: solo se guarda un diccionario.
+    if not isinstance(lista_usu, dict):
+        print("/// No se pudo guardar: 'lista_usu' debe ser un diccionario. ///")
+        return False
     # RESUELTO (Req 1): el guardado se envuelve en try/except OSError; si el archivo no se puede escribir (permisos,
     # disco lleno) se informa y no se corta el programa.
     try:
         with open(inf.RUTA_USUARIOS_JSON, 'w', encoding="utf-8") as archivo:
             json.dump(lista_usu, archivo, indent=4, ensure_ascii=False)
+    except (TypeError, ValueError) as e:
+        print(f"/// No se pudo guardar el archivo de usuarios: {e} ///")
+        return False
     except OSError as e:
         print(f"/// No se pudo escribir el archivo de usuarios: {e} ///")
+        return False
+    return True
 
 def escribir_auto(lista_aut):
     """
@@ -497,14 +572,27 @@ def escribir_auto(lista_aut):
 
     Args:
         lista_aut (dict): Diccionario completo de autos a guardar.
+
+    Returns:
+        bool: True si se guardo correctamente; False si el dato no es un
+        diccionario, no es serializable a JSON o hay un error de escritura.
     """
+    # Validacion: solo se guarda un diccionario.
+    if not isinstance(lista_aut, dict):
+        print("/// No se pudo guardar: 'lista_aut' debe ser un diccionario. ///")
+        return False
     # RESUELTO (Req 1): el guardado se envuelve en try/except OSError; si el archivo no se puede escribir se informa y
     # no se corta el programa.
     try:
         with open(inf.RUTA_AUTOS_JSON, 'w', encoding="utf-8") as archivo:
             json.dump(lista_aut, archivo, indent=4, ensure_ascii=False)
+    except (TypeError, ValueError) as e:
+        print(f"/// No se pudo guardar el archivo de autos: {e} ///")
+        return False
     except OSError as e:
         print(f"/// No se pudo escribir el archivo de autos: {e} ///")
+        return False
+    return True
 
 # ---------- CREATE ----------
 
@@ -512,41 +600,53 @@ def agregar_auto():
     """
     Da de alta un auto nuevo (Create).
 
-    Pide todos los datos del auto y valida que la patente no exista previamente.
-    Al finalizar, guarda la ultima version del diccionario en el archivo JSON.
-    (Req 2 del TP: Create sobreescribe el archivo).
+    Pide todos los datos del auto, valida que la patente no exista ni este vacia
+    y que cada campo tenga un valor permitido. Al finalizar, guarda la ultima
+    version del diccionario en el archivo JSON.
+    (Req 2 del TP: Create sobreescribe el archivo; Req 6: 7 atributos por auto).
     """
     autos = _cargar_autos()
 
-    # Se pide la patente y se valida que no exista (una patente es unica).
-    # RESUELTO (Req 1): se reemplazo el 'except: pass' por 'except EOFError' con retorno, de modo que 'patente' quede
+    # Se pide la patente y se valida que no exista ni este vacia (es unica).
+    # RESUELTO (Req 1): la lectura usa _entrada(), de modo que 'patente' quede
     # siempre definida (antes un input fallido la dejaba sin definir -> NameError).
-    try: patente = input("Patente del nuevo auto: ").strip().upper()
-    except EOFError: return
-    while patente in autos:
-            try: patente = input("Esa patente ya existe. Ingrese otra: ").strip().upper()
-            except EOFError: return
+    patente = _entrada("Patente del nuevo auto: ")
+    if patente is None:
+        return
+    patente = patente.upper()
+    while patente == "" or patente in autos:
+        if patente == "":
+            print("La patente no puede estar vacía.")
+        else:
+            print("Esa patente ya existe. Ingrese otra.")
+        patente = _entrada("Patente del nuevo auto: ")
+        if patente is None:
+            return
+        patente = patente.upper()
 
     # Se piden y validan los demas atributos del auto.
     marca = _pedir_de_tupla("Marca: ", MARCA)
-    modelo = input("Modelo: ").strip().lower()
+    modelo = _entrada("Modelo: ")
     calidad = _pedir_de_tupla("Calidad:", CALIDAD)
     anio = _pedir_entero("Año: ", 2000, 2026)
     precio = _pedir_float("Precio (u$d): ")
     categoria = _pedir_de_tupla("Categoría: ", CATEGORIA)
 
-    # Se crea el registro usando la patente como clave del diccionario.
-    # BUG (KeyError): esta alta no agrega la clave "estado", a diferencia de informe.informe_autos (que la inicializa en
-    # True). Sin "estado", `_mostrar_auto`, `ver_stock` y `rentar_auto` lanzan KeyError al leerlo.
-    # TODO(TP - Req 6): agregar "estado": True para respetar el esquema de 7 atributos por auto que exige la entidad del
-    # Req 6.
+    # Validacion: si se corto la entrada (EOF) en algun campo, se aborta sin guardar.
+    if None in (marca, modelo, calidad, anio, precio, categoria):
+        return
+
+    # Se crea el registro usando la patente como clave, con los 7 atributos del
+    # esquema (incluido "estado", que antes faltaba y provocaba KeyError).
+    # RESUELTO (Req 6): se agrega "estado": True por defecto (auto disponible).
     autos[patente] = {
         "marca": marca,
-        "modelo": modelo,
+        "modelo": modelo.lower(),
         "calidad": calidad,
         "año": anio,
         "precio": precio,
         "categoria": categoria,
+        "estado": True,
     }
     # Se persiste el cambio y se confirma al usuario.
     _guardar_autos(autos)
@@ -556,29 +656,41 @@ def agregar_auto():
 # ---------- UPDATE ----------
 def modificar_estado_auto(patente, estado_auto):
     """
-    Modifica el estado de un auto en el archivo autos.json.
+    Invierte el estado de un auto (disponible <-> ocupado) en autos.json.
 
     Args:
         patente (str): Patente del auto a modificar.
-        estado_auto (bool): Estado actual del auto (True = disponible, False = no disponible).
-                            La funcion invierte este estado al guardar.
+        estado_auto (bool): Estado actual del auto (True = disponible,
+            False = no disponible). La funcion guarda el estado invertido.
+
     Returns:
-        None
+        bool: True si el cambio se guardo; False si el estado no es booleano, la
+        patente no existe o hay un error de escritura.
+
+    Nota:
+        No propaga excepciones: valida los datos y los errores de E/S se
+        informan por pantalla.
     """
-    # Invierte el estado: True = disponible -> pasa a False (rentado)
-    # NOTA (posible error): la ruta "autos.json" esta escrita a mano (no usa la
-    # constante RUTA_AUTOS) y si la patente no existe, autos[patente] da KeyError.
-    if estado_auto == True:
-        autos = _cargar_autos()
-        autos[patente]["estado"] = False
-        with open("autos.json", 'w', encoding="utf-8") as archivo:
+    # Validacion: el estado debe ser booleano.
+    if not isinstance(estado_auto, bool):
+        print("\nEstado inválido: se esperaba True (disponible) o False (ocupado).")
+        return False
+
+    autos = _cargar_autos()
+    # Validacion: debe ser un catalogo con la patente pedida (evita KeyError).
+    if not isinstance(autos, dict) or patente not in autos:
+        print(f"\nNo existe un auto con la patente {patente}.")
+        return False
+
+    # Invierte el estado actual y persiste el cambio (ruta constante RUTA_AUTOS).
+    autos[patente]["estado"] = not estado_auto
+    try:
+        with open(RUTA_AUTOS, "w", encoding="utf-8") as archivo:
             json.dump(autos, archivo, indent=4, ensure_ascii=False)
-    # Invierte el estado: False = rentado -> pasa a True (disponible)
-    elif estado_auto == False:
-        autos = _cargar_autos()
-        autos[patente]["estado"] = True
-        with open("autos.json", 'w', encoding="utf-8") as archivo:
-            json.dump(autos, archivo, indent=4, ensure_ascii=False)
+    except OSError as e:
+        print(f"/// No se pudo escribir el archivo de autos: {e} ///")
+        return False
+    return True
 
 def modificar_auto():
     """
@@ -592,15 +704,14 @@ def modificar_auto():
     """
     autos = _cargar_autos()
     if not autos:
-            print("\nNo hay autos en el catálogo.")
-            try: input("[Enter] ")
-            except: pass
-            return
+        print("\nNo hay autos en el catálogo.")
+        _entrada("[Enter] ")
+        return
 
-    # NOTA (posible error): si el usuario escribe "0" para salir,
-    # _pedir_patente_existente devuelve "0" y autos["0"] lanza KeyError
-    # en el bucle de abajo.
+    # _pedir_patente_existente devuelve None si el usuario cancela ("0").
     patente = _pedir_patente_existente(autos)
+    if patente is None:
+        return
 
     while True:
         # Muestra el menu de campos con su valor actual.
@@ -611,36 +722,56 @@ def modificar_auto():
         print("--------------------")
         print("[0] Terminar")
 
-        opcion = input("\n¿Qué campo desea modificar?: ").strip()
+        opcion = _entrada("\n¿Qué campo desea modificar?: ")
+        if opcion is None:
+            return
 
         # Opcion para salir del menu de modificacion.
         if opcion == "0":
             break
-        # Validacion de la opcion ingresada.
-        # NOTA (posible error): int(opcion) lanza ValueError si el usuario escribe
-        # algo que no sea un numero (solo se controla la opcion "0" antes).
-        elif int(opcion) not in list(range(1, len(autos[patente]) + 1)):
+        # Validacion de la opcion: debe ser un numero entero dentro del rango mostrado.
+        # RESUELTO (Req 1): el int(opcion) se protege con try/except ValueError
+        # (antes un texto no numerico cortaba el programa).
+        try:
+            indice = int(opcion)
+        except ValueError:
+            print("\nOpción no válida. Intente de nuevo.")
+            continue
+        if indice < 1 or indice > len(autos[patente]):
             print("\nOpción no válida. Intente de nuevo.")
             continue
 
         # Se pide el nuevo valor segun el tipo de campo elegido.
-        # NOTA: el mapeo 1-7 es fijo; si el auto tiene menos claves (por ejemplo,
-        # no tiene "estado"), las opciones mostradas no coinciden con estos casos.
-        
+        # NOTA: el mapeo es fijo (7 campos en el orden del esquema).
+        campo = None
+        nuevo = None
         if opcion == "1":
-            autos[patente]["marca"] = _pedir_de_tupla("Marca", MARCA)
+            campo = "marca"
+            nuevo = _pedir_de_tupla("Marca", MARCA)
         elif opcion == "2":
-            autos[patente]["modelo"] = input("Nuevo modelo: ").strip().lower()
+            campo = "modelo"
+            texto = _entrada("Nuevo modelo: ")
+            nuevo = None if texto is None else texto.lower()
         elif opcion == "3":
-            autos[patente]["calidad"] = _pedir_de_tupla("Calidad", CALIDAD)
+            campo = "calidad"
+            nuevo = _pedir_de_tupla("Calidad", CALIDAD)
         elif opcion == "4":
-            autos[patente]["año"] = _pedir_entero("Año", 2000, 2026)
+            campo = "año"
+            nuevo = _pedir_entero("Año", 2000, 2026)
         elif opcion == "5":
-            autos[patente]["precio"] = _pedir_float("Nuevo precio (u$d)")
+            campo = "precio"
+            nuevo = _pedir_float("Nuevo precio (u$d)")
         elif opcion == "6":
-            autos[patente]["categoria"] = _pedir_de_tupla("Categoría", CATEGORIA)
+            campo = "categoria"
+            nuevo = _pedir_de_tupla("Categoría", CATEGORIA)
         elif opcion == "7":
-            autos[patente]["estado"] = _pedir_de_tupla("estado", ESTADO)
+            campo = "estado"
+            nuevo = _pedir_de_tupla("estado", ESTADO)
+
+        # Validacion: si la entrada se corto (None) o no hay campo mapeado, no se guarda.
+        if campo is None or nuevo is None:
+            return
+        autos[patente][campo] = nuevo
 
         # Se guarda el cambio y se confirma.
         _guardar_autos(autos)
@@ -661,14 +792,19 @@ def eliminar_auto():
     # excepciones (FileNotFoundError, json.JSONDecodeError y OSError).
     autos = _cargar_autos()
     if not autos:
-            print("\nNo hay autos en el catálogo.")
-            try: input("[Enter] ")
-            except: pass
-            return
+        print("\nNo hay autos en el catálogo.")
+        _entrada("[Enter] ")
+        return
 
+    # ===== INICIO DEL CODIGO AGREGADO (validacion de patente antes de borrar) =====
+    # BUG CORREGIDO (KeyError): ANTES, con la patente "0" (o None) 'del
+    # autos[patente]' intentaba borrar una clave inexistente y lanzaba KeyError.
+    # AHORA se valida el resultado de la busqueda: si el usuario cancela (None) se
+    # sale sin borrar nada.
     patente = _pedir_patente_existente(autos)
-    # BUG (KeyError): con la patente "0" (o None), 'del autos[patente]' intenta borrar una clave inexistente y lanza
-    # KeyError.
+    if patente is None:
+        return
+    # ====== FIN DEL CODIGO AGREGADO (validacion de patente antes de borrar) ======
     # Se elimina el registro del diccionario y se guarda el estado actualizado.
     del autos[patente]
     _guardar_autos(autos)
@@ -694,10 +830,11 @@ def menu_crud():
         print("[4] Modificar auto")
         print("[5] Eliminar auto")
         print("[0] Salir")
-        # RESUELTO (Req 1): el ingreso de la opcion usa try/except EOFError, asi 'opcion' quede siempre definida
-        # (antes un input fallido la dejaba sin definir -> NameError); al terminar la entrada se sale del menu.
-        try: opcion = input("Seleccione una opción: ").strip()
-        except EOFError: break
+        # RESUELTO (Req 1): el ingreso de la opcion usa _entrada(), asi 'opcion'
+        # quede siempre definida; al terminar la entrada (EOF) se sale del menu.
+        opcion = _entrada("Seleccione una opción: ")
+        if opcion is None:
+            break
 
         # Despacho de la opcion elegida hacia la funcion correspondiente.
         if opcion == "1":
