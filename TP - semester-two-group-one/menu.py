@@ -19,10 +19,11 @@ Tema del trabajo: Administracion de una concesionaria (catalogo de autos + alqui
 # NOTA (imports sin uso): 'json' y 'informe as inf' no se usan en este modulo
 # (se podrian quitar). 'os' si se usa en limpiar().
 # RECOMENDACION: quitar 'json' e 'informe as inf' (imports sin uso) al cerrar el sprint.
-import json, os
-import informe as inf
 import crud as cd
 import usuarios as us
+import informe as inf
+from pathlib import Path
+
 
 # Mapeo de la opcion de menu a la categoria interna usada en autos.json.
 categ_preset = {
@@ -32,14 +33,7 @@ categ_preset = {
     "4": "monovolumen_mpv"
 }
 
-def limpiar():
-    """
-    Limpia la consola segun el sistema operativo.
 
-    En Windows usa 'cls'; en Linux/macOS usa 'clear'. Sirve para mantener la
-    interfaz ordenada entre pantallas del menu.
-    """
-    os.system('cls' if os.name == 'nt' else 'clear')
 
 def rentar_auto(usu_info, lista_usu, lista_aut):
     """
@@ -50,7 +44,7 @@ def rentar_auto(usu_info, lista_usu, lista_aut):
     2. Filtra los modelos disponibles de esa categoria, excluyendo los ya rentados.
     3. Muestra las patentes de ese modelo, tambien excluyendo los ya rentados.
     4. Confirma el alquiler: marca el auto como no disponible en `autos.json` y
-       agrega la patente a `autos_rentados` del usuario en `usuarios.json`.
+    agrega la patente a `autos_rentados` del usuario en `usuarios.json`.
 
     El flujo esta anidado con bucles while para poder volver entre niveles
     (Categorias -> Modelos -> Patentes).
@@ -66,7 +60,7 @@ def rentar_auto(usu_info, lista_usu, lista_aut):
     """
 
     while True:
-        limpiar()
+        cd.limpiar()
         # --- NIVEL 1: seleccion de categoria ---
         print(f" --- Escoja una categoría --- [{usu_info[1]}]\n\n"
             "[1] Sedán / Hatchback\n"
@@ -93,7 +87,7 @@ def rentar_auto(usu_info, lista_usu, lista_aut):
         else:
             # --- NIVEL 2: seleccion de modelo dentro de la categoria ---
             while True:
-                limpiar()
+                cd.limpiar()
                 print(f"--- Modelos disponibles --- [{usu_info[1]}]\n")
 
                 # Filtra modelos unicos disponibles de la categoria elegida. Se considera "disponible" si pertenece a la
@@ -132,7 +126,7 @@ def rentar_auto(usu_info, lista_usu, lista_aut):
                     # --- NIVEL 3: seleccion de patente del modelo elegido ---
                     try:
                         while True:
-                            limpiar()
+                            cd.limpiar()
                             print(f"--- PATENTES con Modelo: {filtrados[opcion2]}---  [{usu_info[1]}]")
 
                             # Lista por comprension: patentes de ese modelo que todavia no estan rentadas.
@@ -161,7 +155,7 @@ def rentar_auto(usu_info, lista_usu, lista_aut):
                                 except: pass
                             else:
                                 # --- Confirmacion y registro del alquiler ---
-                                limpiar()
+                                cd.limpiar()
                                 # El usuario eligio un numero; se obtiene la patente.
                                 patente_elegida = patentes[int(opcion3)-1]
                                 # Marca el auto como no disponible (rentado) en autos.json.
@@ -203,10 +197,10 @@ def devolver_auto(usu_info, lista_usu):
     NOTA (docstring actualizado): el texto anterior decia que estaba incompleto;
     esta version ya devuelve el auto.
     """
-    limpiar()
+    cd.limpiar()
     # TODO(TP - Req 1): manejar excepciones al cargar.
     while True:
-        limpiar()
+        cd.limpiar()
         print(f"--- Autos rentados --- [{usu_info[1]}]\n")
         # BUG (KeyError): si el DNI ('usu_info[0]') no esta en 'lista_usu', o al usuario le falta la clave
         # "autos_rentados", este acceso lanza KeyError.
@@ -228,7 +222,7 @@ def devolver_auto(usu_info, lista_usu):
             except: pass
         else:
             # --- Confirmacion y registro de la devolucion ---
-            limpiar()
+            cd.limpiar()
             # Se obtiene la patente elegida de la lista de autos rentados.
             patente_elegida = lista_usu[usu_info[0]]["autos_rentados"][int(opcion4)-1]
             # Marca el auto como disponible otra vez en autos.json.
@@ -258,7 +252,7 @@ def informe_disponibilidad():
         None
     """
     # Limpia la pantalla y delega en el CRUD para mostrar el catalogo.
-    limpiar()
+    cd.limpiar()
     cd.ver_stock(1,0)
 
 def estado_rentas():
@@ -272,7 +266,7 @@ def estado_rentas():
         None
     """
     # Limpia la pantalla y delega en el CRUD para mostrar solo los rentados.
-    limpiar()
+    cd.limpiar()
     cd.ver_stock(0,1)
 
 def informe_estadisticas():
@@ -299,7 +293,7 @@ def menu_principal():
     """
     
     while True:
-        limpiar()
+        cd.limpiar()
         print("--- MENÚ PRINCIPAL ---\n")
         print("[1] Menu de usuario.")
         print("[2] Menu de empresa.")
@@ -336,7 +330,7 @@ def submenu_usuario():
     # (Ingresar, Registrarse, Rentar, Devolver) para reflejar los cambios: esto es
     # lo que resolvio los bugs "error al ingresar" y "renta infinita".
     while True:
-        limpiar()
+        cd.limpiar()
         print("--- SUBMENÚ: USUARIOS ---\n")
         print("[1] Ingresar")
         print("[2] Registrarse")
@@ -379,7 +373,7 @@ def submenu_usuario():
     
 
     while True:
-        limpiar()
+        cd.limpiar()
         print("--- |USUARIOS| MENÚ: MANEJO DE AUTOS ---", end="")
         print(f"  [{usu_info[1]}]\n")
         print("[1] Rentar auto.")
@@ -391,14 +385,9 @@ def submenu_usuario():
             opcion : str = input("\nSeleccione una opción: ").strip()
             
             if opcion == "1":
-                # Se recarga el catalogo desde disco y se pasa completo a
-                # rentar_auto() (necesita los 3: usuario, usuarios y catalogo).
                 lista_aut = cd.open_autos()
                 rentar_auto(usu_info, lista_usu, lista_aut)
             elif opcion == "2":
-                # NOTA (BUG corregido): devolver_auto() recibe 2 parametros
-                # (usu_info, lista_usu). Antes se le pasaban 3 -> TypeError que el
-                # 'except' de abajo ocultaba (la opcion [2] no hacia nada).
                 devolver_auto(usu_info, lista_usu)
             elif opcion == "0":
                 # Volver al menu principal.
@@ -426,7 +415,7 @@ def submenu_empresa():
     el reporte matricial.
     """
     while True:
-        limpiar()
+        cd.limpiar()
         print("--- SUBMENÚ: INFORMES ---\n")
         print("[1] Disponibilidad de unidades")
         print("[2] Estadisticas del mes")
@@ -455,6 +444,18 @@ def submenu_empresa():
             except: pass
 
 if __name__ == "__main__":
-    limpiar()
+    cd.limpiar()
+    ruta_archivo1 = "usuarios.json"
+    ruta_archivo2 = "autos.json"
+    archivo1 = Path(ruta_archivo1)
+    archivo2 = Path(ruta_archivo2)
+    if archivo1.is_file():
+        print("Es un archivo usuarios ya existente.")
+    else:
+        inf.informe_usuarios(archivo1)
+    if archivo2.is_file():
+        print("Es un archivo autos ya existente.")
+    else:
+        inf.informe_autos(archivo2, 25)
     menu_principal()
-    limpiar()
+    cd.limpiar()

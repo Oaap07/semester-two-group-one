@@ -97,7 +97,7 @@ def limpiar():
 
 def informe_autos(
     ruta_archivo: str, cant_autos: int
-) -> dict:
+) -> None:
     """
     Genera un conjunto aleatorio de autos y lo guarda en un archivo JSON.
 
@@ -138,10 +138,6 @@ def informe_autos(
                     patente += (random.choice(numeros))
                     contador += 1
             patente = patente.upper()
-        # BUG (logica): si una patente generada al azar se repite, se sobreescribe en 'listado' y quedan menos autos de
-        # los pedidos (puede bajar de los 5 minimos que pide el Req 3).
-        # RECOMENDACION (Req 3): generar la patente en un while mientras exista en 'listado', para garantizar unicidad y
-        # la cantidad pedida.
         # Precio base de 90 u$d, con descuento por antiguedad.
         precio = 90
 
@@ -178,9 +174,6 @@ def informe_autos(
 
     try: input("[Enter] ")
     except: pass
-
-    # BUG (TypeError): la funcion esta anotada "-> dict" pero retorna None; si el llamador usa el resultado como
-    # diccionario, lanza TypeError.
     return
 
 
@@ -208,11 +201,21 @@ def informe_usuarios(
             print(f"___ Archivo [{ruta_archivo}] ya existente ___")
     except FileNotFoundError:
         # Usuario de ejemplo (dni 10101010) para poder probar INGRESAR.
-        listado["10101010"] = {
-            "nombre" : "Jorge",
-            "clave" : "1010",
+        listado["95823279"] = {
+            "nombre" : "Jorge Adrian Gonzalez Padron",
+            "clave" : "1234",
             "autos_rentados" : []
         }
+        listado["4817866"] = {
+                    "nombre" : "Benjamin Nahuel Baez",
+                    "clave" : "1234",
+                    "autos_rentados" : []
+                }
+        listado["46280291"] = {
+                    "nombre" : "Juan Ignacio Cayla",
+                    "clave" : "1234",
+                    "autos_rentados" : []
+                }
         with open(ruta_archivo, "w", encoding="utf-8") as f:
             json.dump(listado, f, indent=4, ensure_ascii=False)
             print(f"||| Archivo [{ruta_archivo}] creado exitosamente |||")

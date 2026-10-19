@@ -90,11 +90,10 @@ def _cargar_autos() -> dict:
     except FileNotFoundError:
         return {}
     except OSError as e:
-        # BUG (TypeError): en caso de fallo no retorna nada (None); quien use el resultado como diccionario lanza
-        # TypeError (NoneType no es subscriptable).
         limpiar()
         print(f"/// Ocurrió un error de sistema: {e} ///")
         input("[Enter] ")
+        return {}
 
 
 def _guardar_autos(autos):
