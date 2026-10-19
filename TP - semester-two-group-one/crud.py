@@ -83,12 +83,17 @@ def _cargar_autos() -> dict:
         FileNotFoundError: Si el archivo autos.json no existe.
         OSError: Si ocurre un problema a nivel operativo
     """
-    # TODO(TP - Req 1): envolver en try/except para manejar apertura/lectura del archivo (FileNotFoundError,
-    # json.JSONDecodeError, OSError).
-    try: 
+    # RESUELTO (Req 1): la lectura se maneja con excepciones especificas; FileNotFoundError y json.JSONDecodeError
+    # devuelven un diccionario vacio y OSError informa el error de sistema. Siempre retorna un dict.
+    try:
         with open(RUTA_AUTOS, "r", encoding="utf-8") as archivo:
             return json.load(archivo)
     except FileNotFoundError:
+        return {}
+    except json.JSONDecodeError:
+        limpiar()
+        print("/// El archivo de autos no tiene un formato JSON válido. ///")
+        input("[Enter] ")
         return {}
     except OSError as e:
         limpiar()
@@ -112,8 +117,11 @@ def _guardar_autos(autos):
         OSError: Si ocurre un error al abrir o escribir el archivo.
         TypeError: Si algun valor no es serializable a JSON.
     """
-    # TODO(TP - Req 1): envolver en try/except para el guardado (OSError) y validar que 'autos' sea un diccionario antes
-    # de escribir.
+    # RESUELTO (Req 1): el guardado se envuelve en try/except (OSError) y se valida que 'autos' sea un diccionario
+    # antes de escribir; un tipo inesperado avisa y no corta el programa.
+    if not isinstance(autos, dict):
+        print("/// No se pudo guardar: 'autos' debe ser un diccionario. ///")
+        return
     try:
         with open(RUTA_AUTOS, "w", encoding="utf-8") as archivo:
             json.dump(autos, archivo, indent=4, ensure_ascii=False)
@@ -171,13 +179,17 @@ def _pedir_entero(etiqueta, minimo, maximo):
     Returns:
         int: Numero entero valido ingresado por el usuario.
     """
-    # TODO(TP - Req 1): convertir con try/except (ValueError) en lugar de depender solo de .isdigit(), para un manejo de
-    # excepciones mas robusto.
+    # RESUELTO (Req 1): la conversion se hace con try/except ValueError en lugar de depender solo de .isdigit().
     valor = input(f"{etiqueta} ({minimo}-{maximo}): ").strip()
-    # Se repite mientras no sea un digito o este fuera del rango permitido.
-    while not valor.isdigit() or not (minimo <= int(valor) <= maximo):
+    # Se repite hasta que el valor se pueda convertir a un entero dentro del rango permitido.
+    while True:
+        try:
+            numero = int(valor)
+        except ValueError:
+            numero = None
+        if numero is not None and minimo <= numero <= maximo:
+            return numero
         valor = input(f"Inválido. {etiqueta} debe ser un número entre {minimo} y {maximo}: ").strip()
-    return int(valor)
 
 
 def _pedir_float(etiqueta):
@@ -219,26 +231,33 @@ def _pedir_patente_existente(autos : dict) -> str:
     Returns:
         str: Patente existente, en mayusculas.
     """
-    # TODO(TP - Req 1): validar el tipo de 'autos' (dict) para evitar errores al manipular diccionarios si llega un
-    # valor inesperado.
+    # RESUELTO (Req 1): se valida que 'autos' sea un diccionario y se reemplazaron los 'except: pass' por 'except
+    # EOFError', de modo que 'patente' quede siempre definida (antes un ingreso fallido daba NameError).
+    if not isinstance(autos, dict):
+        print("\nEl catalogo recibido no es valido.")
+        try: input("[Enter] ")
+        except EOFError: pass
+        return None
     if not autos:
-            print("\nNo hay autos en el catálogo.")
-            try: input("[Enter] ")
-            except: pass
-            return
+        print("\nNo hay autos en el catálogo.")
+        try: input("[Enter] ")
+        except EOFError: pass
+        return None
 
-    try: 
+    try:
         patente = input("Ingrese la patente del auto: ").strip().upper()
-        if patente == '0':
-            return patente
-    except: pass
+    except EOFError:
+        return None
+    if patente == '0':
+        return patente
 
     while patente not in autos:
-        try: 
+        try:
             patente = input("Patente no encontrada. Ingrese una patente válida: ").strip().upper()
-            if patente == '0':
-                break
-        except: pass
+        except EOFError:
+            return None
+        if patente == '0':
+            break
     return patente
 
 
@@ -255,18 +274,19 @@ def _mostrar_auto(patente, datos):
         patente (str): Patente del auto (clave del diccionario).
         datos (dict): Diccionario con los atributos del auto.
     """
-    # TODO(TP - Req 1): proteger el acceso a claves con try/except (KeyError) por si al auto le falta algun atributo en
-    # el JSON.
-    # NOTA (dato agregado): tambien imprime el "estado"; si el auto no tiene esa clave (por ejemplo, uno creado con
-    # `agregar_auto`), la ultima linea lanza KeyError.
+    # RESUELTO (Req 1): el acceso a los atributos se protege con try/except KeyError, asi la ficha no se corta si al
+    # auto le falta algun dato en el JSON.
     print(f"\n[{patente}]")
-    print(f"\tMarca: {datos['marca'].capitalize()}")
-    print(f"\tModelo: {datos['modelo'].capitalize()}")
-    print(f"\tCalidad: {datos['calidad']}")
-    print(f"\tAño: {datos['año']}")
-    print(f"\tPrecio: u$d {datos['precio']:.1f}")
-    print(f"\tCategoría: {datos['categoria']}")
-    print(f"\tEstado: {datos['estado']}")
+    try:
+        print(f"\tMarca: {datos['marca'].capitalize()}")
+        print(f"\tModelo: {datos['modelo'].capitalize()}")
+        print(f"\tCalidad: {datos['calidad']}")
+        print(f"\tAño: {datos['año']}")
+        print(f"\tPrecio: u$d {datos['precio']:.1f}")
+        print(f"\tCategoría: {datos['categoria']}")
+        print(f"\tEstado: {datos['estado']}")
+    except KeyError as e:
+        print(f"\t[Falta un dato del auto: {e}]")
 
 
 # ---------- READ ----------
@@ -401,20 +421,28 @@ def open_autos():
     Returns:
         dict: Catalogo {patente: {atributos}}; o None si ocurre un error de sistema.
     """
-    # TODO(TP - Req 1): capturar tambien FileNotFoundError y json.JSONDecodeError, y validar el None antes de
-    # devolverlo.
+    # RESUELTO (Req 1): se capturan FileNotFoundError, json.JSONDecodeError y OSError, y SIEMPRE se retorna un
+    # diccionario ({} en caso de error) en vez de None, para que quien lo use no reciba un TypeError.
     try:
         with open(inf.RUTA_AUTOS_JSON, 'r', encoding="utf-8") as archivo:
             lista_aut = json.load(archivo)
-            return lista_aut
+        if not isinstance(lista_aut, dict):
+            return {}
+        return lista_aut
+    except FileNotFoundError:
+        return {}
+    except json.JSONDecodeError:
+        limpiar()
+        print("/// El archivo de autos no tiene un formato JSON válido. ///")
+        try: input("[Enter] ")
+        except: pass
+        return {}
     except OSError as e:
-        # BUG (TypeError): devuelve None (sin valor); quien lo use como diccionario (por ejemplo menu.py) lanza
-        # TypeError. El Req 1 del TP pide manejo mas especifico.
         limpiar()
         print(f"/// Ocurrió un error de sistema: {e} ///")
         try: input("[Enter] ")
         except: pass
-        return 
+        return {}
 
 
 def open_usuarios():
@@ -425,18 +453,28 @@ def open_usuarios():
         dict: Usuarios {dni: {nombre, clave, autos_rentados}}; o None si ocurre
         un error de sistema.
     """
+    # RESUELTO (Req 1): se capturan FileNotFoundError, json.JSONDecodeError y OSError, y SIEMPRE se retorna un
+    # diccionario ({} en caso de error) en vez de None, para que quien lo use no reciba un TypeError.
     try:
         with open(inf.RUTA_USUARIOS_JSON, 'r', encoding="utf-8") as archivo:
             lista_usu = json.load(archivo)
+        if not isinstance(lista_usu, dict):
+            return {}
         return lista_usu
+    except FileNotFoundError:
+        return {}
+    except json.JSONDecodeError:
+        limpiar()
+        print("/// El archivo de usuarios no tiene un formato JSON válido. ///")
+        try: input("[Enter] ")
+        except: pass
+        return {}
     except OSError as e:
-        # BUG (TypeError): devuelve None; quien lo consuma como diccionario lanza TypeError (en menu.py el except
-        # generico lo oculta).
         limpiar()
         print(f"/// Ocurrió un error de sistema: {e} ///")
         try: input("[Enter] ")
         except: pass
-        return 
+        return {}
 
 def escribir_usuario(lista_usu):
     """
@@ -445,11 +483,13 @@ def escribir_usuario(lista_usu):
     Args:
         lista_usu (dict): Diccionario completo de usuarios a guardar.
     """
-    # BUG (OSError): sin try/except; si el archivo no se puede escribir (permisos, disco lleno) el OSError se propaga y
-    # corta el programa.
-    # TODO(TP - Req 1): envolver en try/except (OSError) para el guardado.
-    with open(inf.RUTA_USUARIOS_JSON, 'w', encoding="utf-8") as archivo:
-        json.dump(lista_usu, archivo, indent=4, ensure_ascii=False)
+    # RESUELTO (Req 1): el guardado se envuelve en try/except OSError; si el archivo no se puede escribir (permisos,
+    # disco lleno) se informa y no se corta el programa.
+    try:
+        with open(inf.RUTA_USUARIOS_JSON, 'w', encoding="utf-8") as archivo:
+            json.dump(lista_usu, archivo, indent=4, ensure_ascii=False)
+    except OSError as e:
+        print(f"/// No se pudo escribir el archivo de usuarios: {e} ///")
 
 def escribir_auto(lista_aut):
     """
@@ -458,10 +498,13 @@ def escribir_auto(lista_aut):
     Args:
         lista_aut (dict): Diccionario completo de autos a guardar.
     """
-    # BUG (OSError): sin try/except; si el archivo no se puede escribir, el error se propaga y corta el programa.
-    # TODO(TP - Req 1): envolver en try/except (OSError) para el guardado.
-    with open(inf.RUTA_AUTOS_JSON, 'w', encoding="utf-8") as archivo:
-        json.dump(lista_aut, archivo, indent=4, ensure_ascii=False)
+    # RESUELTO (Req 1): el guardado se envuelve en try/except OSError; si el archivo no se puede escribir se informa y
+    # no se corta el programa.
+    try:
+        with open(inf.RUTA_AUTOS_JSON, 'w', encoding="utf-8") as archivo:
+            json.dump(lista_aut, archivo, indent=4, ensure_ascii=False)
+    except OSError as e:
+        print(f"/// No se pudo escribir el archivo de autos: {e} ///")
 
 # ---------- CREATE ----------
 
@@ -476,13 +519,13 @@ def agregar_auto():
     autos = _cargar_autos()
 
     # Se pide la patente y se valida que no exista (una patente es unica).
-    # BUG (NameError): si el input falla (por ejemplo, EOFError), el except lo ignora y 'patente' queda sin definir ->
-    # NameError en la linea de abajo.
+    # RESUELTO (Req 1): se reemplazo el 'except: pass' por 'except EOFError' con retorno, de modo que 'patente' quede
+    # siempre definida (antes un input fallido la dejaba sin definir -> NameError).
     try: patente = input("Patente del nuevo auto: ").strip().upper()
-    except: pass
+    except EOFError: return
     while patente in autos:
             try: patente = input("Esa patente ya existe. Ingrese otra: ").strip().upper()
-            except: pass
+            except EOFError: return
 
     # Se piden y validan los demas atributos del auto.
     marca = _pedir_de_tupla("Marca: ", MARCA)
@@ -614,7 +657,8 @@ def eliminar_auto():
     el archivo JSON con la ultima version.
     (Req 2 del TP: Delete sobreescribe el archivo).
     """
-    # TODO(TP - Req 1): manejar excepciones en la carga y en el guardado.
+    # RESUELTO (Req 1): la carga y el guardado se delegan en _cargar_autos() y _guardar_autos(), que ya manejan las
+    # excepciones (FileNotFoundError, json.JSONDecodeError y OSError).
     autos = _cargar_autos()
     if not autos:
             print("\nNo hay autos en el catálogo.")
@@ -650,11 +694,10 @@ def menu_crud():
         print("[4] Modificar auto")
         print("[5] Eliminar auto")
         print("[0] Salir")
-        # TODO(TP - Req 1): manejar excepciones en el ingreso de datos.
-        # BUG (NameError): si el input falla, el except lo ignora y 'opcion' queda sin definir -> NameError en el
-        # despacho de mas abajo.
+        # RESUELTO (Req 1): el ingreso de la opcion usa try/except EOFError, asi 'opcion' quede siempre definida
+        # (antes un input fallido la dejaba sin definir -> NameError); al terminar la entrada se sale del menu.
         try: opcion = input("Seleccione una opción: ").strip()
-        except: pass
+        except EOFError: break
 
         # Despacho de la opcion elegida hacia la funcion correspondiente.
         if opcion == "1":

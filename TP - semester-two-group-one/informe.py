@@ -229,16 +229,13 @@ def informe_usuarios(
 
 if __name__ == "__main__":
     limpiar()
+    # RESUELTO (Req 1): se capturan excepciones especificas (FileNotFoundError, json.JSONDecodeError, OSError) en
+    # lugar del 'except' generico; si falla la precarga inicial se continua igual.
     try:
         # Intento de generar un informe inicial al arrancar el programa.
-        # TODO(TP - Req 1): usar manejo de excepciones especifico (FileNotFoundError, JSONDecodeError) en lugar de
-        # 'except' generico.
         informe_autos(RUTA_AUTOS_JSON, 25)
         print()
         informe_usuarios(RUTA_USUARIOS_JSON)
-    except:
-        # Si falla (archivo faltante, formato invalido, etc.) se continua igual.
-        # TODO(TP - Req 1): capturar excepciones especificas (FileNotFoundError, json.JSONDecodeError, OSError) en lugar
-        # del except generico.
+    except (FileNotFoundError, json.JSONDecodeError, OSError):
         pass
     limpiar()
