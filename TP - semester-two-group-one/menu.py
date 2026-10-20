@@ -35,7 +35,7 @@ categ_preset = {
 
 
 
-def rentar_auto(usu_info, lista_usu, lista_aut):
+def rentar_auto(usu_info, lista_usu, lista_aut, pozo):
     """
     Flujo completo para alquilar un auto disponible.
 
@@ -58,7 +58,7 @@ def rentar_auto(usu_info, lista_usu, lista_aut):
         Se usan listas por comprension y conjuntos (set) para filtrar los datos.
         Se documentan explicitamente las listas por comprension utilizadas.
     """
-
+    cd.open_usuarios()
     while True:
         cd.limpiar()
         # --- NIVEL 1: seleccion de categoria ---
@@ -158,22 +158,31 @@ def rentar_auto(usu_info, lista_usu, lista_aut):
                                 cd.limpiar()
                                 # El usuario eligio un numero; se obtiene la patente.
                                 patente_elegida = patentes[int(opcion3)-1]
+                                precio_unitario = lista_aut[patente_elegida]["precio"]                                
+                                lista_usu[usu_info[0]]["autos_rentados"].append(patente_elegida)                                
+                                # ///Detalle de la renta///
+                                print('--- DETALLE DE LA RENTA ---')
+                                # Muestra el modelo del vehiculo y la patente seleccionada
+                                print(f'vehiculo: {lista_aut[patente_elegida]["marca"]} {lista_aut[patente_elegida]["modelo"]} (patente: {patente_elegida})')
+                                # Muestra el precio diario por alquilar ese auto
+                                print(f'Precio diario: u$d {precio_unitario:.1f}')
+                                
+
+                                
+                                while True:
+                                    try:
+                                        dias = int(input("Ingrese cuantos dias desea rentar su auto : "))
+                                        if dias > 0:
+                                            break
+                                        print('La cantidad debe ser mayor a 0 ')
+                                    except ValueError:
+                                        print('Por favor, ingrese un numero entero valido')
+                                inf.pozo += dias * precio_unitario
+                                
+                                cd.escribir_usuario(lista_usu)
                                 # Marca el auto como no disponible (rentado) en autos.json.
                                 cd.modificar_estado_auto(patente_elegida, True)
-                                # Agrega la patente a los autos rentados del usuario
-                                # (usu_info[0] es el DNI, que es la clave en lista_usu).
-                                lista_usu[usu_info[0]]["autos_rentados"].append(patente_elegida)
-                                # NOTA (bug "renta infinita" - RESUELTO): antes 'lista_aut'
-                                # quedaba desactualizado en memoria y el auto se podia
-                                # volver a rentar en la misma sesion. Ahora submenu_usuario
-                                # recarga el catalogo desde disco (cd.open_autos()) antes de
-                                # cada operacion, por lo que el cambio ya se refleja.
-                                # Persiste los usuarios (con el nuevo alquiler).
-                                cd.escribir_usuario(lista_usu)
-                                # Salir del bucle de patentes tras alquilar.
-                                return 
-                    # RESUELTO (Req 1): en lugar de 'except Exception' se capturan las excepciones esperadas del
-                    # bloque (KeyError, IndexError, TypeError, ValueError).
+                                return pozo
                     except (KeyError, IndexError, TypeError, ValueError) as e: input(e)
 
 def devolver_auto(usu_info, lista_usu):
@@ -236,10 +245,6 @@ def devolver_auto(usu_info, lista_usu):
             # Salir del bucle de patentes tras devolver.
             return 
 
-# Muestra la disponibilidad de unidades (informe para la empresa).
-# NOTA (implementado): ahora delega en cd.ver_stock(1, 0), que arma con pandas
-# el catalogo completo. El texto viejo sobre "(contexto global: lista, opcion,
-# opcion2)" ya no aplica.
 def ver_catalogo():
     """
     Muestra la disponibilidad de unidades.
@@ -283,119 +288,7 @@ def estado_rentas():
     cd.ver_stock(0,1)
 
 def informe_estadisticas():
-    """
-    Muestra estadisticas del catalogo de autos con graficos de matplotlib
-    en una sola ventana, dispuestos en una grilla de 2x2.
-
-    Graficos:
-        1. Barras: cantidad de autos por categoria.
-        2. Barras: autos disponibles vs rentados.
-        3. Torta: distribucion de autos por marca.
-        4. Barras: precio promedio (u$d) por categoria.
-
-    La ventana se mantiene abierta hasta que el usuario la cierra.
-
-    Returns:
-        None
-    """
-    # Se importa aca para que, si la libreria no esta instalada, solo falle
-    # esta opcion del menu y no todo el programa.
-    try:
-        import matplotlib.pyplot as plt
-    except ImportError:
-        cd.limpiar()
-        print("Falta la libreria 'matplotlib'. Instalela con: pip install matplotlib")
-        try:
-            input("[Enter] ")
-        except EOFError:
-            pass
-        return
-
-    cd.limpiar()
-    autos = cd.open_autos()
-
-    if not autos:
-        print("No hay autos en el catálogo para calcular estadísticas.")
-        try:
-            input("[Enter] ")
-        except EOFError:
-            pass
-        return
-
-    # Acumuladores: se usan .get() para tolerar autos con claves faltantes.
-    por_categoria = {}
-    por_marca = {}
-    estado = {"Disponibles": 0, "Rentados": 0}
-    suma_precios = {}
-
-    for datos in autos.values():
-        categoria = str(datos.get("categoria", "sin_categoria"))
-        marca = str(datos.get("marca", "sin_marca")).capitalize()
-        precio = datos.get("precio", 0)
-
-        por_categoria[categoria] = por_categoria.get(categoria, 0) + 1
-        por_marca[marca] = por_marca.get(marca, 0) + 1
-        suma_precios[categoria] = suma_precios.get(categoria, 0) + (
-            precio if isinstance(precio, (int, float)) else 0
-        )
-
-        if datos.get("estado") == True:
-            estado["Disponibles"] += 1
-        else:
-            estado["Rentados"] += 1
-
-    # Precio promedio por categoria.
-    precio_promedio = {
-        cat: round(suma_precios[cat] / por_categoria[cat], 1)
-        for cat in por_categoria
-    }
-
-    try:
-        fig, ejes = plt.subplots(2, 2, figsize=(13, 8))
-        fig.suptitle(f"Estadísticas del catálogo ({len(autos)} autos)", fontsize=14)
-
-        # 1. Autos por categoria.
-        ax = ejes[0][0]
-        barras = ax.bar(list(por_categoria.keys()), list(por_categoria.values()),
-                        color="#4C72B0")
-        ax.bar_label(barras)
-        ax.set_title("Autos por categoría")
-        ax.set_ylabel("Cantidad")
-        ax.tick_params(axis="x", rotation=20)
-
-        # 2. Disponibles vs rentados.
-        ax = ejes[0][1]
-        barras = ax.bar(list(estado.keys()), list(estado.values()),
-                        color=["#55A868", "#C44E52"])
-        ax.bar_label(barras)
-        ax.set_title("Disponibles vs Rentados")
-        ax.set_ylabel("Cantidad")
-
-        # 3. Distribucion por marca (torta).
-        ax = ejes[1][0]
-        ax.pie(list(por_marca.values()), labels=list(por_marca.keys()),
-               autopct="%1.1f%%", startangle=90)
-        ax.set_title("Distribución por marca")
-
-        # 4. Precio promedio por categoria.
-        ax = ejes[1][1]
-        barras = ax.bar(list(precio_promedio.keys()), list(precio_promedio.values()),
-                        color="#DD8452")
-        ax.bar_label(barras, fmt="%.0f")
-        ax.set_title("Precio promedio por categoría")
-        ax.set_ylabel("u$d")
-        ax.tick_params(axis="x", rotation=20)
-
-        fig.tight_layout()
-        print("Se abrió la ventana con los gráficos. Cierrela para volver al menú.")
-        # show() bloquea la ejecucion hasta que se cierra la ventana.
-        plt.show()
-    except (TypeError, ValueError, KeyError, RuntimeError) as e:
-        print(f"\nNo se pudo generar el gráfico: {e}")
-        try:
-            input("[Enter] ")
-        except EOFError:
-            pass
+print("hola")
 
 def menu_principal():   
     """
