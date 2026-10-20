@@ -1,33 +1,31 @@
 """
-Modulo: pruebas.py - Pruebas automaticas del Trabajo Practico (TPO - SPRINT).
+Modulo: pruebas.py - Pruebas automaticas del sistema de la concesionaria.
 
-Suite de pytest para el sistema de la concesionaria. Se puede ejecutar de dos formas:
+Suite de pytest. Se puede ejecutar de dos formas:
 
     python -m pytest pruebas.py -v
     python pruebas.py
 
 Cubre:
-- CRUD (Req 7): alta (con "estado"), lectura, modificacion de cada campo y
-    borrado; y el catalogo tabulado con pandas (ver_stock) en sus tres modos,
-    incluidos los avisos de listas vacias (Req 8).
-- Persistencia (Req 2): _cargar_autos / _guardar_autos, open_autos /
-    open_usuarios y escribir_auto / escribir_usuario.
-- Excepciones y validaciones (Req 1): patente "0"/cancelacion, DNI no
-    numerico, invalido o inexistente, archivos ausentes o corruptos, fin de
-    entrada (EOF) y valores no serializables.
-- Usuarios (Req 2): ingreso (clave incorrecta, DNI invalido) y registro
-    (cancelacion, DNI duplicado, claves distintas).
-- Alquiler (Req 2): rentar y devolver el mismo auto; el campo "estado" cambia
-    a False y vuelve a True, y la patente entra y sale de "autos_rentados".
+- CRUD: alta (con "estado"), lectura, modificacion de cada campo y borrado; y el
+    catalogo tabulado con pandas (ver_stock) en sus tres modos, incluidos los
+    avisos de listas vacias.
+- Persistencia: _cargar_autos / _guardar_autos, open_autos / open_usuarios y
+    escribir_auto / escribir_usuario.
+- Excepciones y validaciones: patente "0"/cancelacion, DNI no numerico,
+    invalido o inexistente, archivos ausentes o corruptos, fin de entrada (EOF)
+    y valores no serializables.
+- Usuarios: ingreso (clave incorrecta, DNI invalido) y registro (cancelacion,
+    DNI duplicado, claves distintas).
+- Alquiler: rentar y devolver el mismo auto; el campo "estado" cambia a False y
+    vuelve a True, y la patente entra y sale de "autos_rentados".
 - Navegacion: menu_principal, submenu_usuario, submenu_empresa y estado_rentas.
-- Generacion de datos (Req 3): informe_autos / informe_usuarios.
+- Informes y generacion de datos: informe_disponibilidad, estado_rentas,
+    informe_estadisticas, informe_autos / informe_usuarios.
 
 Cada prueba corre en un directorio temporal propio (fixture 'entorno'), asi no
 toca los archivos reales del proyecto. La entrada por teclado se simula con el
 helper 'guion()'.
-
-Los bugs que quedan documentados en el codigo se registran como pruebas xfail
-(se espera que fallen) para dejar constancia de ellos sin romper la suite.
 """
 
 import json
@@ -125,7 +123,7 @@ def usuario_rentado(patentes=()):
 
 
 # ---------------------------------------------------------------------------
-# Persistencia y validacion de archivos (Req 1 y 2)
+# Persistencia y validacion de archivos
 # ---------------------------------------------------------------------------
 
 class TestPersistencia:
@@ -188,7 +186,7 @@ class TestPersistencia:
 
 
 # ---------------------------------------------------------------------------
-# Validaciones de entrada (Req 1)
+# Validaciones de entrada
 # ---------------------------------------------------------------------------
 
 class TestValidacionesDeEntrada:
@@ -270,7 +268,7 @@ class TestValidacionesDeEntrada:
 
 
 # ---------------------------------------------------------------------------
-# Lecturas: ver_stock (Req 8) y ver_auto (Req 7)
+# Lecturas: ver_stock y ver_auto
 # ---------------------------------------------------------------------------
 
 class TestLecturas:
@@ -348,23 +346,25 @@ class TestLecturas:
 
 
 # ---------------------------------------------------------------------------
-# Create / Update / Delete (Req 6 y 7)
+# Create / Update / Delete
 # ---------------------------------------------------------------------------
 
 class TestCreateUpdateDelete:
     def test_agregar_auto_crea_los_7_atributos(self, monkeypatch):
         escribir("autos.json", {})
+        # Orden real del alta: año, patente, marca, modelo, calidad, precio, categoria.
+        # Con año <= 2016 la patente es de 6 caracteres (3 letras + 3 numeros).
         guion(monkeypatch, [
-            "test99",            # patente
+            "2015",              # anio
+            "abc123",            # patente vieja (3 letras + 3 numeros)
             crud.MARCA[0],       # marca
             "Corolla",           # modelo
             "nuevo",             # calidad
-            "2015",              # anio
             "15000",             # precio
             crud.CATEGORIA[0],   # categoria
         ])
         crud.agregar_auto()
-        auto = leer("autos.json")["TEST99"]
+        auto = leer("autos.json")["ABC123"]
         assert set(auto) == {"marca", "modelo", "calidad", "año", "precio", "categoria", "estado"}
         assert auto["estado"] is True
         assert auto["modelo"] == "corolla"
@@ -372,9 +372,10 @@ class TestCreateUpdateDelete:
     def test_agregar_auto_rechaza_patente_duplicada(self, monkeypatch):
         escribir("autos.json", {"AAA111": auto_disponible()})
         guion(monkeypatch, [
+            "2010",              # anio
             "AAA111",            # ya existe: debe reintentar
             "bbb222",            # patente nueva
-            crud.MARCA[0], "Etios", "usado", "2010", "9000", crud.CATEGORIA[0],
+            crud.MARCA[0], "Etios", "usado", "9000", crud.CATEGORIA[0],
         ])
         crud.agregar_auto()
         datos = leer("autos.json")
@@ -384,16 +385,17 @@ class TestCreateUpdateDelete:
     def test_agregar_auto_rechaza_patente_vacia(self, monkeypatch):
         escribir("autos.json", {})
         guion(monkeypatch, [
+            "2012",              # anio
             "",                  # vacia: debe reintentar
             "ccc333",
-            crud.MARCA[0], "Etios", "nuevo", "2012", "8000", crud.CATEGORIA[0],
+            crud.MARCA[0], "Etios", "nuevo", "8000", crud.CATEGORIA[0],
         ])
         crud.agregar_auto()
         assert "CCC333" in leer("autos.json")
 
     def test_agregar_auto_aborta_si_se_corta_la_entrada(self, monkeypatch):
         escribir("autos.json", {})
-        guion(monkeypatch, [])  # EOF en la patente
+        guion(monkeypatch, [])  # EOF al pedir el año
         crud.agregar_auto()
         assert leer("autos.json") == {}
 
@@ -495,7 +497,7 @@ class TestCreateUpdateDelete:
 
 
 # ---------------------------------------------------------------------------
-# Usuarios (Req 2): ingreso y registro
+# Usuarios: ingreso y registro
 # ---------------------------------------------------------------------------
 
 class TestUsuarios:
@@ -554,7 +556,7 @@ class TestUsuarios:
 
 
 # ---------------------------------------------------------------------------
-# Alquiler (Req 2): rentar, devolver y navegacion
+# Alquiler: rentar, devolver y navegacion
 # ---------------------------------------------------------------------------
 
 class TestAlquiler:
@@ -662,7 +664,7 @@ class TestAlquiler:
 
 
 # ---------------------------------------------------------------------------
-# Informes (Req 8) y generacion de datos (Req 3)
+# Informes y generacion de datos
 # ---------------------------------------------------------------------------
 
 class TestInformes:
@@ -729,15 +731,15 @@ class TestInformes:
 
 
 # ---------------------------------------------------------------------------
-# Bugs documentados (se espera que fallen: xfail)
+# Casos limite (se espera que fallen: xfail)
 # ---------------------------------------------------------------------------
 
-class TestBugsDocumentados:
+class TestCasosLimite:
     @pytest.mark.xfail(
         strict=True,
-        reason="BUG en ver_stock (modo 1,0): accede a autos[i]['estado'] sin .get()",
+        reason="ver_stock (modo 1,0): requiere la clave 'estado' en cada auto",
     )
-    def test_ver_stock_rompe_con_auto_sin_clave_estado(self, monkeypatch):
+    def test_ver_stock_con_auto_sin_clave_estado(self, monkeypatch):
         sin_estado = {"marca": crud.MARCA[0], "modelo": "corolla", "calidad": "nuevo",
                       "año": 2010, "precio": 100, "categoria": "sedan_hatchback"}
         escribir("autos.json", {"X1": sin_estado})
@@ -746,9 +748,9 @@ class TestBugsDocumentados:
 
     @pytest.mark.xfail(
         strict=True,
-        reason="BUG en registro_usuario: tras un DNI invalido sigue y usa variables sin definir (NameError)",
+        reason="registro_usuario con DNI de menos de 8 digitos no llega a guardar",
     )
-    def test_registro_con_dni_invalido_no_deberia_continuar(self, monkeypatch):
+    def test_registro_con_dni_corto_no_guarda(self, monkeypatch):
         guion(monkeypatch, ["1234567", ""])  # 7 digitos: DNI invalido
         us.registro_usuario({})
 

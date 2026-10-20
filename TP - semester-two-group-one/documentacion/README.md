@@ -4,7 +4,7 @@
 
 | Documento | Contenido | Audiencia |
 |-----------|-----------|-----------|
-| [DOCUMENTACION_TECNICA.md](./DOCUMENTACION_TECNICA.md) | Descripción del sistema, estructura de módulos, modelo de datos, persistencia, requisitos técnicos, instalación/ejecución, manejo de errores y problemas conocidos. | Desarrolladores / docentes |
+| [DOCUMENTACION_TECNICA.md](./DOCUMENTACION_TECNICA.md) | Descripción del sistema, estructura de módulos, modelo de datos, persistencia, requisitos técnicos, instalación/ejecución y pruebas automáticas. | Desarrolladores / docentes |
 | [MANUAL_DE_USUARIO.md](./MANUAL_DE_USUARIO.md) | Guía de uso paso a paso: inicio rápido, navegación de menús, registro e ingreso, gestión del catálogo, alquileres, validaciones y solución de problemas. | Usuarios finales |
 | [presentacion_rentar.html](./presentacion_rentar.html) | Presentación HTML del flujo de alquiler. | Usuarios / docentes |
 
@@ -15,7 +15,7 @@
 - **Generar los datos (si no existen):** `python informe.py`
 - **Pruebas automáticas (pytest):** `python pruebas.py`
 - **Persistencia:** `autos.json` (catálogo) y `usuarios.json` (usuarios y sus alquileres)
-- **Lenguaje:** Python 3.12+ (requiere `pandas` para las tablas de los informes)
+- **Lenguaje:** Python 3.12+ (requiere `pandas` y `matplotlib` para las tablas y gráficos de los informes)
 
-> La documentación técnica incluye una sección de **pruebas automáticas** (§11) con el
-> detalle de la suite `pruebas.py` (94 pruebas).
+> La documentación técnica incluye una sección de **pruebas automáticas** (§8) con el
+> detalle de la suite `pruebas.py` (95 pruebas).

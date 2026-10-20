@@ -1,5 +1,5 @@
 """
-Requisitos del Trabajo Practico (TPO - SPRINT) - Programacion I
+(TPO - SPRINT) - Programacion I
 Facultad de Ingenieria Informatica
 
 Modulo: usuarios.py - Ingreso y registro de usuarios.

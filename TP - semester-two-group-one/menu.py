@@ -16,8 +16,7 @@ Es el PROGRAMA PRINCIPAL del sistema:
 - informe_estadisticas() ... graficos de barras y torta con pandas + matplotlib.
 
 Se apoya en crud.py (lee y modifica autos.json) y usuarios.py (login/registro).
-Los modelos y las patentes se filtran con listas y conjuntos por comprension
-(Requisito 5).
+Los modelos y las patentes se filtran con listas y conjuntos por comprension.
 """
 
 import crud as cd
@@ -245,7 +244,7 @@ def ver_catalogo():
     Muestra el catalogo completo de autos como tabla.
 
     Delega en `cd.ver_stock(1, 0)`, que arma con pandas el catalogo completo
-    (Req 8 del TP: reporte matricial).
+    (reporte matricial).
 
     Returns:
         None
@@ -258,7 +257,7 @@ def informe_disponibilidad():
     Muestra solo los autos disponibles como tabla.
 
     Delega en `cd.ver_stock(1, 1)`, que arma con pandas el listado filtrado de
-    los autos que no estan rentados (Req 8 del TP: reporte matricial).
+    los autos que no estan rentados (reporte matricial).
 
     Returns:
         None
@@ -271,7 +270,7 @@ def estado_rentas():
     Muestra solo los autos rentados como tabla.
 
     Delega en `cd.ver_stock(0, 1)`, que arma con pandas el listado de los autos
-    no disponibles (Req 8 del TP: reporte matricial).
+    no disponibles (reporte matricial).
 
     Returns:
         None
@@ -473,8 +472,8 @@ def submenu_empresa():
         [3] estado_rentas() ............ solo rentados (cd.ver_stock(0,1)).
         [4] informe_estadisticas() ..... resumen estadistico.
 
-    Las tablas se arman con pandas (DataFrame), que es el reporte matricial del
-    Req 8. Permite volver al menu principal con [0].
+    Las tablas se arman con pandas (DataFrame), el reporte matricial del sistema.
+    Permite volver al menu principal con [0].
 
     Returns:
         None
@@ -493,13 +492,13 @@ def submenu_empresa():
         except: opcion : str = ""
 
         if opcion == "1":
-            # Catalogo completo: tabla con pandas (Req 8).
+            # Catalogo completo: tabla con pandas.
             ver_catalogo()
         elif opcion == "2":
-            # Solo disponibles: tabla con pandas (Req 8).
+            # Solo disponibles: tabla con pandas.
             informe_disponibilidad()
         elif opcion == "3":
-            # Solo rentados: tabla con pandas (Req 8).
+            # Solo rentados: tabla con pandas.
             estado_rentas()
         elif opcion == "4":
             # Estadisticas generales del catalogo.

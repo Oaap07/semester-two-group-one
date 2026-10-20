@@ -1,5 +1,5 @@
 """
-Requisitos del Trabajo Practico (TPO - SPRINT) - Programacion I
+(TPO - SPRINT) - Programacion I
 Facultad de Ingenieria Informatica
 
 Modulo: informe.py - Constantes compartidas y precarga de datos.
@@ -14,7 +14,7 @@ años, rutas de los JSON) y las funciones que generan la precarga inicial:
 - limpiar() .......... limpia la consola segun el sistema operativo.
 
 Los catalogos de apoyo (AUTOS, categorias_modelos, preset) relacionan cada marca
-con sus modelos y cada año con el prefijo de patente que le corresponde (Req 4).
+con sus modelos y cada año con el prefijo de patente que le corresponde.
 """
 
 import json
@@ -105,14 +105,14 @@ def informe_autos(
 
     Args:
         ruta_archivo (str): Ruta del archivo JSON a generar.
-        cant_autos (int): Cantidad de autos a generar. Nota: hoy el valor se
-            ignora y siempre se generan 25 (la precarga del Req 3).
+        cant_autos (int): Cantidad de autos a generar. La precarga usa un valor
+            fijo de 25 registros.
 
     Returns:
         None
     """
     listado = {}
-    # Se fuerza la cantidad a 25 (precarga fija del Req 3).
+    # La precarga genera un catalogo fijo de 25 autos.
     cant_autos = 25
     # Se genera cada auto con patente, precio y atributos aleatorios.
     for _ in range(1, cant_autos + 1):
@@ -157,7 +157,7 @@ def informe_autos(
             "calidad": random.choice(CALIDADES),
             "año": anio,
             "precio": precio,
-            # Comprension (Req 5): busca en categorias_modelos la categoria a la
+            # Comprension: busca en categorias_modelos la categoria a la
             # que pertenece el modelo elegido.
             "categoria": [i for i in categorias_modelos if modelo in categorias_modelos[i]][0],
             # Estado inicial: disponible (True).

@@ -9,7 +9,6 @@ Tema del trabajo: Administracion de una concesionaria (catalogo de autos + alqui
 import json, os
 import informe as inf
 import pandas as pd
-import matplotlib as mt
 
 
 # ==========================================
@@ -24,6 +23,7 @@ CALIDAD = inf.CALIDADES
 MARCA = inf.MARCAS
 CATEGORIA = inf.CATEGORIAS
 ESTADO = inf.DISPONIBLE
+# Mapeo entre la opcion numerica del menu y la categoria interna de autos.json.
 categ_preset = {
     "1": "sedan_hatchback",
     "2": "suv_crossover",
@@ -31,12 +31,6 @@ categ_preset = {
     "4": "monovolumen_mpv"
 }
 
-# Mapeo entre la opcion numerica del menu de modificacion y el campo del JSON.
-# Formato: "clave de menu": ("nombre del campo en el JSON", "nombre para mostrar").
-# Se usa para no repetir la lista de campos editables en varios lugares.
-# NOTA: describe un diccionario de mapeo que ya no existe
-# en el codigo; `modificar_auto` arma las opciones en forma dinamica segun las
-# claves del auto elegido.
 
 def limpiar():
     """
@@ -118,7 +112,6 @@ def _guardar_autos(autos):
 
     Sobreescribe `autos.json` con la ultima version del diccionario recibido,
     manteniendo un formato legible (indentado) y conservando los acentos.
-    (Req 2 del TP: Create/Update/Delete sobreescriben el archivo).
 
     Args:
         autos (dict): Diccionario con el catalogo a guardar.
@@ -329,10 +322,9 @@ def ver_stock(base,rentados):
         base (int): 1 para el catalogo completo; 0 para el listado de rentados.
         rentados (int): 1 para armar un listado filtrado; 0 para el catalogo.
 
-    NOTA (funcion nueva / modificada): reemplaza a la antigua `ver_autos()` y
-    ahora es el "motor" de los informes de menu.py (`informe_disponibilidad` y
-    `estado_rentas`). Se apoya en pandas (DataFrame), que la documentacion
-    tecnica recomienda para armar reportes matriciales (Req 8 del TP).
+    Es el "motor" de los informes de menu.py (`ver_catalogo`,
+    `informe_disponibilidad` y `estado_rentas`). Se apoya en pandas (DataFrame)
+    para armar reportes matriciales.
 
     Returns:
         None
@@ -557,12 +549,14 @@ def agregar_auto():
 
     Pide todos los datos del auto y valida que la patente no exista previamente.
     Al finalizar, guarda la ultima version del diccionario en el archivo JSON.
-    (Req 2 del TP: Create sobreescribe el archivo).
     """
     autos = _cargar_autos()
 
     # Se pide la patente y se valida que no exista (una patente es unica).
     anio = _pedir_entero("Año: ", 2000, 2026)
+    # Si se corto la entrada al pedir el año, se aborta el alta sin guardar.
+    if anio is None:
+        return
     while True:
         try:
             if anio <= 2016:
@@ -666,7 +660,6 @@ def modificar_auto():
 
     Pide una patente valida, muestra los valores actuales y permite cambiar el
     campo elegido. Despues de cada cambio se guarda automaticamente en el JSON.
-    (Req 2 del TP: Update sobreescribe el archivo).
 
     El bucle se repite hasta que el usuario elige la opcion [0] salir.
     """
@@ -750,7 +743,6 @@ def eliminar_auto():
 
     Pide una patente existente, borra el registro del diccionario y sobreescribe
     el archivo JSON con la ultima version.
-    (Req 2 del TP: Delete sobreescribe el archivo).
     """
     autos = _cargar_autos()
     if not autos:

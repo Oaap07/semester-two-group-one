@@ -31,11 +31,11 @@ Todos los datos quedan guardados en dos archivos:
 ## 2. Antes de empezar (requisitos)
 
 - Tener instalado **Python 3** (versión **3.12** o superior).
-- Instalar la biblioteca **pandas** (se usa para las tablas de los informes). En una
-  terminal, una sola vez:
+- Instalar las bibliotecas **pandas** y **matplotlib** (se usan para las tablas y los
+  gráficos de los informes). En una terminal, una sola vez:
 
 ```bash
-pip install pandas
+pip install pandas matplotlib
 ```
 
 - Abrir una terminal (CMD, PowerShell o Terminal), ubicarse en la carpeta del
@@ -47,9 +47,7 @@ python informe.py
 ```
 
 Al ejecutar `informe.py` se crean `autos.json` (con 25 autos) y `usuarios.json` (con
-tres usuarios de ejemplo). Si los archivos ya existen, no se modifican.
-
----
+tres usuarios de ejemplo). Si los archivos ya existen, no se modifican.---
 
 ## 3. Inicio rápido
 
@@ -68,9 +66,9 @@ python menu.py
 python crud.py
 ```
 
-> **Importante:** `menu.py` **no** genera los datos. Si `autos.json` o `usuarios.json`
-> no existen, el programa sigue funcionando pero sin datos. Creá los archivos con
-> `python informe.py` antes de usar `menu.py`.
+> **Importante:** al iniciarse, `menu.py` precarga `autos.json` y `usuarios.json` si
+> no existen (o si están vacíos) y luego abre el menú principal. También podés
+> generarlos a mano con `python informe.py` antes de usar `menu.py`.
 
 > **Usuarios de ejemplo:** si generaste los datos con `informe.py`, podés ingresar con
 > cualquiera de estos DNI, todos con la **contraseña `1234`**:
@@ -140,7 +138,8 @@ Después de **ingresar correctamente**, aparece el submenú de manejo de autos:
 - **[1] Ver STOCK completo:** muestra todo el catálogo como tabla.
 - **[2] Autos Disponibles:** tabla con **solo** los autos disponibles.
 - **[3] Autos rentados:** tabla con **solo** los autos alquilados.
-- **[4] Estadísticas generales:** **pendiente** (todavía no muestra información).
+- **[4] Estadísticas generales:** gráficos del catálogo (barras de autos disponibles por
+  marca y torta de disponibles vs. rentados).
 
 ### 4.4 Menú del CRUD (`crud.py`)
 
@@ -214,9 +213,10 @@ patente se agrega a tus **autos rentados** en `usuarios.json`.
 - **[1] Ver STOCK completo:** tabla con **todos** los autos y su estado.
 - **[2] Autos Disponibles:** tabla con **solo** los autos disponibles.
 - **[3] Autos rentados:** tabla con **solo** los autos alquilados.
+- **[4] Estadísticas generales:** abre una ventana con los gráficos del catálogo (una
+  barra por marca con los autos disponibles y una torta de disponibles vs. rentados).
 
-Las tablas se generan con pandas (reporte matricial). La opción
-**[4] Estadísticas generales** todavía está pendiente.
+Las tablas se generan con pandas (reporte matricial) y los gráficos con matplotlib.
 
 ---
 
@@ -246,15 +246,18 @@ Si no hay autos, el sistema avisa: *"No hay autos en el catálogo."*
 
 ### 7.3 Agregar un auto — opción [3]
 
-1. Ingresá la **patente**. No puede repetirse (debe ser única).
-2. Completá los campos; el sistema valida cada uno:
+1. Ingresá el **año** (número entero entre 2000 y 2026).
+2. Ingresá la **patente**. El formato depende del año:
+   - año ≤ 2016 → 3 letras + 3 números (ej. `ABC123`);
+   - año > 2016 → 2 letras + 3 números + 2 letras (ej. `AA123AA`).
+   No puede repetirse (debe ser única).
+3. Completá el resto de los campos; el sistema valida cada uno:
 
 | Campo | Qué ingresar |
 |-------|--------------|
 | Marca | Una de: `toyota`, `renault`, `fiat`, `peugeot`, `chevrolet` |
-| Modelo | Texto libre (se guarda en minúsculas) |
+| Modelo | Uno de los modelos de la marca elegida (ej. `etios`, `corolla`) |
 | Calidad | Una de: `nuevo`, `cuidado`, `usado` |
-| Año | Número entero entre 2000 y 2026 |
 | Precio | Número positivo (podés usar coma o punto) |
 | Categoría | Una de: `sedan_hatchback`, `suv_crossover`, `pickup`, `monovolumen_mpv` |
 
@@ -296,8 +299,10 @@ Al terminar: *"Auto [PATENTE] agregado correctamente."*
 
 El sistema evita datos incorrectos:
 
-- **Patentes:** se convierten a mayúsculas y no pueden repetirse.
+- **Patentes:** se convierten a mayúsculas y no pueden repetirse. El formato depende
+  del año: `ABC123` (año ≤ 2016) o `AA123AA` (año > 2016).
 - **Marca / Calidad / Categoría:** solo aceptan los valores predefinidos.
+- **Modelo:** debe ser uno de los modelos de la marca elegida.
 - **Año:** obligatorio entero entre 2000 y 2026.
 - **Precio:** número positivo (se acepta `50,5` o `50.5`).
 - **DNI:** 8 dígitos numéricos.
@@ -317,19 +322,16 @@ Los archivos `usuarios.json`/`autos.json` pueden no existir (generálos con
 `python informe.py`) o el DNI no está registrado. Podés usar un usuario de ejemplo
 (contraseña `1234`): DNI `95823279`, `4817866` o `46280291`; o registrarte con [2].
 
-**El programa falla al abrir / no encuentra pandas.**
-Falta instalar la dependencia: `pip install pandas`.
+**El programa falla al abrir / no encuentra pandas o matplotlib.**
+Faltan instalar las dependencias: `pip install pandas matplotlib`.
 
 **Cargué autos con `crud.py` y desaparecieron.**
-Ya no debería pasar: `menu.py` **no** regenera el catálogo. Verificá que estás usando
-la misma carpeta (los archivos son relativos al directorio actual).
+Verificá que estás usando la misma carpeta (los archivos son relativos al directorio
+actual).
 
-**Al elegir "Estadísticas generales" no pasa nada de utilidad.**
-Esa función todavía no está implementada (ver documentación técnica).
-
-**Al elegir "Rentar" o "Devolver" volvía al mismo menú sin hacer nada.**
-Era un `TypeError` por llamar a las funciones con un número equivocado de argumentos
-(ya corregido). Si te pasa, actualizá `menu.py` a la última versión.
+**Al elegir "Rentar" o "Devolver" vuelvo al mismo menú sin hacer nada.**
+Asegurate de haber ingresado o registrado antes: para alquilar o devolver primero hay
+que iniciar sesión.
 
 **Un modelo de una categoría no aparece al alquilar.**
 Puede estar ya alquilado (no se muestran los autos rentados) o no pertenecer a la
