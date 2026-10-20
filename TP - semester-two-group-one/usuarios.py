@@ -130,33 +130,38 @@ def registro_usuario(lista):
                 # referencia); no tiene efecto sobre el programa.
                 limpiar
                 try: dni_usu = int(input("Ingrese su DNI: "))
-                except: print("\nError, sólo se permiten números"); input("[Enter] "); break
+                except: 
+                    print("\nError, sólo se permiten números")
+                    try: input("[Enter] ")
+                    except: pass
+                    return
 
                 if dni_usu == 0: return
                 elif len(str(dni_usu)) != 8:
                     print("\nDNI inválido, intente de nuevo.")
                     try: input("[Enter] ")
                     except: pass
-                    break
+                    return
                 elif str(dni_usu) in lista:
                     print("\nDNI ya existente, vaya a 'INGRESAR'")
                     try: input("[Enter] ")
                     except: pass
-                    return ()
+                    return
                 else:
                     nombre_usu : str = input("Ingrese su nombre: ")
-                    clave_usu : str = input("Ingrese una contraseña: ").lower()
+                    clave_usu : str = input("Ingrese una contraseña: ")
                     
                     if clave_usu == "0" or nombre_usu == "0": return ()
-                    clave_usu2 : str = input("Comprueba contraseña: ").lower()
+                    clave_usu2 : str = input("Comprueba contraseña: ")
                     
                     # Bucle de confirmacion: la clave se repite hasta coincidir.
                     while True:
                         if clave_usu == clave_usu2: break
                         elif clave_usu2 == "0": return
                         else: clave_usu2 = input("|| Clave incorrecta, intente de nuevo: ")
-                # Sale del bucle interior tras un intento correcto.
                 break
+                
+                # Sale del bucle interior tras un intento correcto.
         # Se capturan excepciones especificas (ValueError, TypeError/KeyError si
         # 'lista' no es un diccionario valido).
         except (ValueError, TypeError, KeyError):

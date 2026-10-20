@@ -305,7 +305,7 @@ def informe_estadisticas():
 
     autos_excel_modificado = (cd.pd.DataFrame(datos)).T
     
-    midf_true = autos_excel_modificado[autos_excel_modificado["estado"] == True].groupby(autos_excel_modificado["marca"]).size()
+    midf_true = autos_excel_modificado[autos_excel_modificado["estado"] == True].groupby(autos_excel_modificado["marca"]).size().sort_values()
     lista_estados_totales = autos_excel_modificado["estado"].value_counts()
 
     colores_barras = [
@@ -341,8 +341,12 @@ def informe_estadisticas():
                 loc="center",
                 )
     
+    ax1.grid(True, axis='y', linestyle=':', color='gray', alpha=0.6)
+    
     plt.tight_layout()
     plt.show()
+
+
 
     input("Enter para salir: ")
 
@@ -478,6 +482,22 @@ def submenu_empresa():
     Returns:
         None
     """
+    contrasenia = "rent_ar"
+
+    while True:
+        cd.limpiar()
+        try: res = input("/// Ingrese la contraseña de Empresario \n[0] Para salir...\n\n-- ")
+        except: print("[Error] Intente de nuevo"); cd._entrada(input("[Enter] ")); res = ""
+        if res == "0":
+            return
+        elif res == contrasenia:
+            break
+        else:
+            print("\n --- Contraseña incorrecta! Intente de nuevo: ")
+            try: input("[Enter] ")
+            except: pass
+
+
     while True:
         cd.limpiar()
         print("--- SUBMENÚ: INFORMES ---\n")

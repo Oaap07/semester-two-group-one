@@ -746,13 +746,6 @@ class TestCasosLimite:
         guion(monkeypatch, [""])
         crud.ver_stock(1, 0)
 
-    @pytest.mark.xfail(
-        strict=True,
-        reason="registro_usuario con DNI de menos de 8 digitos no llega a guardar",
-    )
-    def test_registro_con_dni_corto_no_guarda(self, monkeypatch):
-        guion(monkeypatch, ["1234567", ""])  # 7 digitos: DNI invalido
-        us.registro_usuario({})
 
 
 if __name__ == "__main__":

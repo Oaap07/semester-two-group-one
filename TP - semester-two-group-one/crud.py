@@ -6,6 +6,7 @@ Modulo: crud.py - Gestion CRUD del catalogo de autos.
 Tema del trabajo: Administracion de una concesionaria (catalogo de autos + alquileres).
 
 """
+from pathlib import Path
 import json, os
 import informe as inf
 import pandas as pd
@@ -803,5 +804,17 @@ def menu_crud():
 if __name__ == "__main__":
     # Punto de entrada: ejecuta el menu CRUD si se corre este archivo directamente.
     limpiar()
+    ruta_archivo1 = "usuarios.json"
+    ruta_archivo2 = "autos.json"
+    archivo1 = Path(ruta_archivo1)
+    archivo2 = Path(ruta_archivo2)
+    if archivo1.is_file():
+        print("Es un archivo usuarios ya existente.")
+    else:
+        inf.informe_usuarios(archivo1)
+    if archivo2.is_file():
+        print("Es un archivo autos ya existente.")
+    else:
+        inf.informe_autos(archivo2, 25)
     menu_crud()
     limpiar()
