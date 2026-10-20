@@ -17,7 +17,8 @@ que comparten datos a través de archivos JSON:
 - `menu.py` — programa principal: menús de usuario y de empresa.
 - `crud.py` — alta, baja, modificación y consulta del catálogo, más la persistencia.
 - `usuarios.py` — ingreso (login) y registro de usuarios.
-- `informe.py` — constantes compartidas, rutas de archivos y precarga de datos.
+- `informe.py` — constantes compartidas, rutas de archivos, precarga y recaudación.
+- `pruebas.py` — suite de pruebas automáticas con **pytest** (94 pruebas).
 
 Archivos de datos (se crean en tiempo de ejecución con `python informe.py`):
 
@@ -31,9 +32,12 @@ La aplicación ofrece:
 
 - Un **CRUD completo** del catálogo (Crear, Leer, Actualizar, Eliminar).
 - Un **menú de usuario** para ingresar/registrarse, alquilar y devolver autos.
-- Un **menú de empresa** con informes (disponibilidad y estado de los autos
-  rentados como tabla con pandas).
-- Una **precarga** de autos aleatorios (`informe.informe_autos`).
+- Un **menú de empresa** con informes (catálogo completo, disponibilidad y estado de
+  los autos rentados, todos como tabla con pandas).
+- Una **precarga** de autos y usuarios aleatorios (`informe.informe_autos` /
+  `informe.informe_usuarios`).
+- Una **suite de pruebas** (`pruebas.py`) que verifica el CRUD, la persistencia, las
+  validaciones, el alquiler y los informes.
 
 ---
 
@@ -41,14 +45,14 @@ La aplicación ofrece:
 
 | # | Requisito | Estado en el código |
 |---|-----------|---------------------|
-| 1 | Manejo de excepciones en ingreso de datos, conversiones y archivos | **Parcial** — hay `try/except` en las entradas y al abrir/guardar archivos, pero abundan los `except` genéricos y varias funciones devuelven `None` ante un error. |
+| 1 | Manejo de excepciones en ingreso de datos, conversiones y archivos | **Cumplido** — todas las entradas y el acceso a archivos usan excepciones específicas (`ValueError`, `EOFError`, `FileNotFoundError`, `json.JSONDecodeError`, `OSError`, `KeyError`, `TypeError`). |
 | 2 | Persistencia en JSON (CUD sobreescriben; Read lee) | **Cumplido** (`autos.json`, `usuarios.json`). |
-| 3 | Precarga desde archivo inicial (mínimo 5 registros) | **Cumplido** (`informe_autos` genera 25 autos; `informe_usuarios` deja 1 usuario de ejemplo). |
+| 3 | Precarga desde archivo inicial (mínimo 5 registros) | **Cumplido** (`informe_autos` genera 25 autos; `informe_usuarios` deja 3 usuarios de ejemplo). |
 | 4 | Uso de tupla o conjunto en la lógica | **Cumplido** (tuplas `MARCAS`, `CALIDADES`, `CATEGORIAS`, `DISPONIBLE`, `ANIOS`; conjuntos en las comprensiones de `menu.py`). |
 | 5 | Al menos una lista por comprensión o lambda | **Cumplido** (comprensiones en `menu.py` e `informe.py`). |
 | 6 | Entidad con diccionario de diccionarios y ≥ 5 atributos | **Cumplido** (7 atributos por auto). |
 | 7 | Menú en consola con CRUD completo | **Cumplido** (`crud.py`). |
-| 8 | Al menos un reporte matricial | **Parcial** — `ver_stock` arma la tabla con pandas (DataFrame) y la reutilizan `informe_disponibilidad` y `estado_rentas`; `informe_estadisticas` sigue siendo un stub. |
+| 8 | Al menos un reporte matricial | **Cumplido** — `ver_stock` arma la tabla con pandas (DataFrame) y la reutilizan `ver_catalogo`, `informe_disponibilidad` y `estado_rentas`; además `crud.py` muestra un ejemplo de matriz como lista de listas (§10). |
 
 ---
 
@@ -59,9 +63,8 @@ TP - semester-two-group-one/
 ├── menu.py                # Punto de entrada: menús de usuario y empresa.
 ├── crud.py                # CRUD del catálogo + persistencia + ver_stock (pandas).
 ├── usuarios.py            # Ingreso y registro de usuarios.
-├── informe.py             # Constantes, rutas y precarga (autos y usuarios).
-├── pruebas.py             # Archivo vacío (placeholder, sin contenido).
-├── tempCodeRunnerFile.py  # Resto de la extensión Code Runner (no es del proyecto).
+├── informe.py             # Constantes, rutas, precarga y recaudación (pozo).
+├── pruebas.py             # Suite de pruebas automáticas (pytest).
 ├── autos.json             # Catálogo de autos (persistencia; se genera al ejecutar).
 ├── usuarios.json          # Usuarios (persistencia; se genera al ejecutar).
 └── documentacion/
@@ -82,8 +85,9 @@ informe.py   (constantes + rutas; no importa otros módulos del TP)
 ```
 
 - `crud.py` se puede ejecutar solo (`python crud.py`) e importa `informe` y `pandas`.
-- `menu.py` es el programa principal e importa `crud` y `usuarios`.
+- `menu.py` es el programa principal e importa `crud`, `usuarios` e `informe`.
 - `informe.py` no depende de ningún otro módulo del TP.
+- `pruebas.py` importa los cuatro módulos y corre con `pytest`.
 
 ---
 
@@ -118,13 +122,12 @@ diccionario con los atributos del auto. Cada auto tiene **7 claves**:
 | `categoria` | str | `sedan_hatchback`, `suv_crossover`, `pickup`, `monovolumen_mpv` |
 | `estado` | bool | `true` = disponible; `false` = alquilado |
 
-> **Nota (dato faltante):** `agregar_auto()` **no** crea la clave `estado`. Los autos
-> dados de alta desde el CRUD quedan sin `estado`, y leerlos luego en
-> `_mostrar_auto`, `ver_stock` o `rentar_auto` lanza `KeyError` (ver §9).
+> **Nota:** `agregar_auto()` crea el auto con las **7 claves del esquema** (incluido
+> `"estado": True`), así que un auto dado de alta desde el CRUD queda disponible y se
+> muestra sin problemas en `_mostrar_auto`, `ver_stock` y `rentar_auto`.
 
-> **Nota (calidades):** la tupla `CALIDADES` es `("nuevo", "cuidado", "usado")`, pero
-> algunos datos pueden contener `"como nuevo"`, que ya no está en la tupla; validar
-> ese valor con el CRUD lo rechaza.
+> **Nota (calidades):** `CALIDADES` es `("nuevo", "cuidado", "usado")` y con esos
+> valores se precarga y se valida el catálogo.
 
 ### 4.2 Usuarios (`usuarios.json`)
 
@@ -133,9 +136,9 @@ que tiene alquiladas:
 
 ```json
 {
-    "10101010": {
-        "nombre": "Jorge",
-        "clave": "1010",
+    "95823279": {
+        "nombre": "Jorge Adrian Gonzalez Padron",
+        "clave": "1234",
         "autos_rentados": ["QRT509"]
     }
 }
@@ -158,8 +161,8 @@ toca). Reglas de generación:
 - `estado` inicial: `True` (disponible).
 
 > **Importante:** `informe_autos` **ignora** el parámetro `cant_autos` y fuerza `25`
-> internamente. `informe_usuarios` deja precargado un único usuario de ejemplo
-> (DNI `10101010`, nombre `Jorge`, clave `1010`) para poder probar el ingreso.
+> internamente. `informe_usuarios` deja precargados **3 usuarios de ejemplo**, todos con
+> clave `1234` (DNI `95823279`, `4817866` y `46280291`), para poder probar el ingreso.
 
 ---
 
@@ -169,16 +172,16 @@ toca). Reglas de generación:
 
 | Función | Tipo | Descripción |
 |---------|------|-------------|
-| `_cargar_autos()` | Persistencia | Lee `autos.json` y lo devuelve como diccionario. |
+| `_cargar_autos()` | Persistencia | Lee `autos.json` y lo devuelve como diccionario (`{}` si falla). |
 | `_guardar_autos(autos)` | Persistencia | Sobreescribe `autos.json`. |
-| `open_autos()` / `open_usuarios()` | Persistencia | Lecturas usadas por `menu.py` (devuelven `None` si falla). |
+| `open_autos()` / `open_usuarios()` | Persistencia | Lecturas usadas por `menu.py` (devuelven `{}` si falla). |
 | `escribir_usuario(lista)` / `escribir_auto(lista)` | Persistencia | Sobreescriben `usuarios.json` / `autos.json`. |
 | `_pedir_de_tupla`, `_pedir_entero`, `_pedir_float`, `_pedir_patente_existente` | Validación | Piden y validan datos. |
 | `_mostrar_auto(patente, datos)` | Visualización | Imprime la ficha de un auto. |
-| `ver_stock(base, rentados)` | **Read** | Tabla con pandas: `(1,0)` catálogo completo; `(0,1)` solo rentados. |
+| `ver_stock(base, rentados)` | **Read** | Tabla con pandas: `(1,0)` catálogo completo; `(1,1)` solo disponibles; `(0,1)` solo rentados. |
 | `ver_auto()` | **Read** | Muestra la ficha de un auto según su patente. |
-| `agregar_auto()` | **Create** | Da de alta un auto nuevo. |
-| `modificar_estado_auto(patente, estado)` | **Update** | Marca un auto como disponible/no disponible en `autos.json`. |
+| `agregar_auto()` | **Create** | Da de alta un auto nuevo (con las 7 claves). |
+| `modificar_estado_auto(patente, estado)` | **Update** | Invierte el estado de un auto en `autos.json`. |
 | `modificar_auto()` | **Update** | Modifica campos de un auto existente. |
 | `eliminar_auto()` | **Delete** | Elimina un auto por patente. |
 | `menu_crud()` | Menú | Menú interactivo del CRUD. |
@@ -188,24 +191,27 @@ toca). Reglas de generación:
 | Función | Descripción |
 |---------|-------------|
 | `limpiar()` | Limpia la consola según el sistema operativo. |
-| `rentar_auto(usu_info, lista_usu, lista_aut)` | Flujo de alquiler: categoría → modelo → patente. |
+| `rentar_auto(usu_info, lista_usu, lista_aut, pozo)` | Flujo de alquiler: categoría → modelo → patente; acumula en `pozo`. |
 | `devolver_auto(usu_info, lista_usu)` | Registra la devolución de un auto alquilado. |
-| `informe_disponibilidad()` | Tabla del catálogo completo (`cd.ver_stock(1,0)`). |
+| `ver_catalogo()` | Tabla del catálogo completo (`cd.ver_stock(1,0)`). |
+| `informe_disponibilidad()` | Tabla de los autos disponibles (`cd.ver_stock(1,1)`). |
 | `estado_rentas()` | Tabla de los autos rentados (`cd.ver_stock(0,1)`). |
-| `informe_estadisticas()` | **Pendiente** (stub: imprime `"hola"`). |
+| `informe_estadisticas()` | **Pendiente** (stub: imprime `"hola"`; ver §9). |
 | `menu_principal()` | Menú principal (usuario / empresa / salir). |
 | `submenu_usuario()` | Ingresar / registrarse y luego alquilar / devolver. |
-| `submenu_empresa()` | Submenú de informes. |
+| `submenu_empresa()` | Submenú de informes (4 opciones). |
 
 **Flujo de `rentar_auto()`:**
 
 1. Lista las categorías y pide una opción.
 2. Filtra los **modelos** disponibles de esa categoría (excluye los alquilados).
 3. Filtra las **patentes** disponibles de ese modelo.
-4. Marca el auto como no disponible (`modificar_estado_auto`) y agrega la patente a
-   `autos_rentados` del usuario en `usuarios.json`.
+4. Pide los días de alquiler, acumula `días × precio` en `pozo`, marca el auto como no
+   disponible (`modificar_estado_auto`) y agrega la patente a `autos_rentados` del
+   usuario en `usuarios.json`.
 
-Los filtros usan **listas/sets por comprensión** (Requisito 5).
+Los filtros usan **listas/sets por comprensión** (Requisito 5). La recaudación vive en
+`informe.pozo` y se le pasa a la función como cuarto argumento.
 
 **Flujo de `devolver_auto()`:** lista los autos del usuario, pide cuál devolver,
 marca el auto como disponible y quita la patente de `autos_rentados`.
@@ -229,8 +235,9 @@ marca el auto como disponible y quita la patente de `autos_rentados`.
 | `AUTOS`, `MARCAS`, `CALIDADES`, `DISPONIBLE`, `ANIOS`, `CATEGORIAS` | Constantes/tuplas compartidas. |
 | `categorias_modelos`, `preset`, `letras`, `numeros` | Datos auxiliares de la precarga. |
 | `RUTA_AUTOS_JSON`, `RUTA_USUARIOS_JSON` | Rutas relativas de los archivos de datos. |
+| `pozo` | Recaudación acumulada de los alquileres (la actualiza `rentar_auto`). |
 | `informe_autos(ruta, cant)` | Genera 25 autos aleatorios (solo si el archivo no existe). |
-| `informe_usuarios(ruta)` | Crea `usuarios.json` con 1 usuario de ejemplo (si no existe). |
+| `informe_usuarios(ruta)` | Crea `usuarios.json` con 3 usuarios de ejemplo (si no existe). |
 
 ---
 
@@ -265,57 +272,58 @@ python menu.py
 
 # 5) Ejecutar SOLO el CRUD del catálogo (programa independiente)
 python crud.py
+
+# 6) Correr la suite de pruebas
+python pruebas.py
 ```
 
-> **Atención:** `menu.py` **no** genera los datos. Si `autos.json` o `usuarios.json`
-> no existen, las lecturas devuelven `None` y el programa falla al ingresar o
-> alquilar. Ejecutá `python informe.py` una vez para crearlos, o cargá el catálogo con
-> `python crud.py`.
+> **Datos de arranque:** `menu.py` **no** genera los datos. Si `autos.json` o
+> `usuarios.json` no existen, ejecutá `python informe.py` una vez para crearlos (o
+> cargá el catálogo con `python crud.py`). Si faltan, las lecturas devuelven `{}` y el
+> programa sigue funcionando, simplemente sin datos.
 
 ---
 
 ## 8. Manejo de errores (estado actual)
 
-| Ubicación | Manejo actual | Mejora pendiente |
-|-----------|---------------|------------------|
+| Ubicación | Manejo actual | Estado |
+|-----------|---------------|--------|
+| `_entrada` (crud) | `try/except EOFError` | Ok |
 | `_pedir_float` (crud) | `try/except ValueError` | Ok |
-| `_cargar_autos` (crud) | `try/except FileNotFoundError / OSError` | Devuelve `None` en `OSError` |
-| `_guardar_autos` (crud) | `try/except FileNotFoundError / OSError` | Ok (avisa por pantalla) |
-| `open_autos` / `open_usuarios` (crud) | `except OSError` | Devuelve `None`; el consumidor debería validarlo |
-| `escribir_usuario` / `escribir_auto` (crud) | Sin `try/except` | Agregar manejo de `OSError` |
-| `_pedir_entero` (crud) | Solo `.isdigit()` | Usar `try/except ValueError` |
-| `ingresa_usuario` / `registro_usuario` (usuarios) | `except` genérico | Excepciones específicas |
-| Menús de `menu.py` | `except` genérico | Excepciones específicas |
+| `_pedir_entero` (crud) | `try/except ValueError` y validación de rango | Ok |
+| `_cargar_autos` (crud) | `FileNotFoundError`, `json.JSONDecodeError`, `OSError` → `{}` | Ok |
+| `_guardar_autos` (crud) | `TypeError`, `ValueError`, `OSError` → `False` | Ok |
+| `open_autos` / `open_usuarios` (crud) | Mismas excepciones → `{}` (nunca `None`) | Ok |
+| `escribir_usuario` / `escribir_auto` (crud) | `OSError` → `False` | Ok |
+| `ingresa_usuario` / `registro_usuario` (usuarios) | `ValueError`, `TypeError`, `KeyError` | Ok |
+| Menús de `menu.py` | Se captura solo `EOFError` al leer la opción | Ok |
+| `modificar_estado_auto` / `_guardar_autos` (menu → crud) | Fallos de E/S informados por pantalla | Ok |
+
+> El Requisito 1 (manejo de excepciones específicas) queda **cumplido**. Los pocos
+> `except` sin tipo que quedan están **alrededor de `input("[Enter] ")`**, donde solo se
+> busca pausar la pantalla y continuar ante cualquier interrupción de la lectura.
 
 ---
 
 ## 9. Problemas conocidos y pendientes
 
-1. **~~`devolver_auto` / `rentar_auto` rotos por la firma~~ (RESUELTO).**
-   `submenu_usuario` llamaba a `devolver_auto` con 3 argumentos (recibe 2) y a
-   `rentar_auto` con 2 (recibe 3); los `TypeError` quedaban ocultos por el `except`
-   del submenú, así que las opciones [1] y [2] "no hacían nada". Ya están corregidas
-   ambas llamadas.
-2. **`agregar_auto` no guarda `estado`.** Los autos creados desde el CRUD quedan sin
-   esa clave y luego `_mostrar_auto`, `ver_stock` y `rentar_auto` lanzan `KeyError`.
-3. **`informe_estadisticas()` es un stub** (imprime `"hola"`); falta el reporte
-   matricial (Requisito 8).
-4. **`modificar_estado_auto`** escribe en la ruta `"autos.json"` escrita a mano, en
-   lugar de usar la constante `RUTA_AUTOS`, y lanza `KeyError` si la patente no existe.
-5. **`_pedir_patente_existente`** devuelve `"0"` (o `None` si el catálogo está vacío);
-   con ese valor, `ver_auto`, `modificar_auto` y `eliminar_auto` acceden a una clave
-   inexistente y lanzan `KeyError`.
-6. **`modificar_auto`**: `int(opcion)` lanza `ValueError` con entradas no numéricas, y
-   el mapeo de campos es fijo (1–7) aunque el auto tenga menos claves.
-7. **`except` genéricos** en varios puntos (el Requisito 1 pide manejo específico).
-8. **Sin archivos de datos** `open_autos`/`open_usuarios` devuelven `None`.
-9. **`CALIDADES`** no incluye `"como nuevo"`, presente en algunos datos.
-10. **`DISPONIBLE`** usa textos (`"true"`/`"false"`) mientras que `estado` se guarda
-    como booleano; conviven ambos formatos.
-11. **`import informe as inf` (y `json`) sin uso** en `menu.py`.
-12. **`limpiar` sin paréntesis** en `registro_usuario` (`usuarios.py`): no limpia.
-13. **Archivos ajenos al código**: `tempCodeRunnerFile.py` (resto de Code Runner),
-    `pruebas.py` (vacío) y los `__pycache__/*.pyc` versionados.
+1. **`informe_estadisticas()` es un stub** (imprime `"hola"`); falta definir el reporte
+   estadístico del catálogo. Los demás informes (catálogo, disponibilidad y rentados)
+   ya funcionan con pandas.
+2. **`informe_autos` ignora `cant_autos`** y genera siempre 25 autos: conviene respetar
+   el parámetro (el Requisito 3 solo pide un mínimo de 5 registros).
+3. **`registro_usuario` con un DNI no numérico o inválido** corta el bucle interior pero
+   continúa hacia el guardado, donde puede usar variables sin definir (`NameError`).
+   Queda documentado como prueba `xfail` en `pruebas.py`.
+4. **`ver_stock` (modo `(1,0)`) lanza `KeyError`** si un auto carece de la clave
+   `"estado"` (por ejemplo, un JSON editado a mano). Los autos creados por el CRUD ya
+   incluyen `estado`, así que solo afecta a datos externos. Documentado como `xfail`.
+5. **`limpiar` sin paréntesis** dentro de `registro_usuario` (`usuarios.py`): no limpia
+   la pantalla (la sentencia no tiene efecto).
+6. **`CALIDADES`** no incluye `"como nuevo"`; si un dato la contuviera, el CRUD la
+   rechazaría. La precarga ya solo usa los tres valores válidos.
+7. **`DISPONIBLE`** usa textos (`"true"`/`"false"`) mientras que `estado` se guarda como
+   booleano: conviven ambos formatos (la tupla es solo para las entradas del menú).
 
 ---
 
@@ -349,3 +357,32 @@ matriz = [
 ```
 
 > Los valores son ilustrativos y cambian según el contenido de `autos.json`.
+
+---
+
+## 11. Pruebas automáticas (`pruebas.py`)
+
+La suite usa **pytest** y aísla cada prueba en un directorio temporal propio (fixture
+`entorno`), así que **no** toca los archivos reales del proyecto. La entrada por teclado
+se simula con el helper `guion()`.
+
+Estado actual: **94 pruebas que pasan** y **2 marcadas como `xfail`** (fallos esperados
+que documentan los bugs de §9, puntos 3 y 4).
+
+```bash
+pip install pytest
+python -m pytest pruebas.py -v   # o simplemente: python pruebas.py
+```
+
+Cobertura por área:
+
+| Área | Qué verifica |
+|------|--------------|
+| Persistencia | `_cargar_autos` / `_guardar_autos`, `open_autos` / `open_usuarios`, `escribir_auto` / `escribir_usuario`, archivos ausentes/corruptos/no diccionario. |
+| Validaciones | `_entrada`, `_pedir_patente_existente` (cancelar con `"0"`), `_pedir_entero`, `_pedir_float`, `_pedir_de_tupla`. |
+| Lecturas | `ver_stock` en sus tres modos (incluidos los avisos de listas vacías), `ver_auto`, `_mostrar_auto`. |
+| CRUD | Alta con las 7 claves, patente duplicada/vacía, modificación de cada campo, borrado, `modificar_estado_auto`. |
+| Usuarios | Ingreso (clave incorrecta, DNI inexistente/inválido, cancelación) y registro (claves distintas, DNI duplicado, cancelación). |
+| Alquiler | `rentar_auto` y `devolver_auto`: el estado pasa a `False` y vuelve a `True`, y la patente entra/sale de `autos_rentados`. |
+| Navegación | `menu_principal`, `submenu_usuario`, `submenu_empresa`, `estado_rentas`. |
+| Informes/datos | `informe_disponibilidad`, `estado_rentas`, `informe_autos`, `informe_usuarios`. |

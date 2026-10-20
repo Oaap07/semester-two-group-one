@@ -13,5 +13,9 @@
 - **Punto de entrada principal:** `python menu.py`
 - **Administración del catálogo (CRUD):** `python crud.py`
 - **Generar los datos (si no existen):** `python informe.py`
+- **Pruebas automáticas (pytest):** `python pruebas.py`
 - **Persistencia:** `autos.json` (catálogo) y `usuarios.json` (usuarios y sus alquileres)
 - **Lenguaje:** Python 3.12+ (requiere `pandas` para las tablas de los informes)
+
+> La documentación técnica incluye una sección de **pruebas automáticas** (§11) con el
+> detalle de la suite `pruebas.py` (94 pruebas).

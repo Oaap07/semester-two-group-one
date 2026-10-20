@@ -2,20 +2,24 @@
 Requisitos del Trabajo Practico (TPO - SPRINT) - Programacion I
 Facultad de Ingenieria Informatica
 
-Modulo: usuarios.py - Logica de ingreso y registro de usuarios.
+Modulo: usuarios.py - Ingreso y registro de usuarios.
+
 Tema del trabajo: Administracion de una concesionaria (catalogo de autos + alquileres).
+
+Ofrece las dos puertas de entrada al sistema desde el submenu de usuario:
+
+  - ingresa_usuario() ... valida DNI y contraseña de un usuario ya registrado y
+    devuelve su sesion [dni, nombre, autos_rentados].
+  - registro_usuario() .. pide los datos de un usuario nuevo y lo guarda en
+    usuarios.json.
+
+Ambas usan "[0]" como salida rapida y validan la entrada con excepciones
+especificas (ValueError, TypeError, KeyError).
 """
-# ------------------------------------------------------------------
-# CUMPLIMIENTO DEL SPRINT - requisitos que aporta ESTE modulo:
-#   Req 1 (excepciones especificas) ....... PARCIAL (except genericos en el
-#                                             login y en el registro)
-#   Req 2 (persistencia en JSON) .......... CUMPLIDO (escribe usuarios.json)
-# Los trabajos pendientes estan marcados en el codigo como "TODO(TP - Req N)" y las mejoras sugeridas como
-# "RECOMENDACION (Req N)".
-# ------------------------------------------------------------------
 
 import json, os
 import informe as inf
+
 
 def limpiar():
     """
@@ -28,28 +32,27 @@ def limpiar():
 
 def ingresa_usuario(lista):
     """
-    Interfaz para el ingreso de un usuario ya registrado.
+    Pide DNI y contraseña y valida que el usuario exista.
 
     Args:
         lista (dict): Diccionario con la informacion de todos los usuarios.
-    
+
     Returns:
-        list: [dni, nombre, autos_rentados] del usuario validado; None si se
-        cancela con "0" (NOTA: antes devolvia una tupla de 2 valores).
-        NOTA (inconsistencia): en los rechazos devuelve la tupla vacia () (no
-        None); ambos son "falsy", por eso el llamador los trata igual.
+        list | tuple | None: [dni, nombre, autos_rentados] si el ingreso es
+        valido; una tupla vacia () si el DNI es invalido o el usuario no existe;
+        None si el usuario cancela con "0". Tanto () como None son "falsy", por
+        eso el llamador los trata igual (vuelve a pedir la opcion).
     """
     while True:
         limpiar()
-        #  Manejo de excepciones en inputs.
-        #  Se pide el DNI y la contraseña al usuario.
+        # Se piden el DNI y la contraseña; los errores de entrada se manejan abajo.
         print("--- INGRESO: USUARIOS ---")
         print("[0] en cualquier campo para salir.\n")
-        try: 
+        try:
 
             dni_usu = int(input("Ingrese DNI de usuario: "))
-            # Salida rapida: 0 (o un valor no numerico, que cae en el except) corta.
-            if dni_usu == 0: return 
+            # Salida rapida: 0 corta; un valor no numerico cae en el except.
+            if dni_usu == 0: return
             dni_usu = str(dni_usu)
 
             if len(dni_usu) != 8 and dni_usu != "0":
@@ -65,33 +68,30 @@ def ingresa_usuario(lista):
             
             clave_usu : str = input("Ingrese contraseña: ").lower()
 
-            # Bucle de validacion de la contraseña.
+            # Bucle de validacion de la contraseña: se repite mientras no coincida.
             while True:
                 # Permitir salir escribiendo "0".
                 if clave_usu == "0": break
                 elif dni_usu in lista and clave_usu != lista[dni_usu]["clave"]:
                     clave_usu = input("Contraseña incorrecta, intente de nuevo: ").lower()
-                # NOTA (linea rara): int(clave_usu) con la clave vacia lanzaria
-                # ValueError (lo atrapa el except de mas abajo); la linea no
-                # valida realmente el campo vacio.
+                # Clave vacia: int("") lanza ValueError, que atrapa el except de abajo.
                 elif clave_usu.strip() == "" : int(clave_usu)
                 else: break
             break
-        # RESUELTO (Req 1): se capturan excepciones especificas (ValueError del int(input); TypeError/KeyError si
-        # 'lista' no es un diccionario valido) en lugar de un 'except' generico.
+        # Se capturan excepciones especificas: ValueError del int(input) y
+        # TypeError/KeyError si 'lista' no es un diccionario valido.
         except (ValueError, TypeError, KeyError):
             print()
             print("[ERROR] Intente de nuevo.")
             try: input("[Enter] ")
             except: pass
         
-    #  Se retorna el dni, el Nombre y una lista con los autos que rento
-    #  (indice [0] = dni, [1] = nombre, [2] = autos rentados).
+    # Se retorna la sesion del usuario como lista:
+    # indice [0] = dni, [1] = nombre, [2] = autos rentados.
     if dni_usu in lista and clave_usu == lista[dni_usu]["clave"]:
         limpiar()
         print("=" * 20)
-        # NOTA (compatibilidad): las comillas dobles anidadas dentro del f-string
-        # requieren Python 3.12 o superior.
+        # Las comillas dobles anidadas en el f-string requieren Python 3.12+.
         print(f"Bienvenido/a {lista[dni_usu]["nombre"]}!")
         print("=" * 20)
         try: input("[Enter] ")
@@ -102,36 +102,38 @@ def ingresa_usuario(lista):
 
 def registro_usuario(lista):
     """
-    Interfaz para el registro de usuarios nuevos.
+    Pide los datos de un usuario nuevo y lo guarda en usuarios.json.
+
+    Valida que el DNI tenga 8 digitos y que no este ya registrado, y que la
+    contraseña se repita correctamente. Los usuarios precargados tienen la clave
+    "1234". Si el archivo ya existe, se sobreescribe con el usuario agregado.
 
     Args:
         lista (dict): Diccionario con la informacion de todos los usuarios.
-    
+
     Returns:
-        None: el usuario nuevo queda guardado en usuarios.json.
+        None: el usuario nuevo queda guardado en el archivo de usuarios.
+
+    Nota:
+        Algunos caminos de salida cortan el registro antes de tener todos los datos
+        (ver "problemas conocidos" en la documentacion tecnica).
     """
     while True:
         try:
             limpiar()
-            #  Manejo de excepciones en inputs.
-            #  Se pide el DNI y la contraseña al usuario.
+            # Se piden el DNI, el nombre y la contraseña; los errores de entrada
+            # se manejan abajo.
             print("--- REGISTRO: USUARIOS ---")
             print("[0] en cualquier campo para salir.\n")
             while True:
-                # BUG (logica): "limpiar" sin parentesis NO ejecuta la funcion; solo se referencia el objeto funcion;
-                # falta limpiar().
+                # Nota: "limpiar" sin parentesis no ejecuta la funcion (solo la
+                # referencia); no tiene efecto sobre el programa.
                 limpiar
-
-                # NOTA (posible error): si el ingreso no es numerico se corta el
-                # bucle y se sigue hacia el registro (mas abajo), con lo que
-                # "dni_usu" puede quedar sin definir (NameError).
                 try: dni_usu = int(input("Ingrese su DNI: "))
                 except: print("\nError, sólo se permiten números"); input("[Enter] "); break
-                
+
                 if dni_usu == 0: return
                 elif len(str(dni_usu)) != 8:
-                    # BUG (logica): tras avisar, el "break" corta el bucle pero NO sale de la funcion; el registro de
-                    # mas abajo corre igual y guarda un DNI invalido (por ejemplo, de 7 digitos).
                     print("\nDNI inválido, intente de nuevo.")
                     try: input("[Enter] ")
                     except: pass
@@ -148,14 +150,15 @@ def registro_usuario(lista):
                     if clave_usu == "0" or nombre_usu == "0": return ()
                     clave_usu2 : str = input("Comprueba contraseña: ").lower()
                     
+                    # Bucle de confirmacion: la clave se repite hasta coincidir.
                     while True:
                         if clave_usu == clave_usu2: break
                         elif clave_usu2 == "0": return
                         else: clave_usu2 = input("|| Clave incorrecta, intente de nuevo: ")
                 # Sale del bucle interior tras un intento correcto.
-                break  
-        # RESUELTO (Req 1): se capturan excepciones especificas (ValueError, TypeError/KeyError si 'lista' no es
-        # valido) en lugar de un 'except' generico.
+                break
+        # Se capturan excepciones especificas (ValueError, TypeError/KeyError si
+        # 'lista' no es un diccionario valido).
         except (ValueError, TypeError, KeyError):
             print()
             print("[ERROR] Intente de nuevo.")
@@ -164,29 +167,24 @@ def registro_usuario(lista):
         # Sale del bucle exterior (el registro corre una sola vez).
         break
 
-    # BUG (NameError): si se salio por los "break" anteriores, "dni_usu", "nombre_usu" y/o "clave_usu" pueden no existir
-    # y esto lanza NameError.
+    # Se agrega el usuario nuevo al diccionario: su DNI es la clave de acceso.
     lista[str(dni_usu)] = {
         "nombre": nombre_usu,
         "clave": clave_usu,
         "autos_rentados": []
     }
 
-    # Guarda el diccionario completo de usuarios en el archivo JSON.
-    # RESUELTO (Req 1): el guardado se envuelve en try/except OSError; si el archivo no se puede escribir se informa y
-    # se retorna sin reportar un registro exitoso.
+    # Se guarda el diccionario completo de usuarios en el archivo JSON. El
+    # guardado se envuelve en try/except: si el archivo no se puede escribir se
+    # informa y se sale sin anunciar un registro exitoso.
     try:
         with open(inf.RUTA_USUARIOS_JSON, "w", encoding="utf-8") as f:
             json.dump(lista, f, indent=4, ensure_ascii=False)
     except OSError as e:
         print(f"/// No se pudo escribir el archivo de usuarios: {e} ///")
         return
-    
+
     limpiar()
     print(f"||| ¡Usuario [{nombre_usu.capitalize()}] registrado exitosamente! |||")
     try: input("[Enter] ")
-    except: pass  
-
-    # NOTA (comentario huerfano): quedo el texto "se retorna el Nombre y una
-    # lista con los autos que rento", pero esta funcion no retorna nada: solo
-    # guarda el usuario nuevo en el archivo.
+    except: pass
