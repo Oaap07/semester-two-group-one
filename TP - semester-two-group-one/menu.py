@@ -284,18 +284,118 @@ def estado_rentas():
 
 def informe_estadisticas():
     """
-    Muestra estadisticas del catalogo de autos.
+    Muestra estadisticas del catalogo de autos con graficos de matplotlib
+    en una sola ventana, dispuestos en una grilla de 2x2.
 
-    NOTA (funcion incompleta / placeholder): por ahora solo imprime "hola";
-    falta implementarla (Req 8 del TP: reporte matricial).
+    Graficos:
+        1. Barras: cantidad de autos por categoria.
+        2. Barras: autos disponibles vs rentados.
+        3. Torta: distribucion de autos por marca.
+        4. Barras: precio promedio (u$d) por categoria.
+
+    La ventana se mantiene abierta hasta que el usuario la cierra.
 
     Returns:
         None
     """
-    # TODO(TP - Req 8): calcular y mostrar las estadisticas.
-    # RECOMENDACION (Req 8): armar la matriz con pandas igual que en ver_stock, por ejemplo un DataFrame con filas =
-    # categoria y columnas = cantidad de autos disponibles y rentados, impreso con .T (reporte matricial).
-    print("hola")
+    # Se importa aca para que, si la libreria no esta instalada, solo falle
+    # esta opcion del menu y no todo el programa.
+    try:
+        import matplotlib.pyplot as plt
+    except ImportError:
+        cd.limpiar()
+        print("Falta la libreria 'matplotlib'. Instalela con: pip install matplotlib")
+        try:
+            input("[Enter] ")
+        except EOFError:
+            pass
+        return
+
+    cd.limpiar()
+    autos = cd.open_autos()
+
+    if not autos:
+        print("No hay autos en el catálogo para calcular estadísticas.")
+        try:
+            input("[Enter] ")
+        except EOFError:
+            pass
+        return
+
+    # Acumuladores: se usan .get() para tolerar autos con claves faltantes.
+    por_categoria = {}
+    por_marca = {}
+    estado = {"Disponibles": 0, "Rentados": 0}
+    suma_precios = {}
+
+    for datos in autos.values():
+        categoria = str(datos.get("categoria", "sin_categoria"))
+        marca = str(datos.get("marca", "sin_marca")).capitalize()
+        precio = datos.get("precio", 0)
+
+        por_categoria[categoria] = por_categoria.get(categoria, 0) + 1
+        por_marca[marca] = por_marca.get(marca, 0) + 1
+        suma_precios[categoria] = suma_precios.get(categoria, 0) + (
+            precio if isinstance(precio, (int, float)) else 0
+        )
+
+        if datos.get("estado") == True:
+            estado["Disponibles"] += 1
+        else:
+            estado["Rentados"] += 1
+
+    # Precio promedio por categoria.
+    precio_promedio = {
+        cat: round(suma_precios[cat] / por_categoria[cat], 1)
+        for cat in por_categoria
+    }
+
+    try:
+        fig, ejes = plt.subplots(2, 2, figsize=(13, 8))
+        fig.suptitle(f"Estadísticas del catálogo ({len(autos)} autos)", fontsize=14)
+
+        # 1. Autos por categoria.
+        ax = ejes[0][0]
+        barras = ax.bar(list(por_categoria.keys()), list(por_categoria.values()),
+                        color="#4C72B0")
+        ax.bar_label(barras)
+        ax.set_title("Autos por categoría")
+        ax.set_ylabel("Cantidad")
+        ax.tick_params(axis="x", rotation=20)
+
+        # 2. Disponibles vs rentados.
+        ax = ejes[0][1]
+        barras = ax.bar(list(estado.keys()), list(estado.values()),
+                        color=["#55A868", "#C44E52"])
+        ax.bar_label(barras)
+        ax.set_title("Disponibles vs Rentados")
+        ax.set_ylabel("Cantidad")
+
+        # 3. Distribucion por marca (torta).
+        ax = ejes[1][0]
+        ax.pie(list(por_marca.values()), labels=list(por_marca.keys()),
+               autopct="%1.1f%%", startangle=90)
+        ax.set_title("Distribución por marca")
+
+        # 4. Precio promedio por categoria.
+        ax = ejes[1][1]
+        barras = ax.bar(list(precio_promedio.keys()), list(precio_promedio.values()),
+                        color="#DD8452")
+        ax.bar_label(barras, fmt="%.0f")
+        ax.set_title("Precio promedio por categoría")
+        ax.set_ylabel("u$d")
+        ax.tick_params(axis="x", rotation=20)
+
+        fig.tight_layout()
+        print("Se abrió la ventana con los gráficos. Cierrela para volver al menú.")
+        # show() bloquea la ejecucion hasta que se cierra la ventana.
+        plt.show()
+    except (TypeError, ValueError, KeyError, RuntimeError) as e:
+        print(f"\nNo se pudo generar el gráfico: {e}")
+        try:
+            input("[Enter] ")
+        except EOFError:
+            pass
 
 def menu_principal():   
     """
