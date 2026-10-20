@@ -18,7 +18,8 @@ El sistema permite:
 - **Registrarse e ingresar** como usuario.
 - **Alquilar autos** y registrar la operación.
 - **Devolver** los autos alquilados.
-- **Consultar informes** sobre las unidades (disponibilidad y autos rentados).
+- **Consultar informes** sobre las unidades (catálogo completo, disponibles y autos
+  rentados).
 
 Todos los datos quedan guardados en dos archivos:
 
@@ -46,7 +47,7 @@ python informe.py
 ```
 
 Al ejecutar `informe.py` se crean `autos.json` (con 25 autos) y `usuarios.json` (con
-un usuario de ejemplo). Si los archivos ya existen, no se modifican.
+tres usuarios de ejemplo). Si los archivos ya existen, no se modifican.
 
 ---
 
@@ -68,11 +69,12 @@ python crud.py
 ```
 
 > **Importante:** `menu.py` **no** genera los datos. Si `autos.json` o `usuarios.json`
-> no existen, el programa falla al ingresar o alquilar. Creá los archivos con
+> no existen, el programa sigue funcionando pero sin datos. Creá los archivos con
 > `python informe.py` antes de usar `menu.py`.
 
-> **Usuario de ejemplo:** si generaste los datos con `informe.py`, podés ingresar con
-> el **DNI `10101010`** y la **contraseña `1010`**.
+> **Usuarios de ejemplo:** si generaste los datos con `informe.py`, podés ingresar con
+> cualquiera de estos DNI, todos con la **contraseña `1234`**:
+> `95823279`, `4817866` y `46280291`.
 
 ---
 
@@ -127,15 +129,18 @@ Después de **ingresar correctamente**, aparece el submenú de manejo de autos:
 ```
 --- SUBMENÚ: INFORMES ---
 
-[1] Disponibilidad de unidades
-[2] Estadisticas del mes
-[3] Estado de autos rentados
+[1] Ver STOCK completo
+[2] Autos Disponibles
+[3] Autos rentados
+[4] Estadísticas generales
+-------------------------------
 [0] Volver al menú principal
 ```
 
-- **[1] Disponibilidad:** muestra el catálogo completo como tabla.
-- **[2] Estadísticas:** **pendiente** (todavía no muestra información).
-- **[3] Estado de autos rentados:** muestra como tabla los autos que están alquilados.
+- **[1] Ver STOCK completo:** muestra todo el catálogo como tabla.
+- **[2] Autos Disponibles:** tabla con **solo** los autos disponibles.
+- **[3] Autos rentados:** tabla con **solo** los autos alquilados.
+- **[4] Estadísticas generales:** **pendiente** (todavía no muestra información).
 
 ### 4.4 Menú del CRUD (`crud.py`)
 
@@ -204,13 +209,14 @@ patente se agrega a tus **autos rentados** en `usuarios.json`.
 
 > **Nota:** si escribís `0` volvés al menú anterior sin devolver nada.
 
-### 6.3 Informes — submenú de empresa → [1] y [3]
+### 6.3 Informes — submenú de empresa
 
-- **[1] Disponibilidad de unidades:** tabla con **todos** los autos y su estado.
-- **[3] Estado de autos rentados:** tabla con **solo** los autos alquilados.
+- **[1] Ver STOCK completo:** tabla con **todos** los autos y su estado.
+- **[2] Autos Disponibles:** tabla con **solo** los autos disponibles.
+- **[3] Autos rentados:** tabla con **solo** los autos alquilados.
 
-Las tablas se generan con pandas (reporte matricial). La opción **[2] Estadísticas
-del mes** todavía está pendiente.
+Las tablas se generan con pandas (reporte matricial). La opción
+**[4] Estadísticas generales** todavía está pendiente.
 
 ---
 
@@ -254,9 +260,8 @@ Si no hay autos, el sistema avisa: *"No hay autos en el catálogo."*
 
 Al terminar: *"Auto [PATENTE] agregado correctamente."*
 
-> **Nota (bug conocido):** el alta del CRUD **no** guarda el campo `estado`, por lo
-> que ese auto puede fallar al verse en el catálogo o al intentar alquilarlo. Está
-> documentado en la documentación técnica.
+> **Buen dato:** el auto se guarda con las 7 claves del esquema (incluido `estado`,
+> que queda como disponible), así que se puede ver y alquilar de inmediato.
 
 ### 7.4 Modificar un auto — opción [4]
 
@@ -309,8 +314,8 @@ volvé a ejecutar el programa.
 
 **No puedo ingresar (dice "Usuario inexistente").**
 Los archivos `usuarios.json`/`autos.json` pueden no existir (generálos con
-`python informe.py`) o el DNI no está registrado. Podés usar el usuario de ejemplo:
-DNI `10101010`, clave `1010`, o registrarte con la opción [2].
+`python informe.py`) o el DNI no está registrado. Podés usar un usuario de ejemplo
+(contraseña `1234`): DNI `95823279`, `4817866` o `46280291`; o registrarte con [2].
 
 **El programa falla al abrir / no encuentra pandas.**
 Falta instalar la dependencia: `pip install pandas`.
@@ -319,12 +324,12 @@ Falta instalar la dependencia: `pip install pandas`.
 Ya no debería pasar: `menu.py` **no** regenera el catálogo. Verificá que estás usando
 la misma carpeta (los archivos son relativos al directorio actual).
 
-**Al elegir "Estadísticas del mes" no pasa nada de utilidad.**
+**Al elegir "Estadísticas generales" no pasa nada de utilidad.**
 Esa función todavía no está implementada (ver documentación técnica).
 
 **Al elegir "Rentar" o "Devolver" volvía al mismo menú sin hacer nada.**
 Era un `TypeError` por llamar a las funciones con un número equivocado de argumentos
-(ya corregido). Si te pasa, actualizá `menu.py`.
+(ya corregido). Si te pasa, actualizá `menu.py` a la última versión.
 
 **Un modelo de una categoría no aparece al alquilar.**
 Puede estar ya alquilado (no se muestran los autos rentados) o no pertenecer a la

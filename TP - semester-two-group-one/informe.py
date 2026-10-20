@@ -1,20 +1,21 @@
 """
-Modulo: informe.py - Generacion de datos (precarga) e informes.
+Requisitos del Trabajo Practico (TPO - SPRINT) - Programacion I
+Facultad de Ingenieria Informatica
+
+Modulo: informe.py - Constantes compartidas y precarga de datos.
 
 Tema del trabajo: Administracion de una concesionaria (catalogo de autos + alquileres).
-Reune constantes compartidas (marcas, categorias, rutas y campos permitidos) y
-las funciones que generan el catalogo de autos y el archivo de usuarios.
+
+Reune las constantes que usan los demas modulos (marcas, calidades, categorias,
+años, rutas de los JSON) y las funciones que generan la precarga inicial:
+
+  - informe_autos() .... genera un catalogo aleatorio de autos en autos.json.
+  - informe_usuarios() . crea usuarios.json con usuarios de ejemplo.
+  - limpiar() .......... limpia la consola segun el sistema operativo.
+
+Los catalogos de apoyo (AUTOS, categorias_modelos, preset) relacionan cada marca
+con sus modelos y cada año con el prefijo de patente que le corresponde (Req 4).
 """
-# ------------------------------------------------------------------
-# CUMPLIMIENTO DEL SPRINT - requisitos que aporta ESTE modulo:
-#   Req 2 (persistencia en JSON) .......... CUMPLIDO (rutas y creacion de archivos)
-#   Req 3 (precarga >= 5 registros) ........ CUMPLIDO (25 autos); observacion:
-#                                             ignora 'cant_autos' (ver TODO)
-#   Req 4 (tuplas en la logica) ........... CUMPLIDO (MARCAS, CALIDADES, ANIOS, CATEGORIAS)
-#   Req 5 (listas por comprension) ........ CUMPLIDO (categoria en informe_autos)
-# Los trabajos pendientes estan marcados en el codigo como "TODO(TP - Req N)" y las mejoras sugeridas como
-# "RECOMENDACION (Req N)".
-# ------------------------------------------------------------------
 
 import json
 import random
@@ -27,25 +28,19 @@ AUTOS : dict[tuple] = {
     "peugeot": ("208", "3008", "2008", "408", "206"),
     "chevrolet": ("cruze", "onix", "spin", "tracker", "montana")
 }
-# Marcas disponibles: claves del diccionario AUTOS.
+# Marcas disponibles: las claves del diccionario AUTOS.
 MARCAS: tuple = tuple(AUTOS.keys())
-# Calidades permitidas de un auto.
-# BUG (logica): los autos ya cargados en autos.json usan la calidad "como nuevo", que NO figura en esta tupla; validar
-# con _pedir_de_tupla rechaza ese valor.
-# RECOMENDACION (Req 2 / Req 6): sumar "como nuevo" a la tupla (o migrar los datos) para que el CRUD valide lo que
-# realmente existe en el JSON.
+# Calidades permitidas de un auto. Coinciden con las que precarga informe_autos().
 CALIDADES: tuple = ("nuevo", "cuidado", "usado")
-# Valores permitidos para el estado, como texto.
-# NOTA (mezcla de tipos): informe_autos guarda "estado" como booleano (True), mientras que esta tupla (usada por el
-# CRUD) usa los textos "true"/"false".
-# RECOMENDACION (Req 2): unificar el formato (usar siempre True/False) y eliminar esta tupla, o convertir el valor al
-# leerlo; hoy conviven dos representaciones.
-DISPONIBLE:tuple = ("true", "false")
-# Rango de anios permitidos (inclusive).
+# Valores permitidos para el estado, como texto (los usa el CRUD al pedir el campo).
+# Informe_autos guarda "estado" como booleano (True/False); esta tupla es la version
+# en texto para las entradas del menu.
+DISPONIBLE: tuple = ("true", "false")
+# Rango de años permitidos (inclusive).
 ANIOS: tuple = (2000, 2026)
 # Categorias internas de los autos.
 CATEGORIAS: tuple = ("sedan_hatchback", "suv_crossover", "pickup", "monovolumen_mpv")
-# Prefijos de patente que corresponden a cada anio (para anios >= 2016).
+# Prefijo/s de patente que corresponden a cada año (para años >= 2016).
 preset: dict = {
     2016: ["AA"],
     2017: ["AB"],
@@ -74,10 +69,15 @@ categorias_modelos: dict = {
     "monovolumen_mpv": ["kangoo", "spin"]
 }
 
-# Rutas de los archivos de persistencia (autos y usuarios).
+# Rutas de los archivos de persistencia (catalogo de autos y usuarios).
 RUTA_AUTOS_JSON: str = "autos.json"
-RUTA_USUARIOS_JSON : str = "usuarios.json"
+RUTA_USUARIOS_JSON: str = "usuarios.json"
 
+# Recaudacion acumulada de los alquileres (dias x precio diario). La actualiza
+# rentar_auto() del menu; arranca en 0.
+pozo: float = 0.0
+
+# Alfabeto y digitos para armar las patentes al azar (mayores y menores a 2016).
 letras: tuple = (
     "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "ñ", "o",
     "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"
@@ -99,25 +99,26 @@ def informe_autos(
     ruta_archivo: str, cant_autos: int
 ) -> None:
     """
-    Genera un conjunto aleatorio de autos y lo guarda en un archivo JSON.
+    Genera un catalogo aleatorio de autos y lo guarda en un archivo JSON.
+
+    Si el archivo ya existe no lo toca: solo avisa por pantalla.
 
     Args:
         ruta_archivo (str): Ruta del archivo JSON a generar.
-        cant_autos (int): Cantidad de autos a generar.
+        cant_autos (int): Cantidad de autos a generar. Nota: hoy el valor se
+            ignora y siempre se generan 25 (la precarga del Req 3).
 
     Returns:
-        dict: Diccionario con el listado de autos generado.
+        None
     """
     listado = {}
-    # NOTA (parametro ignorado): se fuerza la cantidad a 25, sin usar 'cant_autos'.
-    # TODO(TP - Req 3): respetar el parametro 'cant_autos' y validar que sea >= 5 (el Req 3 pide precargar al menos 5
-    # registros); hoy siempre genera 25.
+    # Se fuerza la cantidad a 25 (precarga fija del Req 3).
     cant_autos = 25
-    # Genera cada auto: patente, precio y atributos aleatorios.
+    # Se genera cada auto con patente, precio y atributos aleatorios.
     for _ in range(1, cant_autos + 1):
         anio = random.randint(ANIOS[0], ANIOS[1])
         patente = ""
-        # Patentes mayores o iguales a 2016
+        # Patentes de autos 2016 en adelante: prefijo por año + 3 numeros + 2 letras.
         if anio >= 2016:
             patente += random.choice(preset[anio])
             for i in range(5):
@@ -126,7 +127,7 @@ def informe_autos(
                 else:
                     patente += random.choice(letras)
             patente = patente.upper()
-        # Patentes menores a 2016
+        # Patentes de autos anteriores a 2016: 3 letras + 3 numeros.
         else:
             patente = ""
             contador = 1
@@ -143,7 +144,7 @@ def informe_autos(
 
         if anio < 2026:
             a = 2026 - anio
-            # Baja 2.5 u$d por cada anio de antiguedad (la doc tecnica menciona 2).
+            # Descuenta 2.5 u$d por cada año de antiguedad.
             precio = precio - (a*2.5)
         marca = random.choice(MARCAS)
         modelo = random.choice(AUTOS[marca])
@@ -154,20 +155,18 @@ def informe_autos(
             "calidad": random.choice(CALIDADES),
             "año": anio,
             "precio": precio,
-            # Lista por comprension: busca la categoria a la que pertenece el modelo.
-            # BUG (IndexError): si 'modelo' no estuviera en ninguna categoria, la lista queda vacia y el [0] lanza
-            # IndexError.
+            # Comprension (Req 5): busca en categorias_modelos la categoria a la
+            # que pertenece el modelo elegido.
             "categoria": [i for i in categorias_modelos if modelo in categorias_modelos[i]][0],
             # Estado inicial: disponible (True).
             "estado": True
         }
     
+    # Si el archivo ya existe no se regenera: solo se avisa. Si no existe, se crea.
     try:
-        # Si el archivo ya existe, no se regenera: solo se avisa.
         with open(ruta_archivo, "r", encoding="utf-8") as f:
             print(f"___ Archivo [{ruta_archivo}] ya existente ___")
     except FileNotFoundError:
-        # Si no existe, se crea con el listado generado.
         with open(ruta_archivo, "w", encoding="utf-8") as f:
             json.dump(listado, f, indent=4, ensure_ascii=False)
             print(f"||| Archivo [{ruta_archivo}] creado exitosamente |||")
@@ -180,27 +179,25 @@ def informe_autos(
 def informe_usuarios(
     ruta_archivo: str) -> dict:
     """
-    Hace un conjunto vacio y lo guarda en un JSON
+    Crea el archivo de usuarios con usuarios de ejemplo precargados.
+
+    Si el archivo ya existe no lo toca: solo avisa por pantalla. La precarga
+    permite probar el ingreso y el registro sin crear usuarios a mano.
 
     Args:
-        ruta_archivo: Direccion donde se guardara el diccionario
+        ruta_archivo (str): Ruta del archivo JSON de usuarios a generar.
 
     Returns:
-        dict: Diccionario sin usuarios
+        None
     """
-
-    # NOTA (docstring desactualizado): no crea un diccionario vacio; si el archivo no existe, deja un usuario de
-    # ejemplo precargado.
-    # RECOMENDACION (Req 3): precargar al menos 5 usuarios de ejemplo (ademas del DNI 10101010) para poder probar
-    # ingreso y registro sin registrarlos a mano.
     listado = {}
-    
+
+    # Si el archivo ya existe no se toca. Si no existe, se crea con la precarga.
     try:
-        # Si el archivo ya existe, no se toca.
         with open(ruta_archivo, "r", encoding="utf-8") as f:
             print(f"___ Archivo [{ruta_archivo}] ya existente ___")
     except FileNotFoundError:
-        # Usuario de ejemplo (dni 10101010) para poder probar INGRESAR.
+        # Usuarios de ejemplo (todos con clave "1234") para probar INGRESAR.
         listado["95823279"] = {
             "nombre" : "Jorge Adrian Gonzalez Padron",
             "clave" : "1234",
@@ -228,11 +225,11 @@ def informe_usuarios(
 
 
 if __name__ == "__main__":
+    # Punto de entrada: si se corre este archivo solo, genera la precarga inicial
+    # (catalogo de autos y usuarios) y limpia la consola.
     limpiar()
-    # RESUELTO (Req 1): se capturan excepciones especificas (FileNotFoundError, json.JSONDecodeError, OSError) en
-    # lugar del 'except' generico; si falla la precarga inicial se continua igual.
+    # Se capturan excepciones especificas; si falla la precarga se continua igual.
     try:
-        # Intento de generar un informe inicial al arrancar el programa.
         informe_autos(RUTA_AUTOS_JSON, 25)
         print()
         informe_usuarios(RUTA_USUARIOS_JSON)

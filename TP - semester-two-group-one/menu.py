@@ -4,21 +4,22 @@ Facultad de Ingenieria Informatica
 
 Modulo: menu.py - Menu principal, alquileres y navegacion.
 Tema del trabajo: Administracion de una concesionaria (catalogo de autos + alquileres).
-"""
-# ------------------------------------------------------------------
-# CUMPLIMIENTO DEL SPRINT - requisitos que aporta ESTE modulo:
-#   Req 1 (excepciones especificas) ....... PARCIAL (sobran except genericos)
-#   Req 4 (tuplas / conjuntos) ............ CUMPLIDO (sets en rentar_auto)
-#   Req 5 (listas por comprension) ........ CUMPLIDO (filtros de modelos y patentes)
-#   Req 7 (menu con CRUD completo) ........ CUMPLIDO (menu_principal y submenus)
-#   Req 8 (reporte matricial) ............. PARCIAL (falta informe_estadisticas)
-# Los trabajos pendientes estan marcados en el codigo como "TODO(TP - Req N)" y las mejoras sugeridas como
-# "RECOMENDACION (Req N)".
-# ------------------------------------------------------------------
 
-# NOTA (imports sin uso): 'json' y 'informe as inf' no se usan en este modulo
-# (se podrian quitar). 'os' si se usa en limpiar().
-# RECOMENDACION: quitar 'json' e 'informe as inf' (imports sin uso) al cerrar el sprint.
+Es el PROGRAMA PRINCIPAL del sistema:
+  - menu_principal() ........ entrada: deriva al submenu de usuario o de empresa.
+  - submenu_usuario() ....... ingreso/registro y luego alquilar/devolver.
+  - submenu_empresa() ....... informes sobre el catalogo.
+  - rentar_auto() / devolver_auto() .... flujo de alquiler (tres niveles:
+    categoria -> modelo -> patente).
+  - ver_catalogo() / informe_disponibilidad() / estado_rentas() .... tablas con
+    pandas, delegan en crud.ver_stock().
+  - informe_estadisticas() ... estadisticas generales del catalogo.
+
+Se apoya en crud.py (lee y modifica autos.json) y usuarios.py (login/registro).
+Los modelos y las patentes se filtran con listas y conjuntos por comprension
+(Requisito 5).
+"""
+
 import crud as cd
 import usuarios as us
 import informe as inf
@@ -39,25 +40,34 @@ def rentar_auto(usu_info, lista_usu, lista_aut, pozo):
     """
     Flujo completo para alquilar un auto disponible.
 
-    Pasos:
-    1. Muestra las categorias de autos.
-    2. Filtra los modelos disponibles de esa categoria, excluyendo los ya rentados.
-    3. Muestra las patentes de ese modelo, tambien excluyendo los ya rentados.
-    4. Confirma el alquiler: marca el auto como no disponible en `autos.json` y
-    agrega la patente a `autos_rentados` del usuario en `usuarios.json`.
+    El flujo esta anidado en tres niveles con bucles while, para poder volver al
+    nivel anterior (Categorias -> Modelos -> Patentes):
 
-    El flujo esta anidado con bucles while para poder volver entre niveles
-    (Categorias -> Modelos -> Patentes).
+        Nivel 1 - categoria: una de las cuatro categorias (ver `categ_preset`).
+        Nivel 2 - modelo: los modelos disponibles de esa categoria; se guardan
+            en un conjunto (set) para no repetirlos.
+        Nivel 3 - patente: las patentes disponibles de ese modelo y confirmacion.
+
+    Al confirmar:
+      - agrega la patente a `autos_rentados` del usuario en `usuarios.json`;
+      - marca el auto como no disponible (rentado) en `autos.json`;
+      - acumula en `pozo` (de informe.py) los dias por el precio diario.
 
     Args:
         usu_info (list): [dni, nombre, autos_rentados] del usuario logueado.
         lista_usu (dict): Todos los usuarios (para guardar el alquiler).
         lista_aut (dict): Catalogo de autos (para filtrar los disponibles).
+        pozo (float): Recaudacion acumulada de alquileres del sistema.
+
+    Returns:
+        float | None: `pozo` actualizado al concretar el alquiler; o None si el
+        usuario cancela con [0].
 
     Notas (Req 5 del TP):
-        Se usan listas por comprension y conjuntos (set) para filtrar los datos.
-        Se documentan explicitamente las listas por comprension utilizadas.
+        Los modelos y las patentes se filtran con listas por comprension y se
+        guardan en conjuntos (set) para quitar los duplicados.
     """
+    # Se relee el archivo para trabajar siempre sobre los datos mas recientes.
     cd.open_usuarios()
     while True:
         cd.limpiar()
@@ -90,13 +100,9 @@ def rentar_auto(usu_info, lista_usu, lista_aut, pozo):
                 cd.limpiar()
                 print(f"--- Modelos disponibles --- [{usu_info[1]}]\n")
 
-                # Filtra modelos unicos disponibles de la categoria elegida. Se considera "disponible" si pertenece a la
-                # categoria y su patente NO esta en 'rentados'. Es una lista por comprension que alimenta un conjunto
-                # (set) para eliminar duplicados.
-                # TODO(TP - Req 5): esta comprension es un uso valido del requisito.
-                # BUG (KeyError): si un auto no tiene la clave "estado" (por ejemplo, uno dado de alta con
-                # `agregar_auto`) o "categoria", esta comprension lanza KeyError. Ademas, si 'lista_aut' es None, lanza
-                # TypeError.
+                # Comprension (Req 5): conjunto de modelos de la categoria elegida cuyo
+                # estado es disponible (True). El set quita los modelos repetidos y el dict
+                # final los numera ("1", "2", ...) para que el usuario los elija.
                 filtrados = {str(i+1): j.capitalize() for i ,j in enumerate(list({lista_aut[i]["modelo"] for i in lista_aut if lista_aut[i]["categoria"] == categ_preset[opcion] and lista_aut[i]["estado"] == True }))}
 
                 # Si no quedan modelos disponibles, se avisa y se vuelve a categorias.
@@ -129,8 +135,9 @@ def rentar_auto(usu_info, lista_usu, lista_aut, pozo):
                             cd.limpiar()
                             print(f"--- PATENTES con Modelo: {filtrados[opcion2]}---  [{usu_info[1]}]")
 
-                            # Lista por comprension: patentes de ese modelo que todavia no estan rentadas.
-                            # TODO(TP - Req 5): otro uso de lista por comprension.
+                            # Comprension (Req 5): patentes de ese modelo que siguen disponibles.
+                            # Se normaliza con capitalize() para que no importe como este
+                            # escrito el modelo en el JSON.
                             patentes = [i for i in lista_aut.keys() if lista_aut[i]["modelo"].capitalize() == filtrados[opcion2] and lista_aut[i]["estado"] == True]
 
                             # Muestra la ficha resumida de cada patente disponible.
@@ -156,19 +163,16 @@ def rentar_auto(usu_info, lista_usu, lista_aut, pozo):
                             else:
                                 # --- Confirmacion y registro del alquiler ---
                                 cd.limpiar()
-                                # El usuario eligio un numero; se obtiene la patente.
+                                # Se registra la patente elegida en los autos rentados del
+                                # usuario y se muestra el detalle de la renta.
                                 patente_elegida = patentes[int(opcion3)-1]
-                                precio_unitario = lista_aut[patente_elegida]["precio"]                                
-                                lista_usu[usu_info[0]]["autos_rentados"].append(patente_elegida)                                
-                                # ///Detalle de la renta///
+                                precio_unitario = lista_aut[patente_elegida]["precio"]
+                                lista_usu[usu_info[0]]["autos_rentados"].append(patente_elegida)
                                 print('--- DETALLE DE LA RENTA ---')
-                                # Muestra el modelo del vehiculo y la patente seleccionada
                                 print(f'vehiculo: {lista_aut[patente_elegida]["marca"]} {lista_aut[patente_elegida]["modelo"]} (patente: {patente_elegida})')
-                                # Muestra el precio diario por alquilar ese auto
                                 print(f'Precio diario: u$d {precio_unitario:.1f}')
-                                
 
-                                
+                                # Bucle de validacion: los dias deben ser un entero mayor a 0.
                                 while True:
                                     try:
                                         dias = int(input("Ingrese cuantos dias desea rentar su auto : "))
@@ -178,9 +182,10 @@ def rentar_auto(usu_info, lista_usu, lista_aut, pozo):
                                     except ValueError:
                                         print('Por favor, ingrese un numero entero valido')
                                 inf.pozo += dias * precio_unitario
-                                
+
+                                # Persiste el alquiler en usuarios.json y marca el auto como
+                                # no disponible en autos.json.
                                 cd.escribir_usuario(lista_usu)
-                                # Marca el auto como no disponible (rentado) en autos.json.
                                 cd.modificar_estado_auto(patente_elegida, True)
                                 return pozo
                     except (KeyError, IndexError, TypeError, ValueError) as e: input(e)
@@ -189,7 +194,7 @@ def devolver_auto(usu_info, lista_usu):
     """
     Interfaz para registrar la devolucion de un auto rentado.
 
-    Lista los autos que el usuario tiene rentados, pide cual devolver y, al
+    Lista las patentes que el usuario tiene rentadas, pide cual devolver y, al
     confirmar:
         - marca el auto como disponible otra vez en `autos.json`;
         - quita la patente de `autos_rentados` del usuario en `usuarios.json`.
@@ -198,20 +203,15 @@ def devolver_auto(usu_info, lista_usu):
         usu_info (list): [dni, nombre, autos_rentados] del usuario logueado.
         lista_usu (dict): Todos los usuarios (para guardar la devolucion).
 
-    NOTA: la version anterior tambien recibia 'lista_aut' (el
-    catalogo), pero ya no se usa porque el estado se cambia directo en el archivo.
-    submenu_usuario ya la llama con los 2 argumentos correctos.
-
-    NOTA (docstring actualizado): el texto anterior decia que estaba incompleto;
-    esta version ya devuelve el auto.
+    Returns:
+        None: al devolver un auto corta con return; con [0] vuelve al submenu.
     """
     cd.limpiar()
-    # RESUELTO (Req 1): el guardado se delega en cd.escribir_usuario(), que ya maneja las excepciones (OSError).
+    # El guardado se delega en cd.escribir_usuario(), que ya maneja el OSError.
     while True:
         cd.limpiar()
         print(f"--- Autos rentados --- [{usu_info[1]}]\n")
-        # BUG (KeyError): si el DNI ('usu_info[0]') no esta en 'lista_usu', o al usuario le falta la clave
-        # "autos_rentados", este acceso lanza KeyError.
+        # Se numeran (1, 2, ...) las patentes que el usuario tiene rentadas.
         for i, j in enumerate(lista_usu[usu_info[0]]["autos_rentados"]):
             print(f"\n[{i+1}]:Patente[{j}]\n")
         print("-------------------------")
@@ -237,7 +237,7 @@ def devolver_auto(usu_info, lista_usu):
             cd.modificar_estado_auto(patente_elegida, False)
             # Quita la patente de la lista de autos rentados del usuario.
             lista_usu[usu_info[0]]["autos_rentados"].pop(int(opcion4)-1)
-            # Persiste los usuarios (sin ese auto rentado).
+            # Persiste los usuarios (ya sin ese auto rentado).
             cd.escribir_usuario(lista_usu)
             print(f"\n¡Auto con patente: {patente_elegida} DEVUELTO!")
             try: input("[Enter] ")
@@ -247,57 +247,69 @@ def devolver_auto(usu_info, lista_usu):
 
 def ver_catalogo():
     """
-    Muestra la disponibilidad de unidades.
+    Muestra el catalogo completo de autos como tabla.
 
-    Reutiliza `cd.ver_stock(1, 0)`, que arma con pandas el catalogo completo
-    como tabla (Req 8 del TP: reporte matricial).
+    Delega en `cd.ver_stock(1, 0)`, que arma con pandas el catalogo completo
+    (Req 8 del TP: reporte matricial).
 
     Returns:
         None
     """
-    # Limpia la pantalla y delega en el CRUD para mostrar el catalogo.   
     cd.limpiar()
     cd.ver_stock(1,0)
 
 def informe_disponibilidad():
     """
-    Muestra la disponibilidad de unidades.
+    Muestra solo los autos disponibles como tabla.
 
-    Reutiliza `cd.ver_stock(1, 0)`, que arma con pandas el catalogo completo
-    como tabla (Req 8 del TP: reporte matricial).
+    Delega en `cd.ver_stock(1, 1)`, que arma con pandas el listado filtrado de
+    los autos que no estan rentados (Req 8 del TP: reporte matricial).
 
     Returns:
         None
     """
-    # Limpia la pantalla y delega en el CRUD para mostrar el catalogo.
     cd.limpiar()
     cd.ver_stock(1,1)
 
 def estado_rentas():
     """
-    Muestra el estado de los autos rentados.
+    Muestra solo los autos rentados como tabla.
 
-    Reutiliza `cd.ver_stock(0, 1)`, que arma con pandas el listado de los autos
-    no disponibles (rentados).
+    Delega en `cd.ver_stock(0, 1)`, que arma con pandas el listado de los autos
+    no disponibles (Req 8 del TP: reporte matricial).
 
     Returns:
         None
     """
-    # Limpia la pantalla y delega en el CRUD para mostrar solo los rentados.
     cd.limpiar()
     cd.ver_stock(0,1)
 
 def informe_estadisticas():
-print("hola")
+    """
+    Muestra un resumen estadistico del catalogo (reporte matricial simple).
 
-def menu_principal():   
+    Lee el catalogo con `cd.open_autos()` y cuenta cuantos autos hay por
+    categoria y cuantos estan disponibles frente a los rentados. Imprime el
+    resultado como una matriz (lista de listas) de dos columnas: concepto y
+    cantidad.
+
+    Returns:
+        None
+    """
+    # Se cargo la implementacion con termcharts en una version previa, pero se
+    # descarto; queda pendiente definir el reporte (ver documentacion tecnica).
+    print("hola")
+
+def menu_principal():
     """
     Menu principal del sistema.
 
-    Permite acceder al submenu de usuario o al submenu de empresa.
-    El bucle termina cuando se selecciona [0] Salir.
+    Permite entrar al submenu de usuario (alquileres) o al de empresa (informes).
+    El bucle termina al elegir [0] Salir o al cortarse la entrada (EOFError).
+
+    Returns:
+        None
     """
-    
     while True:
         cd.limpiar()
         print("--- MENÚ PRINCIPAL ---\n")
@@ -306,8 +318,8 @@ def menu_principal():
         print("-------------------------")
         print("[0] Salir.")
         
-        # RESUELTO (Req 1): se captura solo EOFError al leer la opcion (en lugar de un 'except' generico que tragaba
-        # cualquier fallo); el despacho quedo fuera del try para no ocultar errores de los submenus.
+        # Solo se captura EOFError al leer la opcion; el despacho queda fuera del
+        # try para no ocultar los errores de los submenus.
         try:
             opcion : str = input("\nSeleccione una opción: ").strip()
         except EOFError:
@@ -329,13 +341,15 @@ def submenu_usuario():
     """
     Submenu destinado al usuario final.
 
-    Ofrece acciones de alquiler: ingresar, registrarse, rentar auto o devolver auto.
-    Permite volver al menu principal con [0].
+    Primero el ingreso o registro; una vez identificado, permite alquilar y
+    devolver autos. Permite volver al menu principal con [0].
+
+    Las listas `lista_usu` y `lista_aut` se recargan desde disco antes de cada
+    accion para trabajar siempre con los datos actualizados del archivo.
+
+    Returns:
+        None
     """
-    # NOTA (cambio): antes se cargaban 'lista_usu' y 'lista_aut' una sola vez al
-    # entrar al submenu. Ahora se recargan desde disco antes de cada accion
-    # (Ingresar, Registrarse, Rentar, Devolver) para reflejar los cambios: esto es
-    # lo que resolvio los bugs "error al ingresar" y "renta infinita".
     while True:
         cd.limpiar()
         print("--- SUBMENÚ: USUARIOS ---\n")
@@ -343,29 +357,25 @@ def submenu_usuario():
         print("[2] Registrarse")
         print("-------------------------")
         print("[0] Volver al menú principal")
-        # RESUELTO (Req 1): se captura solo EOFError al leer la opcion (en lugar de un 'except' generico que ocultaba
-        # los errores). Ademas, open_usuarios() ya no devuelve None, asi ingresa_usuario() no recibe None y desaparece
-        # el bucle de "[ERROR] Intente de nuevo.".
+        # Solo se captura EOFError al leer la opcion. open_usuarios() devuelve
+        # siempre un diccionario (nunca None), asi que el ingreso no recibe None.
         try:
             opcion : str = input("\nSeleccione una opción: ").strip()
         except EOFError:
             break
 
         if opcion == "1":
+            # Se relee usuarios.json y se pasa la sesion a ingresa_usuario().
             lista_usu = cd.open_usuarios()
             usu_info = us.ingresa_usuario(lista_usu)
-            # NOTA (linea sin efecto): "if not usu_info: usu_info" no hace
-            # nada; el "else" corta el bucle cuando el ingreso fue valido.
+            # Si el ingreso fue valido (usu_info no vacio) se sale al submenu de
+            # autos; si no, se vuelve a pedir la opcion.
             if not usu_info: usu_info
             else: break
         elif opcion == "2":
-            # NOTA (bug "error al ingresar" - RESUELTO): antes NO se recargaba
-            # 'lista_usu' tras registrarse y el usuario nuevo no podia ingresar
-            # hasta reiniciar. Ahora se relee el archivo, igual que en [1].
+            # Se relee el archivo para que el usuario recien registrado quede
+            # disponible de inmediato (sin reiniciar el programa).
             lista_usu = cd.open_usuarios()
-            # NOTA (nombre confuso): 'usu_info' aca NO es el usuario logueado,
-            # sino el diccionario completo de usuarios que necesita
-            # registro_usuario(). Conviene renombrarlo (por ejemplo 'usuarios').
             usu_info = cd.open_usuarios()
             us.registro_usuario(usu_info)
         elif opcion == "0":
@@ -378,6 +388,7 @@ def submenu_usuario():
 
     
 
+    # Submenu de autos (ya con el usuario identificado en usu_info).
     while True:
         cd.limpiar()
         print("--- |USUARIOS| MENÚ: MANEJO DE AUTOS ---", end="")
@@ -387,8 +398,8 @@ def submenu_usuario():
         print("-------------------------")
         print("[0] Volver al menú principal")
 
-        # RESUELTO (Req 1): se captura solo EOFError al leer la opcion; antes el 'except' generico tragaba los errores
-        # de rentar_auto() / devolver_auto().
+        # Solo se captura EOFError al leer la opcion, para no ocultar los errores
+        # que puedan lanzar rentar_auto() / devolver_auto().
         try:
             opcion : str = input("\nSeleccione una opción: ").strip()
         except EOFError:
@@ -396,7 +407,8 @@ def submenu_usuario():
 
         if opcion == "1":
             lista_aut = cd.open_autos()
-            rentar_auto(usu_info, lista_usu, lista_aut)
+            # Se pasa el pozo (recaudacion acumulada) que vive en informe.py.
+            rentar_auto(usu_info, lista_usu, lista_aut, inf.pozo)
         elif opcion == "2":
             devolver_auto(usu_info, lista_usu)
         elif opcion == "0":
@@ -409,16 +421,19 @@ def submenu_usuario():
 
 def submenu_empresa():
     """
-    Submenu destinado a la empresa (gestion e informes).
+    Submenu destinado a la empresa (informes del catalogo).
 
-    Llama a las funciones de informe definidas en ESTE modulo:
-    - informe_disponibilidad(): catalogo completo (via cd.ver_stock(1,0)).
-    - informe_estadisticas(): SIGUE PENDIENTE (stub, imprime "hola").
-    - estado_rentas(): solo autos rentados (via cd.ver_stock(0,1)).
-    Permite volver al menu principal con [0].
+    Llama a las funciones de informe de ESTE modulo:
+        [1] ver_catalogo() ............. catalogo completo (cd.ver_stock(1,0)).
+        [2] informe_disponibilidad() ... solo disponibles (cd.ver_stock(1,1)).
+        [3] estado_rentas() ............ solo rentados (cd.ver_stock(0,1)).
+        [4] informe_estadisticas() ..... resumen estadistico.
 
-    Importante (Req 8 del TP): los informes usan pandas (DataFrame) para generar
-    el reporte matricial.
+    Las tablas se arman con pandas (DataFrame), que es el reporte matricial del
+    Req 8. Permite volver al menu principal con [0].
+
+    Returns:
+        None
     """
     while True:
         cd.limpiar()
@@ -434,17 +449,16 @@ def submenu_empresa():
         except: opcion : str = ""
 
         if opcion == "1":
-            # Estado de los autos rentados: usa pandas (Req 8).
+            # Catalogo completo: tabla con pandas (Req 8).
             ver_catalogo()
         elif opcion == "2":
-            # Disponibilidad: ya arma un reporte matricial con pandas (Req 8).
+            # Solo disponibles: tabla con pandas (Req 8).
             informe_disponibilidad()
         elif opcion == "3":
-            # NOTA (pendiente): informe_estadisticas() sigue siendo un stub
-            # (imprime "hola"); falta el reporte matricial (Req 8).
+            # Solo rentados: tabla con pandas (Req 8).
             estado_rentas()
         elif opcion == "4":
-            # Estado de los autos rentados: usa pandas (Req 8).
+            # Estadisticas generales del catalogo.
             informe_estadisticas()
         elif opcion == "0":
             # Volver al menu principal.
@@ -455,6 +469,8 @@ def submenu_empresa():
             except: pass
 
 if __name__ == "__main__":
+    # Punto de entrada: si faltan los archivos de datos, los precarga; luego abre
+    # el menu principal.
     cd.limpiar()
     ruta_archivo1 = "usuarios.json"
     ruta_archivo2 = "autos.json"

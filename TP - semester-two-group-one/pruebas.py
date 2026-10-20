@@ -66,6 +66,8 @@ def entorno(tmp_path, monkeypatch):
     """Aisla cada prueba: directorio temporal propio y sin datos de entrada."""
     monkeypatch.chdir(tmp_path)
     monkeypatch.setattr("builtins.input", _sin_entrada)
+    # La recaudacion (pozo) es global: se reinicia para que no arrastre entre pruebas.
+    monkeypatch.setattr(inf, "pozo", 0.0, raising=False)
     return tmp_path
 
 
@@ -558,9 +560,9 @@ class TestAlquiler:
         lista_aut = crud.open_autos()
         usu_info = [DNI, "Juan", lista_usu[DNI]["autos_rentados"]]
 
-        # categoria "1" -> modelo "1" -> patente "1"
-        guion(monkeypatch, ["1", "1", "1"])
-        menu.rentar_auto(usu_info, lista_usu, lista_aut)
+        # categoria "1" -> modelo "1" -> patente "1" -> 3 dias de alquiler
+        guion(monkeypatch, ["1", "1", "1", "3"])
+        menu.rentar_auto(usu_info, lista_usu, lista_aut, inf.pozo)
 
         assert leer("autos.json")["AAA111"]["estado"] is False
         assert "AAA111" in leer("usuarios.json")[DNI]["autos_rentados"]
@@ -572,7 +574,7 @@ class TestAlquiler:
         lista_aut = crud.open_autos()
 
         guion(monkeypatch, ["0"])
-        menu.rentar_auto([DNI, "Juan", []], lista_usu, lista_aut)
+        menu.rentar_auto([DNI, "Juan", []], lista_usu, lista_aut, inf.pozo)
 
         assert leer("autos.json")["AAA111"]["estado"] is True
         assert leer("usuarios.json")[DNI]["autos_rentados"] == []
@@ -582,7 +584,7 @@ class TestAlquiler:
         lista_usu = leer("usuarios.json")
 
         guion(monkeypatch, ["1", "", "0"])
-        menu.rentar_auto([DNI, "Juan", []], lista_usu, {})
+        menu.rentar_auto([DNI, "Juan", []], lista_usu, {}, inf.pozo)
 
         assert "No hay autos disponibles" in capsys.readouterr().out
 
