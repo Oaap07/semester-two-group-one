@@ -37,6 +37,11 @@ from pathlib import Path
 
 import pytest
 
+# matplotlib sin ventanas: usa el backend "Agg" (solo guarda en memoria), asi las
+# pruebas de informes_estadisticas corren en consolas/CI sin pantalla.
+import matplotlib
+matplotlib.use("Agg")
+
 # Se agrega la carpeta del proyecto al path para poder importar los modulos.
 RAIZ = Path(__file__).resolve().parent
 if str(RAIZ) not in sys.path:
@@ -645,9 +650,15 @@ class TestAlquiler:
         menu.submenu_empresa()
 
     def test_submenu_empresa_opcion_estadisticas(self, monkeypatch, capsys):
-        guion(monkeypatch, ["4", "0"])
+        escribir("autos.json", {"DISP01": auto_disponible()})
+        # matplotlib sin ventanas: show() se apaga para que la prueba no abra
+        # una ventana ni se quede esperando. El guion lleva el "Enter" que pide
+        # informe_estadisticas al final y el "0" que sale del submenu.
+        monkeypatch.setattr("matplotlib.pyplot.show", lambda *a, **k: None)
+        guion(monkeypatch, ["4", "", "0"])
         menu.submenu_empresa()
-        assert "hola" in capsys.readouterr().out
+        salida = capsys.readouterr().out
+        assert "No hay autos" not in salida
 
 
 # ---------------------------------------------------------------------------
@@ -683,9 +694,21 @@ class TestInformes:
         menu.estado_rentas()
         assert "No hay autos rentados" in capsys.readouterr().out
 
-    def test_informe_estadisticas_sigue_siendo_un_stub(self, capsys):
+    def test_informe_estadisticas_grafica_con_catalogo(self, monkeypatch, capsys):
+        escribir("autos.json", {"DISP01": auto_disponible(), "RENT01": auto_rentado()})
+        # show() apagado: la prueba valida que se arman y muestran los graficos
+        # sin abrir una ventana real.
+        monkeypatch.setattr("matplotlib.pyplot.show", lambda *a, **k: None)
+        guion(monkeypatch, [""])
+        menu.informe_estadisticas()  # no debe lanzar
+        assert "No hay autos" not in capsys.readouterr().out
+
+    def test_informe_estadisticas_catalogo_vacio_avisa(self, monkeypatch, capsys):
+        escribir("autos.json", {})
+        guion(monkeypatch, [""])
         menu.informe_estadisticas()
-        assert capsys.readouterr().out.strip() == "hola"
+        # Con catalogo vacio no arma graficos: avisa en lugar de lanzar KeyError.
+        assert "No hay autos" in capsys.readouterr().out
 
     def test_informe_autos_genera_los_registros_del_esquema(self, monkeypatch):
         random.seed(1234)  # determinismo para que la prueba no sea flaky

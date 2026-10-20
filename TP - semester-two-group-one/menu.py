@@ -1,5 +1,5 @@
-"""
-Requisitos del Trabajo Practico (TPO - SPRINT) - Programacion I
+﻿"""
+(TPO - SPRINT) - Programacion I
 Facultad de Ingenieria Informatica
 
 Modulo: menu.py - Menu principal, alquileres y navegacion.
@@ -13,7 +13,7 @@ Es el PROGRAMA PRINCIPAL del sistema:
     categoria -> modelo -> patente).
 - ver_catalogo() / informe_disponibilidad() / estado_rentas() .... tablas con
     pandas, delegan en crud.ver_stock().
-- informe_estadisticas() ... estadisticas generales del catalogo.
+- informe_estadisticas() ... graficos de barras y torta con pandas + matplotlib.
 
 Se apoya en crud.py (lee y modifica autos.json) y usuarios.py (login/registro).
 Los modelos y las patentes se filtran con listas y conjuntos por comprension
@@ -65,9 +65,6 @@ def rentar_auto(usu_info, lista_usu, lista_aut, pozo):
         float | None: `pozo` actualizado al concretar el alquiler; o None si el
         usuario cancela con [0].
 
-    Notas (Req 5 del TP):
-        Los modelos y las patentes se filtran con listas por comprension y se
-        guardan en conjuntos (set) para quitar los duplicados.
     """
     # Se relee el archivo para trabajar siempre sobre los datos mas recientes.
     cd.open_usuarios()
@@ -101,10 +98,6 @@ def rentar_auto(usu_info, lista_usu, lista_aut, pozo):
             while True:
                 cd.limpiar()
                 print(f"--- Modelos disponibles --- [{usu_info[1]}]\n")
-
-                # Comprension (Req 5): conjunto de modelos de la categoria elegida cuyo
-                # estado es disponible (True). El set quita los modelos repetidos y el dict
-                # final los numera ("1", "2", ...) para que el usuario los elija.
                 filtrados = {str(i+1): j.capitalize() for i ,j in enumerate(list({lista_aut[i]["modelo"] for i in lista_aut if lista_aut[i]["categoria"] == categ_preset[opcion] and lista_aut[i]["estado"] == True }))}
 
                 # Si no quedan modelos disponibles, se avisa y se vuelve a categorias.
@@ -137,7 +130,7 @@ def rentar_auto(usu_info, lista_usu, lista_aut, pozo):
                             cd.limpiar()
                             print(f"--- PATENTES con Modelo: {filtrados[opcion2]}---  [{usu_info[1]}]")
 
-                            # Comprension (Req 5): patentes de ese modelo que siguen disponibles.
+                            # Comprension: patentes de ese modelo que siguen disponibles.
                             # Se normaliza con capitalize() para que no importe como este
                             # escrito el modelo en el JSON.
                             patentes = [i for i in lista_aut.keys() if lista_aut[i]["modelo"].capitalize() == filtrados[opcion2] and lista_aut[i]["estado"] == True]
@@ -288,10 +281,29 @@ def estado_rentas():
 
 def informe_estadisticas():
     """
-    Muestra estadisticas del catalogo de autos.
+    Muestra un resumen grafico del catalogo (reporte matricial con pandas).
+
+    Lee el catalogo con `cd._cargar_autos()`, lo convierte a un DataFrame de
+    pandas y dibuja dos graficos con matplotlib:
+        - barras: cantidad de autos DISPONIBLES agrupados por marca;
+        - torta: proporcion entre autos disponibles y rentados.
+
+    Si el catalogo esta vacio (o no se pudo leer) avisa por pantalla y sale sin
+    armar los graficos, para no fallar sobre un DataFrame sin columnas.
+
+    Returns:
+        None
     """
     cd.limpiar()
-    datos : dict = cd._cargar_autos()
+    datos: dict = cd._cargar_autos()
+    if not datos:
+        # Sin autos, el DataFrame queda sin columnas y el filtro por "estado"
+        # lanzaria KeyError; se avisa y se sale.
+        print("No hay autos en el catalogo para analizar.")
+        try: input("[Enter] ")
+        except: pass
+        return
+
     autos_excel_modificado = (cd.pd.DataFrame(datos)).T
     
     midf_true = autos_excel_modificado[autos_excel_modificado["estado"] == True].groupby(autos_excel_modificado["marca"]).size()
@@ -332,7 +344,7 @@ def informe_estadisticas():
     
     plt.tight_layout()
     plt.show()
-    
+
     input("Enter para salir: ")
 
 def menu_principal():
@@ -419,9 +431,6 @@ def submenu_usuario():
             print("\nOpción no válida. Intente de nuevo.")
             try: input("[Enter] ")
             except EOFError: pass
-
-
-    
 
     # Submenu de autos (ya con el usuario identificado en usu_info).
     while True:
