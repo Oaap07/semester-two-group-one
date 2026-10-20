@@ -8,9 +8,9 @@ Tema del trabajo: Administracion de una concesionaria (catalogo de autos + alqui
 
 Ofrece las dos puertas de entrada al sistema desde el submenu de usuario:
 
-  - ingresa_usuario() ... valida DNI y contraseña de un usuario ya registrado y
+- ingresa_usuario() ... valida DNI y contraseña de un usuario ya registrado y
     devuelve su sesion [dni, nombre, autos_rentados].
-  - registro_usuario() .. pide los datos de un usuario nuevo y lo guarda en
+- registro_usuario() .. pide los datos de un usuario nuevo y lo guarda en
     usuarios.json.
 
 Ambas usan "[0]" como salida rapida y validan la entrada con excepciones

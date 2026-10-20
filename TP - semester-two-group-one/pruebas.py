@@ -7,20 +7,20 @@ Suite de pytest para el sistema de la concesionaria. Se puede ejecutar de dos fo
     python pruebas.py
 
 Cubre:
-  - CRUD (Req 7): alta (con "estado"), lectura, modificacion de cada campo y
+- CRUD (Req 7): alta (con "estado"), lectura, modificacion de cada campo y
     borrado; y el catalogo tabulado con pandas (ver_stock) en sus tres modos,
     incluidos los avisos de listas vacias (Req 8).
-  - Persistencia (Req 2): _cargar_autos / _guardar_autos, open_autos /
+- Persistencia (Req 2): _cargar_autos / _guardar_autos, open_autos /
     open_usuarios y escribir_auto / escribir_usuario.
-  - Excepciones y validaciones (Req 1): patente "0"/cancelacion, DNI no
+- Excepciones y validaciones (Req 1): patente "0"/cancelacion, DNI no
     numerico, invalido o inexistente, archivos ausentes o corruptos, fin de
     entrada (EOF) y valores no serializables.
-  - Usuarios (Req 2): ingreso (clave incorrecta, DNI invalido) y registro
+- Usuarios (Req 2): ingreso (clave incorrecta, DNI invalido) y registro
     (cancelacion, DNI duplicado, claves distintas).
-  - Alquiler (Req 2): rentar y devolver el mismo auto; el campo "estado" cambia
+- Alquiler (Req 2): rentar y devolver el mismo auto; el campo "estado" cambia
     a False y vuelve a True, y la patente entra y sale de "autos_rentados".
-  - Navegacion: menu_principal, submenu_usuario, submenu_empresa y estado_rentas.
-  - Generacion de datos (Req 3): informe_autos / informe_usuarios.
+- Navegacion: menu_principal, submenu_usuario, submenu_empresa y estado_rentas.
+- Generacion de datos (Req 3): informe_autos / informe_usuarios.
 
 Cada prueba corre en un directorio temporal propio (fixture 'entorno'), asi no
 toca los archivos reales del proyecto. La entrada por teclado se simula con el

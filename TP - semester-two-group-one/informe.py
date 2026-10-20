@@ -78,10 +78,10 @@ RUTA_USUARIOS_JSON: str = "usuarios.json"
 pozo: float = 0.0
 
 # Alfabeto y digitos para armar las patentes al azar (mayores y menores a 2016).
-letras: tuple = (
+letras: tuple = [
     "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "ñ", "o",
     "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"
-)
+]
 numeros: tuple = ("0", "1", "2", "3", "4", "5", "6", "7", "8", "9")
 
 
