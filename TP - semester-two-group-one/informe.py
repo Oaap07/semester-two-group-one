@@ -78,10 +78,10 @@ categorias_modelos: dict = {
 RUTA_AUTOS_JSON: str = "autos.json"
 RUTA_USUARIOS_JSON : str = "usuarios.json"
 
-letras: tuple = (
+letras: list = [
     "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "ñ", "o",
     "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"
-)
+]
 numeros: tuple = ("0", "1", "2", "3", "4", "5", "6", "7", "8", "9")
 
 
@@ -119,6 +119,7 @@ def informe_autos(
         patente = ""
         # Patentes mayores o iguales a 2016
         if anio >= 2016:
+            letras.remove("ñ")
             patente += random.choice(preset[anio])
             for i in range(5):
                 if i <= 2:
@@ -126,6 +127,7 @@ def informe_autos(
                 else:
                     patente += random.choice(letras)
             patente = patente.upper()
+            letras.append("ñ")
         # Patentes menores a 2016
         else:
             patente = ""
@@ -225,6 +227,7 @@ def informe_usuarios(
     except:
         pass
     return
+
 
 
 if __name__ == "__main__":

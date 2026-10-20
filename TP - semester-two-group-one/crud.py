@@ -28,7 +28,6 @@ import informe as inf
 import pandas as pd
 import matplotlib as mt
 
-
 # ==========================================
 # CONFIGURACION Y CONSTANTES
 # ==========================================
@@ -101,7 +100,6 @@ def _cargar_autos() -> dict:
         input("[Enter] ")
         return {}
 
-
 def _guardar_autos(autos):
     """
     Escribe el catalogo de autos en el archivo JSON.
@@ -131,6 +129,7 @@ def _guardar_autos(autos):
         limpiar()
         print(f"/// Ocurrió un error de sistema: {e} ///")
         input("[Enter] ")
+
 
 
 # ---------- Validaciones de entrada ----------
@@ -163,7 +162,6 @@ def _pedir_de_tupla(etiqueta, opciones):
         return False
     return valor
 
-
 def _pedir_entero(etiqueta, minimo, maximo):
     """
     Pide un numero entero dentro de un rango.
@@ -191,7 +189,6 @@ def _pedir_entero(etiqueta, minimo, maximo):
             return numero
         valor = input(f"Inválido. {etiqueta} debe ser un número entre {minimo} y {maximo}: ").strip()
 
-
 def _pedir_float(etiqueta):
     """
     Pide un numero decimal positivo (acepta coma o punto).
@@ -216,7 +213,6 @@ def _pedir_float(etiqueta):
             # Si no se puede convertir a float, se vuelve a pedir el valor.
             pass
         valor = input(f"Inválido. {etiqueta} debe ser un número positivo: ").strip().replace(",", ".")
-
 
 def _pedir_patente_existente(autos : dict) -> str:
     """
@@ -261,6 +257,7 @@ def _pedir_patente_existente(autos : dict) -> str:
     return patente
 
 
+
 # ---------- Mostrar ----------
 
 def _mostrar_auto(patente, datos):
@@ -287,6 +284,7 @@ def _mostrar_auto(patente, datos):
         print(f"\tEstado: {datos['estado']}")
     except KeyError as e:
         print(f"\t[Falta un dato del auto: {e}]")
+
 
 
 # ---------- READ ----------
@@ -316,7 +314,6 @@ def ver_stock(base,rentados):
     limpiar()
     autos : dict = _cargar_autos()
 
-    input("Te metes a los condicionales")
     # --- MODO 1: catalogo completo (base=1, rentados=0) ---
     if base == 1 and rentados == 0:
         # Recorre el catalogo preparando los campos para mostrarlos en la tabla.
@@ -362,13 +359,11 @@ def ver_stock(base,rentados):
     # BUG (UnboundLocalError): con otra combinacion (por ejemplo, ver_stock(0, 0)) no entra en ningun modo y
     # "autos_rentados" queda sin definir -> UnboundLocalError (subclase de NameError) en la linea del DataFrame de
     # abajo.
-
     # Arma un DataFrame de pandas: si base == 1 usa el catalogo completo; si no,
     # usa el diccionario de rentados. Las patentes quedan como columnas y los
     # atributos como filas; el .T deja una fila por auto.
-    input("Te metes al try")
-    try: autos_excel_modificado = pd.DataFrame(autos if base == 1 and rentados == 0 else (autos_disponibles if base == 1 and rentados == 1 else autos_rentados))
-    except Exception: input(autos_excel_modificado)
+    autos_excel_modificado = pd.DataFrame(autos if base == 1 and rentados == 0 else (autos_disponibles if base == 1 and rentados == 1 else autos_rentados))
+
     # BUG (logica): en el modo rentados se controla "autos" (no "autos_rentados"), asi que si no hay autos rentados se
     # muestra una tabla vacia en vez del aviso.
     # RECOMENDACION (Req 8): controlar "autos_rentados" para que el informe de rentados avise correctamente cuando no
@@ -387,7 +382,6 @@ def ver_stock(base,rentados):
         input("Presione cualquier tecla para salir: ")
         return
     except: pass
-
 
 def ver_auto():
     """
@@ -443,7 +437,6 @@ def open_autos():
         try: input("[Enter] ")
         except: pass
         return {}
-
 
 def open_usuarios():
     """
@@ -506,6 +499,8 @@ def escribir_auto(lista_aut):
     except OSError as e:
         print(f"/// No se pudo escribir el archivo de autos: {e} ///")
 
+
+
 # ---------- CREATE ----------
 
 def agregar_auto():
@@ -551,6 +546,7 @@ def agregar_auto():
     # Se persiste el cambio y se confirma al usuario.
     _guardar_autos(autos)
     print(f"\nAuto {patente} agregado correctamente.")
+
 
 
 # ---------- UPDATE ----------
@@ -647,6 +643,7 @@ def modificar_auto():
         print(f"\n{patente} actualizado correctamente.")
 
 
+
 # ---------- DELETE ----------
 
 def eliminar_auto():
@@ -673,6 +670,7 @@ def eliminar_auto():
     del autos[patente]
     _guardar_autos(autos)
     print(f"\nAuto {patente} eliminado correctamente.")
+
 
 
 # ---------- Menu ----------
@@ -716,6 +714,7 @@ def menu_crud():
             break
         else:
             print("\nOpción no válida. Intente de nuevo.")
+
 
 
 if __name__ == "__main__":

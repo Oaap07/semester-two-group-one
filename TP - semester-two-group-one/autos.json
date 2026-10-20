@@ -1,113 +1,50 @@
 {
-    "AI866EO": {
-        "marca": "chevrolet",
-        "modelo": "tracker",
+    "AE926FQ": {
+        "marca": "peugeot",
+        "modelo": "2008",
         "calidad": "nuevo",
-        "año": 2026,
-        "precio": 90,
+        "año": 2020,
+        "precio": 75.0,
         "categoria": "suv_crossover",
         "estado": true
     },
-    "JIA737": {
+    "AF695YH": {
         "marca": "peugeot",
         "modelo": "408",
-        "calidad": "usado",
-        "año": 2008,
-        "precio": 45.0,
+        "calidad": "nuevo",
+        "año": 2021,
+        "precio": 77.5,
         "categoria": "sedan_hatchback",
         "estado": true
     },
-    "MYÑ700": {
+    "AG770YT": {
         "marca": "renault",
-        "modelo": "kardian",
-        "calidad": "usado",
-        "año": 2013,
-        "precio": 57.5,
-        "categoria": "suv_crossover",
-        "estado": true
-    },
-    "AG025PW": {
-        "marca": "toyota",
-        "modelo": "yaris",
+        "modelo": "clio",
         "calidad": "cuidado",
         "año": 2023,
         "precio": 82.5,
         "categoria": "sedan_hatchback",
         "estado": true
     },
-    "AG697GE": {
-        "marca": "toyota",
-        "modelo": "yaris",
-        "calidad": "usado",
-        "año": 2024,
-        "precio": 85.0,
-        "categoria": "sedan_hatchback",
-        "estado": true
-    },
-    "SUL573": {
+    "AB406PB": {
         "marca": "renault",
-        "modelo": "kangoo",
+        "modelo": "duster",
         "calidad": "cuidado",
-        "año": 2007,
-        "precio": 42.5,
-        "categoria": "monovolumen_mpv",
-        "estado": true
-    },
-    "BNS355": {
-        "marca": "chevrolet",
-        "modelo": "tracker",
-        "calidad": "cuidado",
-        "año": 2014,
-        "precio": 60.0,
+        "año": 2017,
+        "precio": 67.5,
         "categoria": "suv_crossover",
         "estado": true
     },
-    "AE758PT": {
-        "marca": "peugeot",
-        "modelo": "408",
-        "calidad": "usado",
-        "año": 2019,
-        "precio": 72.5,
-        "categoria": "sedan_hatchback",
-        "estado": true
-    },
-    "XYI005": {
+    "AG653EA": {
         "marca": "fiat",
-        "modelo": "pulse",
-        "calidad": "cuidado",
-        "año": 2010,
-        "precio": 50.0,
-        "categoria": "suv_crossover",
-        "estado": true
-    },
-    "ÑQY190": {
-        "marca": "toyota",
-        "modelo": "rav4",
-        "calidad": "usado",
-        "año": 2000,
-        "precio": 25.0,
-        "categoria": "suv_crossover",
-        "estado": true
-    },
-    "AG587BB": {
-        "marca": "toyota",
-        "modelo": "etios",
-        "calidad": "cuidado",
+        "modelo": "cronos",
+        "calidad": "nuevo",
         "año": 2023,
         "precio": 82.5,
         "categoria": "sedan_hatchback",
         "estado": true
     },
-    "KOM517": {
-        "marca": "fiat",
-        "modelo": "argo",
-        "calidad": "nuevo",
-        "año": 2007,
-        "precio": 42.5,
-        "categoria": "sedan_hatchback",
-        "estado": true
-    },
-    "MAF598": {
+    "DRG750": {
         "marca": "fiat",
         "modelo": "fastback",
         "calidad": "nuevo",
@@ -116,111 +53,174 @@
         "categoria": "suv_crossover",
         "estado": true
     },
-    "YZI870": {
+    "LHW728": {
+        "marca": "toyota",
+        "modelo": "yaris",
+        "calidad": "usado",
+        "año": 2004,
+        "precio": 35.0,
+        "categoria": "sedan_hatchback",
+        "estado": true
+    },
+    "WWD241": {
+        "marca": "fiat",
+        "modelo": "toro",
+        "calidad": "nuevo",
+        "año": 2002,
+        "precio": 30.0,
+        "categoria": "pickup",
+        "estado": false
+    },
+    "PFS764": {
+        "marca": "renault",
+        "modelo": "kangoo",
+        "calidad": "nuevo",
+        "año": 2015,
+        "precio": 62.5,
+        "categoria": "monovolumen_mpv",
+        "estado": false
+    },
+    "AG971CW": {
         "marca": "toyota",
         "modelo": "hilux",
+        "calidad": "cuidado",
+        "año": 2023,
+        "precio": 82.5,
+        "categoria": "pickup",
+        "estado": true
+    },
+    "AE159CR": {
+        "marca": "peugeot",
+        "modelo": "3008",
+        "calidad": "cuidado",
+        "año": 2021,
+        "precio": 77.5,
+        "categoria": "suv_crossover",
+        "estado": true
+    },
+    "AG647CG": {
+        "marca": "peugeot",
+        "modelo": "206",
+        "calidad": "usado",
+        "año": 2023,
+        "precio": 82.5,
+        "categoria": "sedan_hatchback",
+        "estado": true
+    },
+    "XXA767": {
+        "marca": "chevrolet",
+        "modelo": "montana",
         "calidad": "usado",
         "año": 2009,
         "precio": 47.5,
         "categoria": "pickup",
         "estado": true
     },
-    "AE489PN": {
+    "KZN390": {
+        "marca": "renault",
+        "modelo": "clio",
+        "calidad": "usado",
+        "año": 2003,
+        "precio": 32.5,
+        "categoria": "sedan_hatchback",
+        "estado": true
+    },
+    "AI418CZ": {
+        "marca": "peugeot",
+        "modelo": "2008",
+        "calidad": "usado",
+        "año": 2026,
+        "precio": 90,
+        "categoria": "suv_crossover",
+        "estado": true
+    },
+    "LER492": {
+        "marca": "renault",
+        "modelo": "clio",
+        "calidad": "nuevo",
+        "año": 2004,
+        "precio": 35.0,
+        "categoria": "sedan_hatchback",
+        "estado": true
+    },
+    "AH176DH": {
+        "marca": "renault",
+        "modelo": "kardian",
+        "calidad": "usado",
+        "año": 2025,
+        "precio": 87.5,
+        "categoria": "suv_crossover",
+        "estado": true
+    },
+    "ÑAZ376": {
         "marca": "chevrolet",
         "modelo": "montana",
         "calidad": "usado",
-        "año": 2020,
-        "precio": 75.0,
+        "año": 2004,
+        "precio": 35.0,
         "categoria": "pickup",
         "estado": true
     },
-    "HOE859": {
-        "marca": "toyota",
-        "modelo": "rav4",
+    "YKH699": {
+        "marca": "peugeot",
+        "modelo": "3008",
         "calidad": "usado",
-        "año": 2005,
-        "precio": 37.5,
+        "año": 2006,
+        "precio": 40.0,
         "categoria": "suv_crossover",
         "estado": true
     },
-    "PGD424": {
-        "marca": "fiat",
-        "modelo": "cronos",
-        "calidad": "usado",
-        "año": 2008,
-        "precio": 45.0,
-        "categoria": "sedan_hatchback",
-        "estado": true
-    },
-    "AEV584": {
-        "marca": "chevrolet",
-        "modelo": "spin",
-        "calidad": "cuidado",
-        "año": 2014,
-        "precio": 60.0,
-        "categoria": "monovolumen_mpv",
-        "estado": true
-    },
-    "AE689FA": {
+    "AH784YU": {
         "marca": "toyota",
-        "modelo": "etios",
+        "modelo": "hilux",
         "calidad": "nuevo",
-        "año": 2019,
-        "precio": 72.5,
-        "categoria": "sedan_hatchback",
-        "estado": true
-    },
-    "LAL635": {
-        "marca": "toyota",
-        "modelo": "yaris",
-        "calidad": "usado",
-        "año": 2010,
-        "precio": 50.0,
-        "categoria": "sedan_hatchback",
-        "estado": true
-    },
-    "DKF865": {
-        "marca": "renault",
-        "modelo": "kangoo",
-        "calidad": "nuevo",
-        "año": 2008,
-        "precio": 45.0,
-        "categoria": "monovolumen_mpv",
-        "estado": true
-    },
-    "AH747LB": {
-        "marca": "chevrolet",
-        "modelo": "spin",
-        "calidad": "cuidado",
         "año": 2025,
         "precio": 87.5,
-        "categoria": "monovolumen_mpv",
-        "estado": false
-    },
-    "SYÑ770": {
-        "marca": "fiat",
-        "modelo": "fastback",
-        "calidad": "cuidado",
-        "año": 2000,
-        "precio": 25.0,
-        "categoria": "suv_crossover",
+        "categoria": "pickup",
         "estado": true
     },
-    "AF827OR": {
+    "MXE142": {
+        "marca": "peugeot",
+        "modelo": "408",
+        "calidad": "cuidado",
+        "año": 2009,
+        "precio": 47.5,
+        "categoria": "sedan_hatchback",
+        "estado": true
+    },
+    "AG395VL": {
         "marca": "peugeot",
         "modelo": "208",
         "calidad": "usado",
-        "año": 2022,
-        "precio": 80.0,
+        "año": 2023,
+        "precio": 82.5,
         "categoria": "sedan_hatchback",
-        "estado": false
+        "estado": true
     },
-    "BZO620": {
-        "marca": "toyota",
-        "modelo": "corolla",
+    "YÑQ421": {
+        "marca": "chevrolet",
+        "modelo": "montana",
         "calidad": "cuidado",
-        "año": 2007,
-        "precio": 42.5,
+        "año": 2002,
+        "precio": 30.0,
+        "categoria": "pickup",
+        "estado": true
+    },
+    "HLF245": {
+        "marca": "toyota",
+        "modelo": "yaris",
+        "calidad": "cuidado",
+        "año": 2003,
+        "precio": 32.5,
+        "categoria": "sedan_hatchback",
+        "estado": true
+    },
+    "AH270WG": {
+        "marca": "peugeot",
+        "modelo": "208",
+        "calidad": "nuevo",
+        "año": 2025,
+        "precio": 87.5,
         "categoria": "sedan_hatchback",
         "estado": true
     }

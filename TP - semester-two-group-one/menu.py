@@ -22,7 +22,9 @@ Tema del trabajo: Administracion de una concesionaria (catalogo de autos + alqui
 import crud as cd
 import usuarios as us
 import informe as inf
+import matplotlib.pyplot as plt
 from pathlib import Path
+
 
 
 # Mapeo de la opcion de menu a la categoria interna usada en autos.json.
@@ -285,17 +287,51 @@ def estado_rentas():
 def informe_estadisticas():
     """
     Muestra estadisticas del catalogo de autos.
-
-    NOTA (funcion incompleta / placeholder): por ahora solo imprime "hola";
-    falta implementarla (Req 8 del TP: reporte matricial).
-
-    Returns:
-        None
     """
-    # TODO(TP - Req 8): calcular y mostrar las estadisticas.
-    # RECOMENDACION (Req 8): armar la matriz con pandas igual que en ver_stock, por ejemplo un DataFrame con filas =
-    # categoria y columnas = cantidad de autos disponibles y rentados, impreso con .T (reporte matricial).
-    print("hola")
+    cd.limpiar()
+    datos : dict = cd._cargar_autos()
+    autos_excel_modificado = (cd.pd.DataFrame(datos)).T
+    
+    midf_true = autos_excel_modificado[autos_excel_modificado["estado"] == True].groupby(autos_excel_modificado["marca"]).size()
+    lista_estados_totales = autos_excel_modificado["estado"].value_counts()
+
+    colores_barras = [
+    "#4D96FF",
+    "#FF6B6B",
+    "#6BCB77",
+    "#FFD93D",
+    "#9B51E0",
+    "#FF9F45",
+    "#2EC4B6",
+    ]      
+
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
+    
+    ax1.bar(midf_true.index.str.capitalize(), 
+            midf_true.values,
+            color=colores_barras,)
+    ax1.set_title("Autos disponibles (por marcas)", 
+                fontsize=16,
+                fontweight="bold",
+                loc="center",
+                )
+    
+    ax2.pie(lista_estados_totales, 
+            # labels="Disponibles" for i in lista_estados_totales if i == True else "Ocupados",
+            autopct="%0.1f%%",
+            colors=["#6BCB77","#FF6B6B"],
+            textprops={"fontsize": 20,
+            "fontfamily": "sans-serif",},)
+    ax2.set_title("Autos disponibles y rentados", 
+                fontsize=16,
+                fontweight="bold",
+                loc="center",
+                )
+    
+    plt.tight_layout()
+    plt.show()
+    
+    input("Enter para salir: ")
 
 def menu_principal():   
     """
